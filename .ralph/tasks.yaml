@@ -3,8 +3,8 @@
 # DO NOT EDIT - regenerated on task file change
 
 source_file: RALPH_TASK.md
-source_mtime: 1769587406
-generated_at: 2026-01-28T08:03:37Z
+source_mtime: 1769587429
+generated_at: 2026-01-28T08:04:38Z
 
 tasks:
   - id: "line_26"
@@ -247,9 +247,9 @@ tasks:
     raw_marker: -
   - id: "line_72"
     line_number: 72
-    status: pending
+    status: completed
     parallel_group: 999999
-    description: T031 [数据模型] 定义愿望表单验证规则 `frontend/src/utils/validation.ts`
+    description: T031 [数据模型] 定义愿望表单验证规则 `src/utils/validation.js`
     indent_level: 0
     raw_marker: -
   - id: "line_73"
