@@ -1,11 +1,6 @@
-/**
- * 日志记录和监控工具
- * 提供统一的日志记录功能，支持多种日志级别和输出方式
- */
-
-import { Request } from 'express'
 import * as fs from 'fs'
 import * as path from 'path'
+import { Request, Response } from 'express'
 
 /**
  * 日志级别枚举
@@ -14,28 +9,17 @@ export enum LogLevel {
   DEBUG = 0,
   INFO = 1,
   WARN = 2,
-  ERROR = 3,
-  FATAL = 4
+  ERROR = 3
 }
 
 /**
- * 日志配置接口
+ * 日志级别名称映射
  */
-export interface LoggerConfig {
-  /** 日志级别，低于此级别的日志不会被记录 */
-  level?: LogLevel
-  /** 是否输出到控制台 */
-  console?: boolean
-  /** 是否输出到文件 */
-  file?: boolean
-  /** 日志文件目录 */
-  logDir?: string
-  /** 日志文件最大大小（字节），默认10MB */
-  maxFileSize?: number
-  /** 保留的日志文件数量，默认10个 */
-  maxFiles?: number
-  /** 是否启用性能监控 */
-  enablePerformance?: boolean
+const LOG_LEVEL_NAMES: Record<LogLevel, string> = {
+  [LogLevel.DEBUG]: 'DEBUG',
+  [LogLevel.INFO]: 'INFO',
+  [LogLevel.WARN]: 'WARN',
+  [LogLevel.ERROR]: 'ERROR'
 }
 
 /**
@@ -43,300 +27,412 @@ export interface LoggerConfig {
  */
 export interface LogEntry {
   level: LogLevel
+  levelName: string
   message: string
   timestamp: string
-  data?: any
-  error?: Error
-  context?: Record<string, any>
-  performance?: {
-    duration: number
-    operation: string
-  }
+  service?: string
+  method?: string
+  path?: string
+  statusCode?: number
+  duration?: number
+  error?: string | Error
+  userId?: string
+  ip?: string
+  metadata?: Record<string, any>
 }
 
 /**
- * 日志工具类
+ * 性能监控指标接口
  */
-class Logger {
-  private config: Required<LoggerConfig>
-  private logStream: fs.WriteStream | null = null
-  private currentLogFile: string | null = null
+export interface PerformanceMetrics {
+  requestCount: number
+  errorCount: number
+  averageResponseTime: number
+  slowestRequests: Array<{
+    method: string
+    path: string
+    duration: number
+    timestamp: string
+  }>
+  errorRate: number
+}
 
-  constructor(config: LoggerConfig = {}) {
+/**
+ * 日志配置接口
+ */
+interface LoggerConfig {
+  level: LogLevel
+  enableFileLogging: boolean
+  enableConsoleLogging: boolean
+  logDir: string
+  maxFileSize: number // 字节
+  maxFiles: number
+  enableJsonFormat: boolean
+  enablePerformanceMonitoring: boolean
+}
+
+/**
+ * 日志记录和监控工具类
+ */
+class LoggerService {
+  private config: LoggerConfig
+  private logStream: fs.WriteStream | null = null
+  private currentLogFile: string = ''
+  private performanceMetrics: PerformanceMetrics = {
+    requestCount: 0,
+    errorCount: 0,
+    averageResponseTime: 0,
+    slowestRequests: [],
+    errorRate: 0
+  }
+  private responseTimes: number[] = []
+
+  constructor() {
+    // 从环境变量读取配置
+    const logLevel = process.env.LOG_LEVEL || 'INFO'
     this.config = {
-      level: config.level ?? (process.env.NODE_ENV === 'production' ? LogLevel.INFO : LogLevel.DEBUG),
-      console: config.console ?? true,
-      file: config.file ?? true,
-      logDir: config.logDir ?? path.join(process.cwd(), 'logs'),
-      maxFileSize: config.maxFileSize ?? 10 * 1024 * 1024, // 10MB
-      maxFiles: config.maxFiles ?? 10,
-      enablePerformance: config.enablePerformance ?? true
+      level: this.parseLogLevel(logLevel),
+      enableFileLogging: process.env.ENABLE_FILE_LOGGING === 'true',
+      enableConsoleLogging: process.env.ENABLE_CONSOLE_LOGGING !== 'false',
+      logDir: process.env.LOG_DIR || path.join(process.cwd(), 'logs'),
+      maxFileSize: parseInt(process.env.MAX_LOG_FILE_SIZE || '10485760', 10), // 默认10MB
+      maxFiles: parseInt(process.env.MAX_LOG_FILES || '10', 10),
+      enableJsonFormat: process.env.LOG_JSON_FORMAT === 'true',
+      enablePerformanceMonitoring: process.env.ENABLE_PERFORMANCE_MONITORING !== 'false'
     }
 
     // 确保日志目录存在
-    if (this.config.file && !fs.existsSync(this.config.logDir)) {
-      fs.mkdirSync(this.config.logDir, { recursive: true })
+    if (this.config.enableFileLogging) {
+      this.ensureLogDirectory()
+      this.initializeLogFile()
     }
+  }
 
-    // 初始化日志文件流
-    if (this.config.file) {
-      this.initLogFile()
+  /**
+   * 解析日志级别字符串
+   */
+  private parseLogLevel(level: string): LogLevel {
+    const upperLevel = level.toUpperCase()
+    switch (upperLevel) {
+      case 'DEBUG':
+        return LogLevel.DEBUG
+      case 'INFO':
+        return LogLevel.INFO
+      case 'WARN':
+        return LogLevel.WARN
+      case 'ERROR':
+        return LogLevel.ERROR
+      default:
+        return LogLevel.INFO
+    }
+  }
+
+  /**
+   * 确保日志目录存在
+   */
+  private ensureLogDirectory(): void {
+    if (!fs.existsSync(this.config.logDir)) {
+      fs.mkdirSync(this.config.logDir, { recursive: true })
     }
   }
 
   /**
    * 初始化日志文件
    */
-  private initLogFile(): void {
+  private initializeLogFile(): void {
     const date = new Date().toISOString().split('T')[0]
     this.currentLogFile = path.join(this.config.logDir, `app-${date}.log`)
 
-    try {
-      this.logStream = fs.createWriteStream(this.currentLogFile, { flags: 'a' })
-    } catch (error) {
-      console.error('无法创建日志文件:', error)
-      this.logStream = null
+    // 如果文件存在且超过最大大小，进行轮转
+    if (fs.existsSync(this.currentLogFile)) {
+      const stats = fs.statSync(this.currentLogFile)
+      if (stats.size >= this.config.maxFileSize) {
+        this.rotateLogFile()
+      }
     }
+
+    // 创建写入流
+    this.logStream = fs.createWriteStream(this.currentLogFile, { flags: 'a' })
   }
 
   /**
-   * 检查日志文件大小，如果超过限制则轮转
+   * 轮转日志文件
    */
   private rotateLogFile(): void {
-    if (!this.logStream || !this.currentLogFile) {
+    if (!fs.existsSync(this.currentLogFile)) {
       return
     }
 
-    try {
-      const stats = fs.statSync(this.currentLogFile)
-      if (stats.size >= this.config.maxFileSize) {
-        // 关闭当前文件流
-        this.logStream.end()
+    // 查找已存在的轮转文件
+    let rotationIndex = 1
+    let rotatedFile = `${this.currentLogFile}.${rotationIndex}`
 
-        // 重命名当前文件
-        const timestamp = Date.now()
-        const rotatedFile = this.currentLogFile.replace('.log', `-${timestamp}.log`)
-        fs.renameSync(this.currentLogFile, rotatedFile)
-
-        // 清理旧日志文件
-        this.cleanupOldLogs()
-
-        // 创建新的日志文件
-        this.initLogFile()
-      }
-    } catch (error) {
-      console.error('日志文件轮转失败:', error)
+    while (fs.existsSync(rotatedFile) && rotationIndex < this.config.maxFiles) {
+      rotationIndex++
+      rotatedFile = `${this.currentLogFile}.${rotationIndex}`
     }
+
+    // 如果达到最大文件数，删除最旧的文件
+    if (rotationIndex >= this.config.maxFiles) {
+      const oldestFile = `${this.currentLogFile}.1`
+      if (fs.existsSync(oldestFile)) {
+        fs.unlinkSync(oldestFile)
+      }
+      // 重命名所有文件
+      for (let i = this.config.maxFiles - 1; i >= 1; i--) {
+        const oldFile = `${this.currentLogFile}.${i}`
+        const newFile = `${this.currentLogFile}.${i + 1}`
+        if (fs.existsSync(oldFile)) {
+          fs.renameSync(oldFile, newFile)
+        }
+      }
+      rotationIndex = 1
+    }
+
+    // 重命名当前文件
+    fs.renameSync(this.currentLogFile, `${this.currentLogFile}.${rotationIndex}`)
   }
 
   /**
-   * 清理旧的日志文件
+   * 格式化日志条目
    */
-  private cleanupOldLogs(): void {
-    try {
-      const files = fs.readdirSync(this.config.logDir)
-        .filter(file => file.startsWith('app-') && file.endsWith('.log'))
-        .map(file => ({
-          name: file,
-          path: path.join(this.config.logDir, file),
-          mtime: fs.statSync(path.join(this.config.logDir, file)).mtime
-        }))
-        .sort((a, b) => b.mtime.getTime() - a.mtime.getTime())
-
-      // 删除超出数量限制的文件
-      if (files.length > this.config.maxFiles) {
-        const filesToDelete = files.slice(this.config.maxFiles)
-        filesToDelete.forEach(file => {
-          try {
-            fs.unlinkSync(file.path)
-          } catch (error) {
-            console.error(`删除日志文件失败: ${file.name}`, error)
-          }
-        })
-      }
-    } catch (error) {
-      console.error('清理旧日志文件失败:', error)
+  private formatLogEntry(entry: LogEntry): string {
+    if (this.config.enableJsonFormat) {
+      return JSON.stringify({
+        ...entry,
+        error: entry.error instanceof Error ? entry.error.stack : entry.error
+      })
     }
-  }
 
-  /**
-   * 格式化日志消息
-   */
-  private formatMessage(entry: LogEntry): string {
-    const parts = [
-      `[${entry.timestamp}]`,
-      `[${LogLevel[entry.level]}]`,
-      entry.message
-    ]
+    const parts = [`[${entry.timestamp}]`, `[${entry.levelName}]`, entry.message]
 
-    if (entry.context) {
-      parts.push(`Context: ${JSON.stringify(entry.context)}`)
+    if (entry.service) {
+      parts.push(`[${entry.service}]`)
+    }
+
+    if (entry.method && entry.path) {
+      parts.push(`${entry.method} ${entry.path}`)
+    }
+
+    if (entry.statusCode) {
+      parts.push(`Status: ${entry.statusCode}`)
+    }
+
+    if (entry.duration !== undefined) {
+      parts.push(`Duration: ${entry.duration}ms`)
+    }
+
+    if (entry.userId) {
+      parts.push(`User: ${entry.userId}`)
+    }
+
+    if (entry.ip) {
+      parts.push(`IP: ${entry.ip}`)
     }
 
     if (entry.error) {
-      parts.push(`Error: ${entry.error.message}`)
-      if (entry.error.stack) {
-        parts.push(`Stack: ${entry.error.stack}`)
+      const errorStr = entry.error instanceof Error ? entry.error.stack : String(entry.error)
+      parts.push(`Error: ${errorStr}`)
+    }
+
+    if (entry.metadata && Object.keys(entry.metadata).length > 0) {
+      parts.push(`Metadata: ${JSON.stringify(entry.metadata)}`)
+    }
+
+    return parts.join(' | ')
+  }
+
+  /**
+   * 写入日志
+   */
+  private writeLog(entry: LogEntry): void {
+    // 检查日志级别
+    if (entry.level < this.config.level) {
+      return
+    }
+
+    const formattedMessage = this.formatLogEntry(entry)
+
+    // 控制台输出
+    if (this.config.enableConsoleLogging) {
+      switch (entry.level) {
+        case LogLevel.DEBUG:
+          console.debug(formattedMessage)
+          break
+        case LogLevel.INFO:
+          console.info(formattedMessage)
+          break
+        case LogLevel.WARN:
+          console.warn(formattedMessage)
+          break
+        case LogLevel.ERROR:
+          console.error(formattedMessage)
+          break
       }
     }
 
-    if (entry.performance) {
-      parts.push(`Performance: ${entry.performance.operation} took ${entry.performance.duration}ms`)
+    // 文件输出
+    if (this.config.enableFileLogging && this.logStream) {
+      // 检查文件大小，必要时轮转
+      const stats = fs.statSync(this.currentLogFile)
+      if (stats.size >= this.config.maxFileSize) {
+        this.rotateLogFile()
+        this.initializeLogFile()
+      }
+
+      this.logStream.write(formattedMessage + '\n')
     }
 
-    if (entry.data) {
-      parts.push(`Data: ${JSON.stringify(entry.data)}`)
-    }
-
-    return parts.join(' ')
-  }
-
-  /**
-   * 获取日志级别对应的颜色（用于控制台输出）
-   */
-  private getLevelColor(level: LogLevel): string {
-    switch (level) {
-      case LogLevel.DEBUG:
-        return '\x1b[36m' // 青色
-      case LogLevel.INFO:
-        return '\x1b[32m' // 绿色
-      case LogLevel.WARN:
-        return '\x1b[33m' // 黄色
-      case LogLevel.ERROR:
-      case LogLevel.FATAL:
-        return '\x1b[31m' // 红色
-      default:
-        return '\x1b[0m' // 默认
+    // 性能监控
+    if (this.config.enablePerformanceMonitoring && entry.duration !== undefined) {
+      this.updatePerformanceMetrics(entry)
     }
   }
 
   /**
-   * 重置颜色
+   * 更新性能指标
    */
-  private resetColor(): string {
-    return '\x1b[0m'
+  private updatePerformanceMetrics(entry: LogEntry): void {
+    this.performanceMetrics.requestCount++
+
+    if (entry.statusCode && entry.statusCode >= 400) {
+      this.performanceMetrics.errorCount++
+    }
+
+    if (entry.duration !== undefined) {
+      this.responseTimes.push(entry.duration)
+
+      // 保持最近1000个响应时间
+      if (this.responseTimes.length > 1000) {
+        this.responseTimes.shift()
+      }
+
+      // 计算平均响应时间
+      const sum = this.responseTimes.reduce((a, b) => a + b, 0)
+      this.performanceMetrics.averageResponseTime = Math.round(sum / this.responseTimes.length)
+
+      // 更新最慢请求列表（保留前10个）
+      if (entry.method && entry.path) {
+        this.performanceMetrics.slowestRequests.push({
+          method: entry.method,
+          path: entry.path,
+          duration: entry.duration,
+          timestamp: entry.timestamp
+        })
+
+        // 按响应时间降序排序，保留前10个
+        this.performanceMetrics.slowestRequests.sort((a, b) => b.duration - a.duration)
+        if (this.performanceMetrics.slowestRequests.length > 10) {
+          this.performanceMetrics.slowestRequests = this.performanceMetrics.slowestRequests.slice(
+            0,
+            10
+          )
+        }
+      }
+    }
+
+    // 计算错误率
+    if (this.performanceMetrics.requestCount > 0) {
+      this.performanceMetrics.errorRate =
+        (this.performanceMetrics.errorCount / this.performanceMetrics.requestCount) * 100
+    }
   }
 
   /**
-   * 记录日志
+   * 记录DEBUG级别日志
    */
-  private log(level: LogLevel, message: string, data?: any, error?: Error, context?: Record<string, any>): void {
-    // 检查日志级别
-    if (level < this.config.level) {
-      return
-    }
-
-    const entry: LogEntry = {
-      level,
+  debug(message: string, meta?: Partial<LogEntry>): void {
+    this.writeLog({
+      level: LogLevel.DEBUG,
+      levelName: LOG_LEVEL_NAMES[LogLevel.DEBUG],
       message,
       timestamp: new Date().toISOString(),
-      data,
-      error,
-      context
-    }
-
-    const formattedMessage = this.formatMessage(entry)
-
-    // 输出到控制台
-    if (this.config.console) {
-      const color = this.getLevelColor(level)
-      const reset = this.resetColor()
-      console.log(`${color}${formattedMessage}${reset}`)
-    }
-
-    // 输出到文件
-    if (this.config.file && this.logStream) {
-      this.logStream.write(formattedMessage + '\n')
-      this.rotateLogFile()
-    }
+      ...meta
+    })
   }
 
   /**
-   * Debug级别日志
+   * 记录INFO级别日志
    */
-  debug(message: string, data?: any, context?: Record<string, any>): void {
-    this.log(LogLevel.DEBUG, message, data, undefined, context)
-  }
-
-  /**
-   * Info级别日志
-   */
-  info(message: string, data?: any, context?: Record<string, any>): void {
-    this.log(LogLevel.INFO, message, data, undefined, context)
-  }
-
-  /**
-   * Warn级别日志
-   */
-  warn(message: string, data?: any, context?: Record<string, any>): void {
-    this.log(LogLevel.WARN, message, data, undefined, context)
-  }
-
-  /**
-   * Error级别日志
-   */
-  error(message: string, error?: Error, data?: any, context?: Record<string, any>): void {
-    this.log(LogLevel.ERROR, message, data, error, context)
-  }
-
-  /**
-   * Fatal级别日志
-   */
-  fatal(message: string, error?: Error, data?: any, context?: Record<string, any>): void {
-    this.log(LogLevel.FATAL, message, data, error, context)
-  }
-
-  /**
-   * 性能监控：记录操作耗时
-   */
-  performance(operation: string, duration: number, context?: Record<string, any>): void {
-    if (!this.config.enablePerformance) {
-      return
-    }
-
-    const entry: LogEntry = {
+  info(message: string, meta?: Partial<LogEntry>): void {
+    this.writeLog({
       level: LogLevel.INFO,
-      message: `Performance: ${operation}`,
+      levelName: LOG_LEVEL_NAMES[LogLevel.INFO],
+      message,
       timestamp: new Date().toISOString(),
-      performance: {
-        duration,
-        operation
-      },
-      context
-    }
-
-    const formattedMessage = this.formatMessage(entry)
-
-    if (this.config.console) {
-      console.log(`\x1b[35m${formattedMessage}\x1b[0m`) // 紫色
-    }
-
-    if (this.config.file && this.logStream) {
-      this.logStream.write(formattedMessage + '\n')
-      this.rotateLogFile()
-    }
+      ...meta
+    })
   }
 
   /**
-   * HTTP请求日志
+   * 记录WARN级别日志
    */
-  httpRequest(req: Request, statusCode: number, duration: number): void {
-    const context = {
+  warn(message: string, meta?: Partial<LogEntry>): void {
+    this.writeLog({
+      level: LogLevel.WARN,
+      levelName: LOG_LEVEL_NAMES[LogLevel.WARN],
+      message,
+      timestamp: new Date().toISOString(),
+      ...meta
+    })
+  }
+
+  /**
+   * 记录ERROR级别日志
+   */
+  error(message: string, error?: Error | string, meta?: Partial<LogEntry>): void {
+    this.writeLog({
+      level: LogLevel.ERROR,
+      levelName: LOG_LEVEL_NAMES[LogLevel.ERROR],
+      message,
+      timestamp: new Date().toISOString(),
+      error: error instanceof Error ? error : error,
+      ...meta
+    })
+  }
+
+  /**
+   * 记录HTTP请求日志
+   */
+  logRequest(req: Request, res: Response, duration: number): void {
+    const entry: Partial<LogEntry> = {
       method: req.method,
       path: req.path,
-      statusCode,
+      statusCode: res.statusCode,
       duration,
       ip: req.ip || req.socket.remoteAddress,
-      userAgent: req.get('user-agent')
+      userId: (req as any).user?.id,
+      service: 'http'
     }
 
-    if (statusCode >= 500) {
-      this.error(`HTTP ${req.method} ${req.path}`, undefined, { statusCode, duration }, context)
-    } else if (statusCode >= 400) {
-      this.warn(`HTTP ${req.method} ${req.path}`, { statusCode, duration }, context)
+    if (res.statusCode >= 500) {
+      this.error('请求处理失败', undefined, entry)
+    } else if (res.statusCode >= 400) {
+      this.warn('请求处理警告', entry)
     } else {
-      this.info(`HTTP ${req.method} ${req.path}`, { statusCode, duration }, context)
+      this.info('请求处理成功', entry)
     }
+  }
+
+  /**
+   * 获取性能指标
+   */
+  getPerformanceMetrics(): PerformanceMetrics {
+    return { ...this.performanceMetrics }
+  }
+
+  /**
+   * 重置性能指标
+   */
+  resetPerformanceMetrics(): void {
+    this.performanceMetrics = {
+      requestCount: 0,
+      errorCount: 0,
+      averageResponseTime: 0,
+      slowestRequests: [],
+      errorRate: 0
+    }
+    this.responseTimes = []
   }
 
   /**
@@ -350,14 +446,62 @@ class Logger {
   }
 }
 
-// 创建默认logger实例
-const logger = new Logger({
-  level: process.env.NODE_ENV === 'production' ? LogLevel.INFO : LogLevel.DEBUG,
-  console: true,
-  file: process.env.NODE_ENV === 'production',
-  logDir: path.join(process.cwd(), 'logs'),
-  enablePerformance: true
-})
+/**
+ * 日志服务单例
+ */
+export const logger = new LoggerService()
 
-export default logger
-export { Logger, LogLevel, LoggerConfig, LogEntry }
+/**
+ * HTTP请求日志中间件
+ * 记录所有HTTP请求的详细信息
+ */
+export const requestLogger = (req: Request, res: Response, next: () => void): void => {
+  const startTime = Date.now()
+
+  // 监听响应完成
+  res.on('finish', () => {
+    const duration = Date.now() - startTime
+    logger.logRequest(req, res, duration)
+  })
+
+  next()
+}
+
+/**
+ * 错误监控中间件
+ * 捕获并记录未处理的错误
+ */
+export const errorMonitor = (error: Error, req?: Request, res?: Response): void => {
+  logger.error('未处理的错误', error, {
+    service: 'error-monitor',
+    method: req?.method,
+    path: req?.path,
+    ip: req?.ip || req?.socket.remoteAddress,
+    userId: (req as any)?.user?.id
+  })
+}
+
+/**
+ * 性能监控中间件
+ * 记录慢请求和性能问题
+ */
+export const performanceMonitor = (req: Request, res: Response, next: () => void): void => {
+  const startTime = Date.now()
+  const slowRequestThreshold = parseInt(process.env.SLOW_REQUEST_THRESHOLD || '1000', 10) // 默认1秒
+
+  res.on('finish', () => {
+    const duration = Date.now() - startTime
+
+    if (duration > slowRequestThreshold) {
+      logger.warn('检测到慢请求', {
+        method: req.method,
+        path: req.path,
+        duration,
+        threshold: slowRequestThreshold,
+        service: 'performance-monitor'
+      })
+    }
+  })
+
+  next()
+}
