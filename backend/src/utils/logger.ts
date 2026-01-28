@@ -471,7 +471,7 @@ export const requestLogger = (req: Request, res: Response, next: () => void): vo
  * 错误监控中间件
  * 捕获并记录未处理的错误
  */
-export const errorMonitor = (error: Error, req?: Request, res?: Response): void => {
+export const errorMonitor = (error: Error, req?: Request): void => {
   logger.error('未处理的错误', error, {
     service: 'error-monitor',
     method: req?.method,
@@ -497,7 +497,7 @@ export const performanceMonitor = (req: Request, res: Response, next: () => void
         method: req.method,
         path: req.path,
         duration,
-        threshold: slowRequestThreshold,
+        metadata: { threshold: slowRequestThreshold },
         service: 'performance-monitor'
       })
     }

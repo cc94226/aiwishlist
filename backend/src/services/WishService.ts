@@ -96,15 +96,15 @@ export class WishService {
         sortBy,
         sortOrder
       })
-      const cached = await cacheService.get<WishQueryResult>(cacheKey)
-      if (cached !== null) {
+      const cached = cacheService.get<WishQueryResult>(cacheKey)
+      if (cached !== undefined) {
         return cached
       }
     }
 
     try {
       const result = await WishModel.findAll(queryOptions)
-      
+
       // 缓存结果（仅对已发布状态的查询进行缓存，且不包含用户特定查询）
       if (!userId && !search && queryStatus === 'published') {
         const cacheKey = CacheKeys.wishList({
@@ -115,9 +115,9 @@ export class WishService {
           sortBy,
           sortOrder
         })
-        await cacheService.set(cacheKey, result, 300) // 缓存5分钟
+        cacheService.set(cacheKey, result, 300) // 缓存5分钟
       }
-      
+
       return result
     } catch (error) {
       if (error instanceof AppError) {
@@ -144,8 +144,8 @@ export class WishService {
     const cacheService = getCacheService()
     if (!userId && !isAdmin) {
       const cacheKey = CacheKeys.wishDetail(id)
-      const cached = await cacheService.get<Wish>(cacheKey)
-      if (cached !== null && cached.status === 'published') {
+      const cached = cacheService.get<Wish>(cacheKey)
+      if (cached !== undefined && cached.status === 'published') {
         return cached
       }
     }
@@ -175,7 +175,7 @@ export class WishService {
       // 缓存结果（仅对已发布状态的愿望进行缓存，且不包含用户特定权限）
       if (!userId && !isAdmin && wish.status === 'published') {
         const cacheKey = CacheKeys.wishDetail(id)
-        await cacheService.set(cacheKey, wish, 600) // 缓存10分钟
+        cacheService.set(cacheKey, wish, 600) // 缓存10分钟
       }
 
       return wish
@@ -193,14 +193,7 @@ export class WishService {
    * @returns Promise<WishQueryResult> 搜索结果和分页信息
    */
   static async searchWish(request: SearchWishRequest): Promise<WishQueryResult> {
-    const {
-      keyword,
-      job,
-      page = 1,
-      pageSize = 10,
-      userId,
-      isAdmin = false
-    } = request
+    const { keyword, job, page = 1, pageSize = 10, userId, isAdmin = false } = request
 
     // 验证搜索关键词
     if (!keyword || keyword.trim().length === 0) {
@@ -331,8 +324,8 @@ export class WishService {
     const cacheService = getCacheService()
     if (!isAdmin) {
       const cacheKey = CacheKeys.popularWishes(pageSize)
-      const cached = await cacheService.get<WishQueryResult>(cacheKey)
-      if (cached !== null) {
+      const cached = cacheService.get<WishQueryResult>(cacheKey)
+      if (cached !== undefined) {
         return cached
       }
     }
@@ -347,13 +340,13 @@ export class WishService {
 
     try {
       const result = await WishModel.findAll(queryOptions)
-      
+
       // 缓存结果（仅对普通用户的查询进行缓存）
       if (!isAdmin) {
         const cacheKey = CacheKeys.popularWishes(pageSize)
-        await cacheService.set(cacheKey, result, 300) // 缓存5分钟
+        cacheService.set(cacheKey, result, 300) // 缓存5分钟
       }
-      
+
       return result
     } catch (error) {
       if (error instanceof AppError) {
@@ -379,8 +372,8 @@ export class WishService {
     const cacheService = getCacheService()
     if (!isAdmin) {
       const cacheKey = CacheKeys.latestWishes(pageSize)
-      const cached = await cacheService.get<WishQueryResult>(cacheKey)
-      if (cached !== null) {
+      const cached = cacheService.get<WishQueryResult>(cacheKey)
+      if (cached !== undefined) {
         return cached
       }
     }
@@ -395,13 +388,13 @@ export class WishService {
 
     try {
       const result = await WishModel.findAll(queryOptions)
-      
+
       // 缓存结果（仅对普通用户的查询进行缓存）
       if (!isAdmin) {
         const cacheKey = CacheKeys.latestWishes(pageSize)
-        await cacheService.set(cacheKey, result, 180) // 缓存3分钟（最新列表更新频繁）
+        cacheService.set(cacheKey, result, 180) // 缓存3分钟（最新列表更新频繁）
       }
-      
+
       return result
     } catch (error) {
       if (error instanceof AppError) {

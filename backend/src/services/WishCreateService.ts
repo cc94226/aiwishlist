@@ -137,12 +137,12 @@ export class WishCreateService {
       }
 
       const wish = await WishModel.create(wishData)
-      
+
       // 清除相关缓存
       const cacheService = getCacheService()
-      await cacheService.deletePattern('wish:*') // 清除所有愿望相关缓存
-      await cacheService.delete(CacheKeys.categoryStats()) // 清除岗位统计缓存
-      
+      cacheService.deletePattern('wish:*') // 清除所有愿望相关缓存
+      cacheService.delete(CacheKeys.categoryStats(false)) // 清除岗位统计缓存
+
       return wish
     } catch (error) {
       if (error instanceof AppError) {
@@ -250,17 +250,17 @@ export class WishCreateService {
       }
 
       const wish = await WishModel.update(id, updateData)
-      
+
       // 清除相关缓存
       const cacheService = getCacheService()
-      await cacheService.delete(CacheKeys.wishDetail(id)) // 清除愿望详情缓存
-      await cacheService.deletePattern('wish:list:*') // 清除愿望列表缓存
-      await cacheService.deletePattern('wish:popular:*') // 清除热门愿望缓存
-      await cacheService.deletePattern('wish:latest:*') // 清除最新愿望缓存
+      cacheService.delete(CacheKeys.wishDetail(id)) // 清除愿望详情缓存
+      cacheService.deletePattern('wish:list:*') // 清除愿望列表缓存
+      cacheService.deletePattern('wish:popular:*') // 清除热门愿望缓存
+      cacheService.deletePattern('wish:latest:*') // 清除最新愿望缓存
       if (job !== undefined || existingWish.job !== job) {
-        await cacheService.delete(CacheKeys.categoryStats()) // 如果岗位改变，清除岗位统计缓存
+        cacheService.delete(CacheKeys.categoryStats(false)) // 如果岗位改变，清除岗位统计缓存
       }
-      
+
       return wish
     } catch (error) {
       if (error instanceof AppError) {
@@ -302,16 +302,15 @@ export class WishCreateService {
     }
 
     try {
-      const deletedWish = existingWish // 保存被删除的愿望信息用于清除缓存
       await WishModel.delete(id)
-      
+
       // 清除相关缓存
       const cacheService = getCacheService()
-      await cacheService.delete(CacheKeys.wishDetail(id)) // 清除愿望详情缓存
-      await cacheService.deletePattern('wish:list:*') // 清除愿望列表缓存
-      await cacheService.deletePattern('wish:popular:*') // 清除热门愿望缓存
-      await cacheService.deletePattern('wish:latest:*') // 清除最新愿望缓存
-      await cacheService.delete(CacheKeys.categoryStats()) // 清除岗位统计缓存
+      cacheService.delete(CacheKeys.wishDetail(id)) // 清除愿望详情缓存
+      cacheService.deletePattern('wish:list:*') // 清除愿望列表缓存
+      cacheService.deletePattern('wish:popular:*') // 清除热门愿望缓存
+      cacheService.deletePattern('wish:latest:*') // 清除最新愿望缓存
+      cacheService.delete(CacheKeys.categoryStats(false)) // 清除岗位统计缓存
     } catch (error) {
       if (error instanceof AppError) {
         throw error
@@ -358,15 +357,15 @@ export class WishCreateService {
 
     try {
       const wish = await WishModel.update(id, { status: 'published' })
-      
+
       // 清除相关缓存（发布愿望会影响列表和统计）
       const cacheService = getCacheService()
-      await cacheService.delete(CacheKeys.wishDetail(id)) // 清除愿望详情缓存
-      await cacheService.deletePattern('wish:list:*') // 清除愿望列表缓存
-      await cacheService.deletePattern('wish:popular:*') // 清除热门愿望缓存
-      await cacheService.deletePattern('wish:latest:*') // 清除最新愿望缓存
-      await cacheService.delete(CacheKeys.categoryStats()) // 清除岗位统计缓存
-      
+      cacheService.delete(CacheKeys.wishDetail(id)) // 清除愿望详情缓存
+      cacheService.deletePattern('wish:list:*') // 清除愿望列表缓存
+      cacheService.deletePattern('wish:popular:*') // 清除热门愿望缓存
+      cacheService.deletePattern('wish:latest:*') // 清除最新愿望缓存
+      cacheService.delete(CacheKeys.categoryStats(false)) // 清除岗位统计缓存
+
       return wish
     } catch (error) {
       if (error instanceof AppError) {
@@ -406,15 +405,15 @@ export class WishCreateService {
 
     try {
       const wish = await WishModel.update(id, { status: 'archived' })
-      
+
       // 清除相关缓存（下架愿望会影响列表和统计）
       const cacheService = getCacheService()
-      await cacheService.delete(CacheKeys.wishDetail(id)) // 清除愿望详情缓存
-      await cacheService.deletePattern('wish:list:*') // 清除愿望列表缓存
-      await cacheService.deletePattern('wish:popular:*') // 清除热门愿望缓存
-      await cacheService.deletePattern('wish:latest:*') // 清除最新愿望缓存
-      await cacheService.delete(CacheKeys.categoryStats()) // 清除岗位统计缓存
-      
+      cacheService.delete(CacheKeys.wishDetail(id)) // 清除愿望详情缓存
+      cacheService.deletePattern('wish:list:*') // 清除愿望列表缓存
+      cacheService.deletePattern('wish:popular:*') // 清除热门愿望缓存
+      cacheService.deletePattern('wish:latest:*') // 清除最新愿望缓存
+      cacheService.delete(CacheKeys.categoryStats(false)) // 清除岗位统计缓存
+
       return wish
     } catch (error) {
       if (error instanceof AppError) {

@@ -1,9 +1,4 @@
-/**
- * 缓存服务
- * 提供统一的数据缓存策略，支持内存缓存和Redis缓存
- */
-
-// import { AppError } from '../middleware/errorHandler' // 暂时未使用
+import { LRUCache } from 'lru-cache'
 
 /**
  * 缓存配置接口
@@ -13,100 +8,36 @@ export interface CacheConfig {
   defaultTTL?: number
   /** 是否启用缓存 */
   enabled?: boolean
-  /** Redis配置（可选） */
-  redis?: {
-    host: string
-    port: number
-    password?: string
-    db?: number
-  } | null
+  /** 最大缓存项数量 */
+  max?: number
 }
-
-/**
- * 缓存项接口
- */
-interface CacheItem<T> {
-  /** 缓存数据 */
-  data: T
-  /** 过期时间戳（毫秒） */
-  expiresAt: number
-  /** 创建时间戳（毫秒） */
-  createdAt: number
-}
-
-/**
- * 缓存键生成器类型
- */
-export type CacheKeyGenerator = (...args: any[]) => string
 
 /**
  * 缓存服务类
- * 提供内存缓存和可选的Redis缓存支持
+ * 提供基于LRU（最近最少使用）策略的内存缓存
  */
 export class CacheService {
-  private memoryCache: Map<string, CacheItem<any>>
-  private redisClient: any = null
+  private cache: LRUCache<string, any>
   private config: {
     defaultTTL: number
     enabled: boolean
-    redis: { host: string; port: number; password?: string; db?: number } | null
+    max: number
   }
 
   constructor(config: CacheConfig = {}) {
     this.config = {
       defaultTTL: config.defaultTTL || 300, // 默认5分钟
       enabled: config.enabled !== false, // 默认启用
-      redis: config.redis || null
+      max: config.max || 100 // 默认最多100项
     }
 
-    // 初始化内存缓存
-    this.memoryCache = new Map()
-
-    // 如果配置了Redis，初始化Redis客户端
-    if (this.config.redis) {
-      this.initRedis()
-    }
-
-    // 启动过期清理任务
-    this.startCleanupTask()
-  }
-
-  /**
-   * 初始化Redis客户端
-   */
-  private async initRedis() {
-    try {
-      // 动态导入redis模块（如果安装了）
-      // 动态导入redis（如果安装了redis包）
-      // 使用try-catch处理redis模块不存在的情况
-      let redis: any = null
-      try {
-        // @ts-ignore - redis包是可选的
-        redis = await import('redis')
-      } catch {
-        // redis包未安装，使用内存缓存
-        redis = null
-      }
-      this.redisClient = redis.createClient({
-        socket: {
-          host: this.config.redis!.host,
-          port: this.config.redis!.port
-        },
-        password: this.config.redis!.password,
-        database: this.config.redis!.db || 0
-      })
-
-      this.redisClient.on('error', (err: Error) => {
-        console.error('Redis客户端错误:', err)
-        this.redisClient = null // 禁用Redis，回退到内存缓存
-      })
-
-      await this.redisClient.connect()
-      console.log('Redis缓存已连接')
-    } catch (error) {
-      console.warn('Redis未安装或连接失败，使用内存缓存:', error)
-      this.redisClient = null
-    }
+    // 初始化LRU缓存
+    this.cache = new LRUCache<string, any>({
+      max: this.config.max,
+      ttl: this.config.defaultTTL * 1000, // 转换为毫秒
+      updateAgeOnGet: true, // 访问时更新过期时间
+      updateAgeOnHas: false // 检查时不更新过期时间
+    })
   }
 
   /**
@@ -178,6 +109,48 @@ export class CacheService {
   }
 
   /**
+   * 批量删除缓存（支持模式匹配，兼容旧接口）
+   * @deprecated 使用deleteByPrefix代替
+   */
+  deletePattern(pattern: string): number {
+    // 简单的模式匹配：如果包含*，则作为前缀处理
+    if (pattern.includes('*')) {
+      const prefix = pattern.replace(/\*.*$/, '')
+      return this.deleteByPrefix(prefix)
+    }
+    // 否则作为前缀处理
+    return this.deleteByPrefix(pattern)
+  }
+
+  /**
+   * 批量删除缓存（支持通配符模式）
+   */
+  deletePattern(pattern: string): number {
+    let count = 0
+    const keysToDelete: string[] = []
+
+    // 将通配符模式转换为正则表达式
+    const regexPattern = pattern.replace(/\*/g, '.*').replace(/\?/g, '.')
+    const regex = new RegExp(`^${regexPattern}$`)
+
+    // 收集所有匹配模式的键
+    for (const key of this.cache.keys()) {
+      if (regex.test(key)) {
+        keysToDelete.push(key)
+      }
+    }
+
+    // 删除匹配的键
+    for (const key of keysToDelete) {
+      if (this.cache.delete(key)) {
+        count++
+      }
+    }
+
+    return count
+  }
+
+  /**
    * 清空所有缓存
    */
   clear(): void {
@@ -230,6 +203,8 @@ export const CacheKeys = {
     pageSize?: number
     sortBy?: string
     sortOrder?: string
+    userId?: string
+    isAdmin?: boolean
   }) => {
     return `wish:list:${JSON.stringify(params)}`
   },
@@ -246,7 +221,11 @@ export const CacheKeys = {
   },
 
   /** 岗位统计缓存键 */
-  categoryStats: () => 'category:stats',
+  categoryStats: (isAdmin?: boolean) => `category:stats:${isAdmin ? 'admin' : 'user'}`,
+
+  /** 岗位信息缓存键 */
+  categoryInfo: (job: string, isAdmin?: boolean) =>
+    `category:info:${job}:${isAdmin ? 'admin' : 'user'}`,
 
   /** 热门愿望缓存键 */
   popularWishes: (limit?: number) => `wish:popular:${limit || 10}`,

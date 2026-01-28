@@ -82,9 +82,9 @@ export class CategoryService {
     // 尝试从缓存获取（仅对普通用户的查询进行缓存）
     const cacheService = getCacheService()
     if (!isAdmin) {
-      const cacheKey = CacheKeys.categoryStats()
-      const cached = await cacheService.get<CategoryStats>(cacheKey)
-      if (cached !== null) {
+      const cacheKey = CacheKeys.categoryStats(isAdmin)
+      const cached = cacheService.get<CategoryStats>(cacheKey)
+      if (cached !== undefined) {
         return cached
       }
     }
@@ -158,8 +158,8 @@ export class CategoryService {
 
       // 缓存结果（仅对普通用户的查询进行缓存）
       if (!isAdmin) {
-        const cacheKey = CacheKeys.categoryStats()
-        await cacheService.set(cacheKey, result, 600) // 缓存10分钟
+        const cacheKey = CacheKeys.categoryStats(isAdmin)
+        cacheService.set(cacheKey, result, 600) // 缓存10分钟
       }
 
       return result
