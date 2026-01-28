@@ -1,0 +1,266 @@
+/**
+ * 响应式设计和移动端适配样式
+ * 提供移动端、平板和桌面端的响应式布局
+ */
+
+/* 移动端基础样式（默认，小于768px） */
+@media screen and (max-width: 767px) {
+  /* 导航栏移动端适配 */
+  .navbar .container {
+    flex-direction: column;
+    padding: 1rem;
+    gap: 1rem;
+  }
+
+  .logo {
+    font-size: 1.25rem;
+    text-align: center;
+  }
+
+  .nav-links {
+    flex-direction: column;
+    width: 100%;
+    gap: 0.5rem;
+  }
+
+  .nav-links a,
+  .user-name,
+  .btn-logout-nav {
+    width: 100%;
+    text-align: center;
+    padding: 0.75rem;
+  }
+
+  /* 主内容区域移动端适配 */
+  .main-content {
+    padding: 1rem;
+    margin: 1rem auto;
+  }
+
+  /* 卡片网格移动端适配 */
+  .wishes-grid,
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  /* 表单移动端适配 */
+  .form-group {
+    margin-bottom: 1rem;
+  }
+
+  .form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+
+  .form-group input,
+  .form-group textarea,
+  .form-group select {
+    width: 100%;
+    padding: 0.75rem;
+  }
+
+  /* 按钮移动端适配 */
+  .btn,
+  .btn-primary,
+  .btn-secondary {
+    width: 100%;
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+  }
+
+  /* 统计卡片移动端适配 */
+  .stat-card {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  /* 愿望卡片移动端适配 */
+  .wish-card {
+    padding: 1rem;
+  }
+
+  .wish-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .wish-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  /* 快速操作按钮移动端适配 */
+  .quick-actions {
+    grid-template-columns: 1fr;
+  }
+
+  /* 用户信息卡片移动端适配 */
+  .user-info-card {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  /* 筛选区域移动端适配 */
+  .filter-section {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filter-section label {
+    margin-bottom: 0.5rem;
+  }
+
+  .filter-section select {
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+
+  /* 区块标题移动端适配 */
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  /* 表格移动端适配 */
+  table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  /* 模态框移动端适配 */
+  .modal {
+    width: 95%;
+    max-width: 95%;
+    margin: 1rem auto;
+    padding: 1rem;
+  }
+}
+
+/* 平板端样式（768px - 1024px） */
+@media screen and (min-width: 768px) and (max-width: 1024px) {
+  .navbar .container {
+    padding: 0 1.5rem;
+  }
+
+  .main-content {
+    padding: 0 1.5rem;
+  }
+
+  .wishes-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .quick-actions {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* 桌面端样式（大于1024px） */
+@media screen and (min-width: 1025px) {
+  .wishes-grid {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+
+  .quick-actions {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  }
+}
+
+/* 大屏幕样式（大于1440px） */
+@media screen and (min-width: 1440px) {
+  .navbar .container {
+    max-width: 1400px;
+  }
+
+  .main-content {
+    max-width: 1400px;
+  }
+}
+
+/* 横屏移动设备适配 */
+@media screen and (max-width: 1024px) and (orientation: landscape) {
+  .navbar .container {
+    flex-direction: row;
+  }
+
+  .nav-links {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+}
+
+/* 触摸设备优化 */
+@media (hover: none) and (pointer: coarse) {
+  /* 增大触摸目标 */
+  .btn,
+  .btn-primary,
+  .btn-secondary,
+  .action-btn {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* 移除hover效果，使用active状态 */
+  .btn:hover,
+  .btn-primary:hover,
+  .btn-secondary:hover {
+    opacity: 1;
+  }
+
+  .btn:active,
+  .btn-primary:active,
+  .btn-secondary:active {
+    opacity: 0.8;
+  }
+
+  /* 链接触摸优化 */
+  a {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+}
+
+/* 高分辨率屏幕优化 */
+@media screen and (-webkit-min-device-pixel-ratio: 2), screen and (min-resolution: 192dpi) {
+  /* 确保在高分辨率屏幕上文字清晰 */
+  body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* 打印样式 */
+@media print {
+  .navbar,
+  .btn,
+  .action-btn,
+  .wish-actions {
+    display: none;
+  }
+
+  .main-content {
+    max-width: 100%;
+    padding: 0;
+  }
+
+  .wish-card,
+  .stat-card {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}

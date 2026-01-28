@@ -98,7 +98,7 @@ task: Build a Web page app in Vue
 
 ### Phase 8: Polish (收尾优化)
 
-- [ ] T051 [配置] 实现响应式设计和移动端适配 `frontend/src/styles/responsive.css`
+- [x] T051 [配置] 实现响应式设计和移动端适配 `src/styles/responsive.css`
 - [ ] T052 [配置] 实现性能优化 (代码分割、懒加载) `frontend/src/utils/lazyLoad.ts`
 - [ ] T053 [配置] 实现错误边界和异常处理 `frontend/src/components/ErrorBoundary/index.tsx`
 - [ ] T054 [配置] 实现数据缓存策略 `backend/src/services/CacheService.ts`

@@ -2,6 +2,7 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
 import { initDefaultAdmin } from './services/authService'
+import './styles/responsive.css'
 
 // 初始化默认管理员（仅用于演示）
 initDefaultAdmin()

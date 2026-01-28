@@ -3,8 +3,8 @@
 # DO NOT EDIT - regenerated on task file change
 
 source_file: RALPH_TASK.md
-source_mtime: 1769589270
-generated_at: 2026-01-28T08:34:44Z
+source_mtime: 1769589309
+generated_at: 2026-01-28T08:35:11Z
 
 tasks:
   - id: "line_26"
@@ -387,9 +387,9 @@ tasks:
     raw_marker: -
   - id: "line_101"
     line_number: 101
-    status: pending
+    status: completed
     parallel_group: 999999
-    description: T051 [配置] 实现响应式设计和移动端适配 `frontend/src/styles/responsive.css`
+    description: T051 [配置] 实现响应式设计和移动端适配 `src/styles/responsive.css`
     indent_level: 0
     raw_marker: -
   - id: "line_102"
