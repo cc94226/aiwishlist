@@ -1,8 +1,110 @@
 ---
 task: Build a Web page app in Vue
+## 🏗️ 技术架构方案建议
+
+### 技术栈选择
+* **前端**: React 18 + TypeScript + Vite
+* **后端**: Node.js + Express + TypeScript  
+* **数据库**: MySQL + Redis
+* **状态管理**: Zustand (轻量级)
+* **UI框架**: Ant Design
+* **样式**: Tailwind CSS + CSS Modules
+* **构建工具**: Vite (前端) + tsc (后端)
+* **包管理**: pnpm (workspace)
+
+### 架构模式
+* **整体架构**: 前后端分离 + Monorepo
+* **后端架构**: 分层架构 (Controller → Service → Repository)
+* **前端架构**: 组件化 + 模块化
+* **目录结构**: 按功能模块组织
 ---
 
 # Task: CLI Todo App (TypeScript)
+### Phase 1: Setup (项目初始化)
+
+* [ ] T001 [配置] 初始化 pnpm workspace 和项目结构 `package.json`
+* [ ] T002 [配置] 配置前端项目 (Vite + React + TypeScript) `frontend/package.json`
+* [ ] T003 [配置] 配置后端项目 (Node.js + Express + TypeScript) `backend/package.json`
+* [ ] T004 [配置] 设置 ESLint 和 Prettier 统一代码规范 `root/.eslintrc.js`
+* [ ] T005 [配置] 配置 Git hooks (pre-commit, pre-push) `root/.husky/`
+
+### Phase 2: Foundational (基础设施)
+
+* [ ] T006 [数据模型] 定义核心数据类型和接口 `shared/types/index.ts`
+* [ ] T007 [数据模型] 设计数据库表结构 (MySQL) `database/migrations/001_create_tables.sql`
+* [ ] T008 [配置] 配置数据库连接和基础配置 `backend/src/config/database.ts`
+* [ ] T009 [配置] 实现基础中间件 (认证、错误处理、日志) `backend/src/middleware/`
+* [ ] T010 [配置] 前端路由配置和状态管理基础设置 `frontend/src/store/index.ts`
+* [ ] T011 [配置] API请求封装和错误处理 `frontend/src/utils/api.ts`
+
+### Phase 3: User Story - 用户认证系统
+
+* [ ] T012 [测试] [P] 为用户注册/登录接口编写测试用例 `backend/tests/auth.spec.ts`
+* [ ] T013 [数据模型] 定义用户相关数据模型 `backend/src/models/User.ts`
+* [ ] T014 [数据模型] 定义认证相关 DTO 类型 `shared/types/auth.ts`
+* [ ] T015 [业务逻辑] 实现用户服务 (注册、登录、信息管理) `backend/src/services/AuthService.ts`
+* [ ] T016 [API] 实现认证相关路由和控制器 `backend/src/controllers/AuthController.ts`
+* [ ] T017 [UI] 创建登录页面组件 `frontend/src/pages/Login/index.tsx`
+* [ ] T018 [UI] 创建注册页面组件 `frontend/src/pages/Register/index.tsx`
+* [ ] T019 [UI] 创建用户状态管理 hooks `frontend/src/hooks/useAuth.ts`
+* [ ] T017.1 [UI] 创建ProtectedRoute路由保护组件 `frontend/src/components/ProtectedRoute/index.tsx`
+* [ ] T017.2 [UI] 创建Dashboard用户仪表板页面 `frontend/src/pages/Dashboard/index.tsx`
+* [ ] T017.3 [集成] 升级App.tsx集成完整认证系统 `frontend/src/App.tsx`
+* [ ] T017.4 [测试] 创建前端认证系统完整测试套件 `frontend/src/**/__tests__/*.test.tsx`
+
+### Phase 4: User Story - 愿望展示与浏览
+
+* [ ] T020 [测试] [P] 为愿望查询接口编写测试 `backend/tests/wish.spec.ts`
+* [ ] T021 [数据模型] 定义愿望数据模型 `backend/src/models/Wish.ts`
+* [ ] T022 [数据模型] 定义愿望相关 DTO 类型 `shared/types/wish.ts`
+* [ ] T023 [业务逻辑] 实现愿望查询服务 (列表、详情、搜索) `backend/src/services/WishService.ts`
+* [ ] T024 [业务逻辑] 实现岗位分类服务 `backend/src/services/CategoryService.ts`
+* [ ] T025 [API] 实现愿望相关路由和控制器 `backend/src/controllers/WishController.ts`
+* [ ] T026 [UI] 创建愿望列表页面 `frontend/src/pages/WishList/index.tsx`
+* [ ] T027 [UI] 创建愿望详情页面 `frontend/src/pages/WishDetail/index.tsx`
+* [ ] T028 [UI] 创建岗位分类导航组件 `frontend/src/components/CategoryNav/index.tsx`
+* [ ] T029 [UI] 创建愿望卡片组件 `frontend/src/components/WishCard/index.tsx`
+
+### Phase 5: User Story - 愿望提交功能
+
+* [ ] T030 [测试] [P] 为愿望提交接口编写测试 `backend/tests/wish-create.spec.ts`
+* [ ] T031 [数据模型] 定义愿望表单验证规则 `frontend/src/utils/validation.ts`
+* [ ] T032 [业务逻辑] 实现愿望创建服务 `backend/src/services/WishCreateService.ts`
+* [ ] T033 [API] 实现愿望提交相关路由 `backend/src/controllers/WishCreateController.ts`
+* [ ] T034 [UI] 创建愿望提交页面 `frontend/src/pages/WishSubmit/index.tsx`
+* [ ] T035 [UI] 创建愿望表单组件 `frontend/src/components/WishForm/index.tsx`
+
+### Phase 6: User Story - 互动功能 (点赞、收藏、评论)
+
+* [ ] T036 [测试] [P] 为互动功能编写测试 `backend/tests/interaction.spec.ts`
+* [ ] T037 [数据模型] 定义互动数据模型 `backend/src/models/Interaction.ts`
+* [ ] T038 [数据模型] 定义互动相关 DTO 类型 `shared/types/interaction.ts`
+* [ ] T039 [业务逻辑] 实现互动服务 (点赞、收藏、评论) `backend/src/services/InteractionService.ts`
+* [ ] T040 [API] 实现互动相关路由和控制器 `backend/src/controllers/InteractionController.ts`
+* [ ] T041 [UI] 创建点赞组件 `frontend/src/components/LikeButton/index.tsx`
+* [ ] T042 [UI] 创建收藏组件 `frontend/src/components/FavoriteButton/index.tsx`
+* [ ] T043 [UI] 创建评论组件 `frontend/src/components/CommentSection/index.tsx`
+
+### Phase 7: User Story - 个人中心
+
+* [ ] T044 [测试] [P] 为个人中心功能编写测试 `backend/tests/profile.spec.ts`
+* [ ] T045 [数据模型] 扩展用户模型 (个人资料、愿望统计) `backend/src/models/UserProfile.ts`
+* [ ] T046 [业务逻辑] 实现个人资料服务 `backend/src/services/ProfileService.ts`
+* [ ] T047 [API] 实现个人中心路由 `backend/src/controllers/ProfileController.ts`
+* [ ] T048 [UI] 创建个人中心页面 `frontend/src/pages/Profile/index.tsx`
+* [ ] T049 [UI] 创建我的愿望组件 `frontend/src/components/MyWishes/index.tsx`
+* [ ] T050 [UI] 创建收藏夹组件 `frontend/src/components/Favorites/index.tsx`
+
+### Phase 8: Polish (收尾优化)
+
+* [ ] T051 [配置] 实现响应式设计和移动端适配 `frontend/src/styles/responsive.css`
+* [ ] T052 [配置] 实现性能优化 (代码分割、懒加载) `frontend/src/utils/lazyLoad.ts`
+* [ ] T053 [配置] 实现错误边界和异常处理 `frontend/src/components/ErrorBoundary/index.tsx`
+* [ ] T054 [配置] 实现数据缓存策略 `backend/src/services/CacheService.ts`
+* [ ] T055 [配置] 实现日志记录和监控 `backend/src/utils/logger.ts`
+* [ ] T056 [配置] 实现前端路由权限控制 `frontend/src/components/ProtectedRoute/index.tsx`
+* [ ] T057 [配置] 实现数据库备份和恢复脚本 `database/scripts/backup.sh`
+* [ ] T058 [配置] 创建 Docker 配置和部署脚本 `docker-compose.yml`
 
 
 ## Requirements
