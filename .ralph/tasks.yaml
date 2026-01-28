@@ -3,8 +3,8 @@
 # DO NOT EDIT - regenerated on task file change
 
 source_file: RALPH_TASK.md
-source_mtime: 1769587989
-generated_at: 2026-01-28T08:14:16Z
+source_mtime: 1769588087
+generated_at: 2026-01-28T08:14:59Z
 
 tasks:
   - id: "line_26"
@@ -107,14 +107,14 @@ tasks:
     raw_marker: -
   - id: "line_46"
     line_number: 46
-    status: pending
+    status: completed
     parallel_group: 999999
     description: T015 [业务逻辑] 实现用户服务 (注册、登录、信息管理) `backend/src/services/AuthService.ts`
     indent_level: 0
     raw_marker: -
   - id: "line_47"
     line_number: 47
-    status: pending
+    status: completed
     parallel_group: 999999
     description: T016 [API] 实现认证相关路由和控制器 `backend/src/controllers/AuthController.ts`
     indent_level: 0
