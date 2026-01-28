@@ -687,8 +687,22 @@ Phase 2任务项中，T009已完成。Phase 3任务项中，T013已完成。
   - 修复所有TypeScript类型错误
   - 支持从环境变量读取JWT_SECRET和JWT_EXPIRES_IN配置
 
+**已完成的工作（续）：**
+
+- ✅ T016: 实现认证相关路由和控制器（backend/src/controllers/AuthController.ts）
+  - 创建AuthController类，提供完整的认证API端点：
+    - register - 用户注册（POST /api/auth/register）
+    - login - 用户登录（POST /api/auth/login）
+    - getMe - 获取当前用户信息（GET /api/auth/me，需要认证）
+    - updateProfile - 更新用户信息（PUT /api/auth/profile，需要认证）
+    - changePassword - 修改密码（PUT /api/auth/password，需要认证）
+  - 更新路由文件（routes/auth.ts）配置所有认证路由
+  - 集成认证中间件（authenticate）保护需要登录的路由
+  - 实现统一的错误处理和响应格式
+  - 所有路由已在index.ts中注册
+
 **当前状态：**
-Phase 3任务项中，T013、T015已完成。用户数据模型和认证服务已完整实现，包括JWT认证功能。
+Phase 3任务项中，T013、T015、T016已完成。用户数据模型、认证服务和API路由已完整实现，包括JWT认证功能。
 
 **已完成的工作（续）：**
 
