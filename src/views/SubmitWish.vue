@@ -1,13 +1,13 @@
 <template>
   <div class="submit-wish">
     <h2>提交新愿望</h2>
-    <form @submit.prevent="submitWish" class="wish-form">
+    <form class="wish-form" @submit.prevent="submitWish">
       <div class="form-group">
         <label for="title">愿望名称 *</label>
         <input 
-          type="text" 
           id="title" 
           v-model="form.title" 
+          type="text" 
           required
           placeholder="请输入愿望名称"
           class="form-input"
@@ -47,9 +47,9 @@
       <div class="form-group">
         <label for="submitter">提交者姓名</label>
         <input 
-          type="text" 
           id="submitter" 
           v-model="form.submitter" 
+          type="text" 
           placeholder="可选，默认为匿名用户"
           class="form-input"
         />
@@ -57,8 +57,8 @@
 
       <div class="form-actions">
         <button type="submit" class="btn btn-primary">提交愿望</button>
-        <button type="button" @click="saveAsDraft" class="btn btn-draft">保存为草稿</button>
-        <button type="button" @click="resetForm" class="btn btn-secondary">重置</button>
+        <button type="button" class="btn btn-draft" @click="saveAsDraft">保存为草稿</button>
+        <button type="button" class="btn btn-secondary" @click="resetForm">重置</button>
       </div>
     </form>
 

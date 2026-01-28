@@ -3,7 +3,8 @@ export const initialWishes = [
   {
     id: 1,
     title: '智能代码审查助手',
-    description: '希望有一个AI工具能够自动审查代码，识别潜在bug、性能问题和代码规范问题，并提供改进建议。',
+    description:
+      '希望有一个AI工具能够自动审查代码，识别潜在bug、性能问题和代码规范问题，并提供改进建议。',
     job: '开发',
     submitter: '张开发',
     likes: 15,
@@ -25,7 +26,8 @@ export const initialWishes = [
   {
     id: 3,
     title: '智能会议纪要生成',
-    description: '希望有AI工具能够自动记录会议内容，生成结构化的会议纪要，并提取关键决策和待办事项。',
+    description:
+      '希望有AI工具能够自动记录会议内容，生成结构化的会议纪要，并提取关键决策和待办事项。',
     job: '行政',
     submitter: '王行政',
     likes: 18,

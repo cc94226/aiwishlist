@@ -2,7 +2,7 @@
   <div class="wish-detail">
     <div v-if="wish" class="detail-card">
       <div class="detail-header">
-        <button @click="goBack" class="back-btn">← 返回</button>
+        <button class="back-btn" @click="goBack">← 返回</button>
         <div class="header-content">
           <h1>{{ wish.title }}</h1>
           <span class="job-badge" :class="getJobClass(wish.job)">{{ wish.job }}</span>
@@ -45,23 +45,23 @@
         </div>
 
         <div class="wish-actions">
-          <button @click="likeWish" class="action-btn like-btn">
+          <button class="action-btn like-btn" @click="likeWish">
             👍 点赞 ({{ wish.likes }})
           </button>
-          <button @click="toggleFavorite" class="action-btn favorite-btn" :class="{ active: isFavorited }">
+          <button class="action-btn favorite-btn" :class="{ active: isFavorited }" @click="toggleFavorite">
             ⭐ {{ isFavorited ? '已收藏' : '收藏' }}
           </button>
           <button 
             v-if="canEdit" 
-            @click="editWish" 
-            class="action-btn edit-btn"
+            class="action-btn edit-btn" 
+            @click="editWish"
           >
             ✏️ 编辑
           </button>
           <button 
             v-if="canDelete" 
-            @click="deleteWish" 
-            class="action-btn delete-btn"
+            class="action-btn delete-btn" 
+            @click="deleteWish"
           >
             🗑️ 删除
           </button>
@@ -76,7 +76,7 @@
               rows="3"
               class="comment-input"
             ></textarea>
-            <button @click="addComment" class="comment-submit-btn" :disabled="!newComment.trim()">
+            <button class="comment-submit-btn" :disabled="!newComment.trim()" @click="addComment">
               发表评论
             </button>
           </div>
@@ -126,7 +126,7 @@
           </div>
           <div class="form-actions">
             <button type="submit" class="btn btn-primary">保存</button>
-            <button type="button" @click="closeEditDialog" class="btn btn-secondary">取消</button>
+            <button type="button" class="btn btn-secondary" @click="closeEditDialog">取消</button>
           </div>
         </form>
       </div>
@@ -159,17 +159,17 @@ export default {
       return this.wish && canDeleteWish(this.wish)
     }
   },
-  mounted() {
-    this.loadWish()
-    this.loadFavoriteStatus()
-    this.loadMatchInfo()
-  },
   watch: {
     '$route.params.id'() {
       this.loadWish()
       this.loadFavoriteStatus()
       this.loadMatchInfo()
     }
+  },
+  mounted() {
+    this.loadWish()
+    this.loadFavoriteStatus()
+    this.loadMatchInfo()
   },
   methods: {
     loadWish() {

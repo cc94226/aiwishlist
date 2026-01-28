@@ -4,7 +4,7 @@
       <h2>系统管理面板</h2>
       <div class="user-info">
         <span>当前用户：{{ currentUser?.name }} ({{ currentUser?.role === 'admin' ? '管理员' : '普通用户' }})</span>
-        <button @click="logout" class="logout-btn">退出登录</button>
+        <button class="logout-btn" @click="logout">退出登录</button>
       </div>
     </div>
 
@@ -58,22 +58,22 @@
               </td>
               <td>{{ formatDate(wish.createdAt) }}</td>
               <td class="actions-cell">
-                <button @click="editWish(wish.id)" class="btn btn-edit">编辑</button>
+                <button class="btn btn-edit" @click="editWish(wish.id)">编辑</button>
                 <button 
                   v-if="wish.status === 'published'" 
-                  @click="unpublishWish(wish.id)" 
-                  class="btn btn-unpublish"
+                  class="btn btn-unpublish" 
+                  @click="unpublishWish(wish.id)"
                 >
                   下架
                 </button>
                 <button 
                   v-if="wish.status === 'unpublished'" 
-                  @click="publishWish(wish.id)" 
-                  class="btn btn-publish"
+                  class="btn btn-publish" 
+                  @click="publishWish(wish.id)"
                 >
                   发布
                 </button>
-                <button @click="deleteWish(wish.id)" class="btn btn-delete">删除</button>
+                <button class="btn btn-delete" @click="deleteWish(wish.id)">删除</button>
               </td>
             </tr>
           </tbody>
@@ -119,7 +119,7 @@
           </div>
           <div class="form-actions">
             <button type="submit" class="btn btn-primary">保存</button>
-            <button type="button" @click="closeEditDialog" class="btn btn-secondary">取消</button>
+            <button type="button" class="btn btn-secondary" @click="closeEditDialog">取消</button>
           </div>
         </form>
       </div>

@@ -22,10 +22,10 @@ task: Build a Web page app in Vue
 # Task: CLI Todo App (TypeScript)
 ### Phase 1: Setup (项目初始化)
 
-* [ ] T001 [配置] 初始化 pnpm workspace 和项目结构 `package.json`
-* [ ] T002 [配置] 配置前端项目 (Vite + React + TypeScript) `frontend/package.json`
+* [x] T001 [配置] 初始化 pnpm workspace 和项目结构 `package.json`
+* [x] T002 [配置] 配置前端项目 (Vite + Vue 3) `package.json`
 * [ ] T003 [配置] 配置后端项目 (Node.js + Express + TypeScript) `backend/package.json`
-* [ ] T004 [配置] 设置 ESLint 和 Prettier 统一代码规范 `root/.eslintrc.js`
+* [x] T004 [配置] 设置 ESLint 和 Prettier 统一代码规范 `eslint.config.js`
 * [ ] T005 [配置] 配置 Git hooks (pre-commit, pre-push) `root/.husky/`
 
 ### Phase 2: Foundational (基础设施)

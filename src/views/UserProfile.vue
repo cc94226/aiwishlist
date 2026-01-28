@@ -17,7 +17,7 @@
         </div>
         <div class="info-row">
           <label>岗位：</label>
-          <select v-model="userJob" @change="updateJob" class="job-select">
+          <select v-model="userJob" class="job-select" @change="updateJob">
             <option value="">请选择岗位</option>
             <option value="开发">开发</option>
             <option value="设计">设计</option>
@@ -30,7 +30,7 @@
         </div>
       </div>
       <div class="profile-actions">
-        <button @click="logout" class="btn btn-logout">退出登录</button>
+        <button class="btn btn-logout" @click="logout">退出登录</button>
       </div>
     </div>
     <div v-else class="no-user">

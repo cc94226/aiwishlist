@@ -5,27 +5,27 @@ export function calculateMatchScore(userJob, wishJob) {
   if (!userJob || !wishJob) {
     return 0
   }
-  
+
   // 完全匹配
   if (userJob === wishJob) {
     return 100
   }
-  
+
   // 相关岗位匹配（可以根据实际需求扩展）
   const relatedJobs = {
-    '开发': ['产品', '测试'],
-    '设计': ['产品', '运营'],
-    '产品': ['开发', '设计', '运营'],
-    '运营': ['产品', '设计'],
-    '行政': ['人事', '财务'],
-    '测试': ['开发']
+    开发: ['产品', '测试'],
+    设计: ['产品', '运营'],
+    产品: ['开发', '设计', '运营'],
+    运营: ['产品', '设计'],
+    行政: ['人事', '财务'],
+    测试: ['开发']
   }
-  
+
   const related = relatedJobs[userJob] || []
   if (related.includes(wishJob)) {
     return 70 // 相关岗位匹配度70%
   }
-  
+
   // 其他岗位匹配度较低
   return 30
 }
@@ -49,10 +49,10 @@ export function getWishMatchInfo(wish) {
   if (!user || !user.job) {
     return null
   }
-  
+
   const score = calculateMatchScore(user.job, wish.job)
   const description = getMatchDescription(score)
-  
+
   return {
     score,
     ...description,
