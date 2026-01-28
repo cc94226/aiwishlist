@@ -3,8 +3,8 @@
 # DO NOT EDIT - regenerated on task file change
 
 source_file: RALPH_TASK.md
-source_mtime: 1769587902
-generated_at: 2026-01-28T08:12:55Z
+source_mtime: 1769587989
+generated_at: 2026-01-28T08:14:16Z
 
 tasks:
   - id: "line_26"
@@ -93,7 +93,7 @@ tasks:
     raw_marker: -
   - id: "line_44"
     line_number: 44
-    status: pending
+    status: completed
     parallel_group: 999999
     description: T013 [数据模型] 定义用户相关数据模型 `backend/src/models/User.ts`
     indent_level: 0

@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express'
 import { AppError } from './errorHandler'
+import { AuthService } from '../services/AuthService'
 
 /**
  * 扩展Request接口，添加用户信息
@@ -20,37 +21,41 @@ declare global {
 
 /**
  * 认证中间件
- * 验证用户是否已登录（占位符实现，未来将集成JWT）
+ * 验证用户是否已登录（使用JWT token验证）
  */
 export const authenticate = (
   req: Request,
   res: Response,
   next: NextFunction
 ): void => {
-  // TODO: 实现JWT token验证
-  // 当前为占位符实现，从请求头获取token
-  const token = req.headers.authorization?.replace('Bearer ', '')
-
-  if (!token) {
+  // 从请求头获取token
+  const authHeader = req.headers.authorization
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
     throw new AppError('未提供认证令牌', 401, 'UNAUTHORIZED')
   }
 
-  // TODO: 验证token并解析用户信息
-  // 临时实现：如果token存在，设置默认用户（仅用于开发测试）
-  // 生产环境必须实现完整的JWT验证逻辑
-  if (process.env.NODE_ENV === 'development' && token === 'dev-token') {
-    req.user = {
-      id: 'dev-user-id',
-      email: 'dev@example.com',
-      role: 'user',
-      name: '开发用户'
-    }
-    next()
-    return
-  }
+  const token = authHeader.replace('Bearer ', '')
 
-  // 生产环境：验证token失败
-  throw new AppError('无效的认证令牌', 401, 'UNAUTHORIZED')
+  try {
+    // 验证token并解析用户信息
+    const decoded = AuthService.verifyToken(token)
+    
+    // 将用户信息附加到请求对象
+    req.user = {
+      id: decoded.id,
+      email: decoded.email,
+      role: decoded.role,
+      name: decoded.name,
+      job: decoded.job
+    }
+
+    next()
+  } catch (error) {
+    if (error instanceof AppError) {
+      throw error
+    }
+    throw new AppError('无效的认证令牌', 401, 'UNAUTHORIZED')
+  }
 }
 
 /**
@@ -84,23 +89,30 @@ export const optionalAuth = (
   res: Response,
   next: NextFunction
 ): void => {
-  const token = req.headers.authorization?.replace('Bearer ', '')
-
-  if (!token) {
+  const authHeader = req.headers.authorization
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
     // 没有token，继续执行（不设置user）
     next()
     return
   }
 
-  // TODO: 验证token并解析用户信息
-  // 临时实现：如果token存在，设置默认用户（仅用于开发测试）
-  if (process.env.NODE_ENV === 'development' && token === 'dev-token') {
+  const token = authHeader.replace('Bearer ', '')
+
+  try {
+    // 验证token并解析用户信息
+    const decoded = AuthService.verifyToken(token)
+    
+    // 将用户信息附加到请求对象
     req.user = {
-      id: 'dev-user-id',
-      email: 'dev@example.com',
-      role: 'user',
-      name: '开发用户'
+      id: decoded.id,
+      email: decoded.email,
+      role: decoded.role,
+      name: decoded.name,
+      job: decoded.job
     }
+  } catch (error) {
+    // token无效，但不抛出错误，继续执行（不设置user）
+    // 这样可以让接口同时支持已登录和未登录的用户
   }
 
   next()
