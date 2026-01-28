@@ -370,3 +370,20 @@ Ralph Session Started: 2026年 1月28日 星期三 16时06分34秒 CST
 [16:08:29] 🔴 WARN: Approaching token limit (71034 >= 70000)
 [16:08:31] 🔴 READ src/views/Login.vue (228 lines, ~22.2KB)
 [16:08:32] 🔴 SHELL cd /Users/cc/Documents/AI/aiwishlist && npm run lint → exit 0
+[16:08:35] 🔴 SHELL cd /Users/cc/Documents/AI/aiwishlist && git add -A && git commit -m "ralph: 实现T017.1路由保护功能
+
+- 创建路由守卫函数（guards.js）
+- 实现requireAuth守卫（需要登录）
+- 实现requireAdmin守卫（需要管理员权限）
+- 实现redirectIfAuthenticated守卫（已登录则重定向）
+- 更新路由配置应用路由守卫
+- 更新Login.vue支持登录后跳转到redirect参数" → exit 0
+[16:08:38] 🔴 TOKENS: 76749 / 80000 (95%) - rotation imminent [read:296KB write:0KB assist:0KB shell:0KB]
+[16:08:39] 🔴 READ src/App.vue (144 lines, ~14.0KB)
+[16:08:39] 🔴 ROTATE: Token threshold reached (80359 >= 80000)
+[16:08:39] 🔴 READ RALPH_TASK.md (144 lines, ~14.0KB)
+[16:08:39] 🔴 ROTATE: Token threshold reached (83959 >= 80000)
+
+═══════════════════════════════════════════════════════════════
+Ralph Session Started: 2026年 1月28日 星期三 16时08分42秒 CST
+═══════════════════════════════════════════════════════════════

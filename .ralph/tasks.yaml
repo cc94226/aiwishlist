@@ -3,8 +3,8 @@
 # DO NOT EDIT - regenerated on task file change
 
 source_file: RALPH_TASK.md
-source_mtime: 1769587587
-generated_at: 2026-01-28T08:06:32Z
+source_mtime: 1769587714
+generated_at: 2026-01-28T08:08:39Z
 
 tasks:
   - id: "line_26"
@@ -121,30 +121,30 @@ tasks:
     raw_marker: -
   - id: "line_48"
     line_number: 48
-    status: pending
+    status: completed
     parallel_group: 999999
-    description: T017 [UI] 创建登录页面组件 `frontend/src/pages/Login/index.tsx`
+    description: T017 [UI] 创建登录页面组件 `src/views/Login.vue` (Vue项目已实现)
     indent_level: 0
     raw_marker: -
   - id: "line_49"
     line_number: 49
-    status: pending
+    status: completed
     parallel_group: 999999
-    description: T018 [UI] 创建注册页面组件 `frontend/src/pages/Register/index.tsx`
+    description: T018 [UI] 创建注册页面组件 `src/views/Register.vue` (Vue项目已实现)
     indent_level: 0
     raw_marker: -
   - id: "line_50"
     line_number: 50
-    status: pending
+    status: completed
     parallel_group: 999999
-    description: T019 [UI] 创建用户状态管理 hooks `frontend/src/hooks/useAuth.ts`
+    description: T019 [UI] 创建用户状态管理 hooks `src/composables/useAuth.js` (Vue项目已实现)
     indent_level: 0
     raw_marker: -
   - id: "line_51"
     line_number: 51
-    status: pending
+    status: completed
     parallel_group: 999999
-    description: T017.1 [UI] 创建ProtectedRoute路由保护组件 `frontend/src/components/ProtectedRoute/index.tsx`
+    description: T017.1 [UI] 创建ProtectedRoute路由保护组件 `src/router/guards.js` (Vue项目已实现路由守卫)
     indent_level: 0
     raw_marker: -
   - id: "line_52"
