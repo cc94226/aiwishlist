@@ -22,7 +22,18 @@
     "src/**/*.{json,css,scss,md}": [
       "prettier --write"
     ],
-    "*.{json,md}": [
+    "*.{ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "backend/src/**/*.{ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.md": [
+      "prettier --write"
+    ],
+    "*.json": [
       "prettier --write"
     ]
   },
