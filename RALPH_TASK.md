@@ -46,7 +46,7 @@ task: Build a Web page app in Vue
 - [ ] T015 [业务逻辑] 实现用户服务 (注册、登录、信息管理) `backend/src/services/AuthService.ts`
 - [ ] T016 [API] 实现认证相关路由和控制器 `backend/src/controllers/AuthController.ts`
 - [x] T017 [UI] 创建登录页面组件 `src/views/Login.vue` (Vue项目已实现)
-- [ ] T018 [UI] 创建注册页面组件 `frontend/src/pages/Register/index.tsx`
+- [x] T018 [UI] 创建注册页面组件 `src/views/Register.vue` (Vue项目已实现)
 - [ ] T019 [UI] 创建用户状态管理 hooks `frontend/src/hooks/useAuth.ts`
 - [ ] T017.1 [UI] 创建ProtectedRoute路由保护组件 `frontend/src/components/ProtectedRoute/index.tsx`
 - [ ] T017.2 [UI] 创建Dashboard用户仪表板页面 `frontend/src/pages/Dashboard/index.tsx`
