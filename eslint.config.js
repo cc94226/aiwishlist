@@ -30,7 +30,9 @@ export default [
         setTimeout: 'readonly',
         setInterval: 'readonly',
         clearTimeout: 'readonly',
-        clearInterval: 'readonly'
+        clearInterval: 'readonly',
+        requestIdleCallback: 'readonly',
+        cancelIdleCallback: 'readonly'
       }
     },
     rules: {
