@@ -2,6 +2,36 @@ import { query } from '../config/database'
 import { AppError } from '../middleware/errorHandler'
 
 /**
+ * 评论数据模型接口
+ */
+export interface Comment {
+  id: string
+  wish_id: string
+  author: string
+  author_id?: string | null
+  content: string
+  created_at: Date | string
+  updated_at: Date | string
+}
+
+/**
+ * 创建评论数据模型接口（不包含id和时间戳）
+ */
+export interface CreateCommentData {
+  wish_id: string
+  author: string
+  author_id?: string | null
+  content: string
+}
+
+/**
+ * 更新评论数据模型接口（所有字段可选）
+ */
+export interface UpdateCommentData {
+  content?: string
+}
+
+/**
  * 点赞数据模型接口
  */
 export interface Like {
@@ -9,6 +39,14 @@ export interface Like {
   wish_id: string
   user_id: string
   created_at: Date | string
+}
+
+/**
+ * 创建点赞数据模型接口（不包含id和时间戳）
+ */
+export interface CreateLikeData {
+  wish_id: string
+  user_id: string
 }
 
 /**
@@ -22,44 +60,23 @@ export interface Favorite {
 }
 
 /**
- * 评论数据模型接口
+ * 创建收藏数据模型接口（不包含id和时间戳）
  */
-export interface Comment {
-  id: string
+export interface CreateFavoriteData {
   wish_id: string
-  author: string
-  author_id: string | null
-  content: string
-  created_at: Date | string
-  updated_at: Date | string
-}
-
-/**
- * 创建评论数据模型接口
- */
-export interface CreateCommentData {
-  wish_id: string
-  author: string
-  author_id?: string | null
-  content: string
-}
-
-/**
- * 更新评论数据模型接口
- */
-export interface UpdateCommentData {
-  content: string
+  user_id: string
 }
 
 /**
  * 评论查询选项
  */
 export interface CommentQueryOptions {
-  wish_id: string
-  page?: number
-  pageSize?: number
-  sortBy?: 'created_at' | 'updated_at'
-  sortOrder?: 'ASC' | 'DESC'
+  wish_id?: string
+  author_id?: string
+  page?: number // 页码（从1开始）
+  pageSize?: number // 每页数量
+  sortBy?: 'created_at' | 'updated_at' // 排序字段
+  sortOrder?: 'ASC' | 'DESC' // 排序顺序
 }
 
 /**
@@ -74,345 +91,115 @@ export interface CommentQueryResult {
 }
 
 /**
- * 互动模型类
- * 提供点赞、收藏、评论相关的数据库操作方法
+ * 评论模型类
+ * 提供评论相关的数据库操作方法
  */
-export class InteractionModel {
+export class CommentModel {
   /**
-   * 生成UUID
-   * @returns string UUID字符串
-   */
-  private static generateUUID(): string {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-      const r = (Math.random() * 16) | 0
-      const v = c === 'x' ? r : (r & 0x3) | 0x8
-      return v.toString(16)
-    })
-  }
-
-  // ==================== 点赞相关方法 ====================
-
-  /**
-   * 检查用户是否已点赞某个愿望
-   * @param wishId 愿望ID
-   * @param userId 用户ID
-   * @returns Promise<boolean> 是否已点赞
-   */
-  static async hasLiked(wishId: string, userId: string): Promise<boolean> {
-    const sql = 'SELECT id FROM likes WHERE wish_id = ? AND user_id = ?'
-    const results = await query<Like[]>(sql, [wishId, userId])
-    return results.length > 0
-  }
-
-  /**
-   * 添加点赞
-   * @param wishId 愿望ID
-   * @param userId 用户ID
-   * @returns Promise<Like> 点赞记录
-   */
-  static async addLike(wishId: string, userId: string): Promise<Like> {
-    // 检查是否已点赞
-    const hasLiked = await this.hasLiked(wishId, userId)
-    if (hasLiked) {
-      throw new AppError('您已经点赞过这个愿望了', 400, 'ALREADY_LIKED')
-    }
-
-    const id = this.generateUUID()
-    const sql = 'INSERT INTO likes (id, wish_id, user_id) VALUES (?, ?, ?)'
-    await query(sql, [id, wishId, userId])
-
-    // 返回点赞记录
-    const like = await this.getLikeById(id)
-    if (!like) {
-      throw new AppError('创建点赞记录失败', 500, 'CREATE_LIKE_FAILED')
-    }
-
-    return like
-  }
-
-  /**
-   * 取消点赞
-   * @param wishId 愿望ID
-   * @param userId 用户ID
-   * @returns Promise<boolean> 是否成功取消
-   */
-  static async removeLike(wishId: string, userId: string): Promise<boolean> {
-    const sql = 'DELETE FROM likes WHERE wish_id = ? AND user_id = ?'
-    const result = await query(sql, [wishId, userId])
-    return (result as any).affectedRows > 0
-  }
-
-  /**
-   * 根据ID获取点赞记录
-   * @param id 点赞记录ID
-   * @returns Promise<Like | null> 点赞记录
-   */
-  static async getLikeById(id: string): Promise<Like | null> {
-    const sql = 'SELECT * FROM likes WHERE id = ?'
-    const results = await query<Like[]>(sql, [id])
-    return results.length > 0 ? results[0] : null
-  }
-
-  /**
-   * 获取愿望的点赞列表
-   * @param wishId 愿望ID
-   * @param page 页码
-   * @param pageSize 每页数量
-   * @returns Promise<{ likes: Like[]; total: number }> 点赞列表和总数
-   */
-  static async getLikesByWishId(
-    wishId: string,
-    page: number = 1,
-    pageSize: number = 100
-  ): Promise<{ likes: Like[]; total: number }> {
-    const offset = (page - 1) * pageSize
-
-    // 获取总数
-    const countSql = 'SELECT COUNT(*) as total FROM likes WHERE wish_id = ?'
-    const countResults = await query<{ total: number }[]>(countSql, [wishId])
-    const total = countResults[0]?.total || 0
-
-    // 获取列表
-    const sql = 'SELECT * FROM likes WHERE wish_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?'
-    const likes = await query<Like[]>(sql, [wishId, pageSize, offset])
-
-    return { likes, total }
-  }
-
-  /**
-   * 获取用户的点赞列表
-   * @param userId 用户ID
-   * @param page 页码
-   * @param pageSize 每页数量
-   * @returns Promise<{ likes: Like[]; total: number }> 点赞列表和总数
-   */
-  static async getLikesByUserId(
-    userId: string,
-    page: number = 1,
-    pageSize: number = 100
-  ): Promise<{ likes: Like[]; total: number }> {
-    const offset = (page - 1) * pageSize
-
-    // 获取总数
-    const countSql = 'SELECT COUNT(*) as total FROM likes WHERE user_id = ?'
-    const countResults = await query<{ total: number }[]>(countSql, [userId])
-    const total = countResults[0]?.total || 0
-
-    // 获取列表
-    const sql = 'SELECT * FROM likes WHERE user_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?'
-    const likes = await query<Like[]>(sql, [userId, pageSize, offset])
-
-    return { likes, total }
-  }
-
-  // ==================== 收藏相关方法 ====================
-
-  /**
-   * 检查用户是否已收藏某个愿望
-   * @param wishId 愿望ID
-   * @param userId 用户ID
-   * @returns Promise<boolean> 是否已收藏
-   */
-  static async hasFavorited(wishId: string, userId: string): Promise<boolean> {
-    const sql = 'SELECT id FROM favorites WHERE wish_id = ? AND user_id = ?'
-    const results = await query<Favorite[]>(sql, [wishId, userId])
-    return results.length > 0
-  }
-
-  /**
-   * 添加收藏
-   * @param wishId 愿望ID
-   * @param userId 用户ID
-   * @returns Promise<Favorite> 收藏记录
-   */
-  static async addFavorite(wishId: string, userId: string): Promise<Favorite> {
-    // 检查是否已收藏
-    const hasFavorited = await this.hasFavorited(wishId, userId)
-    if (hasFavorited) {
-      throw new AppError('您已经收藏过这个愿望了', 400, 'ALREADY_FAVORITED')
-    }
-
-    const id = this.generateUUID()
-    const sql = 'INSERT INTO favorites (id, wish_id, user_id) VALUES (?, ?, ?)'
-    await query(sql, [id, wishId, userId])
-
-    // 返回收藏记录
-    const favorite = await this.getFavoriteById(id)
-    if (!favorite) {
-      throw new AppError('创建收藏记录失败', 500, 'CREATE_FAVORITE_FAILED')
-    }
-
-    return favorite
-  }
-
-  /**
-   * 取消收藏
-   * @param wishId 愿望ID
-   * @param userId 用户ID
-   * @returns Promise<boolean> 是否成功取消
-   */
-  static async removeFavorite(wishId: string, userId: string): Promise<boolean> {
-    const sql = 'DELETE FROM favorites WHERE wish_id = ? AND user_id = ?'
-    const result = await query(sql, [wishId, userId])
-    return (result as any).affectedRows > 0
-  }
-
-  /**
-   * 根据ID获取收藏记录
-   * @param id 收藏记录ID
-   * @returns Promise<Favorite | null> 收藏记录
-   */
-  static async getFavoriteById(id: string): Promise<Favorite | null> {
-    const sql = 'SELECT * FROM favorites WHERE id = ?'
-    const results = await query<Favorite[]>(sql, [id])
-    return results.length > 0 ? results[0] : null
-  }
-
-  /**
-   * 获取愿望的收藏列表
-   * @param wishId 愿望ID
-   * @param page 页码
-   * @param pageSize 每页数量
-   * @returns Promise<{ favorites: Favorite[]; total: number }> 收藏列表和总数
-   */
-  static async getFavoritesByWishId(
-    wishId: string,
-    page: number = 1,
-    pageSize: number = 100
-  ): Promise<{ favorites: Favorite[]; total: number }> {
-    const offset = (page - 1) * pageSize
-
-    // 获取总数
-    const countSql = 'SELECT COUNT(*) as total FROM favorites WHERE wish_id = ?'
-    const countResults = await query<{ total: number }[]>(countSql, [wishId])
-    const total = countResults[0]?.total || 0
-
-    // 获取列表
-    const sql =
-      'SELECT * FROM favorites WHERE wish_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?'
-    const favorites = await query<Favorite[]>(sql, [wishId, pageSize, offset])
-
-    return { favorites, total }
-  }
-
-  /**
-   * 获取用户的收藏列表
-   * @param userId 用户ID
-   * @param page 页码
-   * @param pageSize 每页数量
-   * @returns Promise<{ favorites: Favorite[]; total: number }> 收藏列表和总数
-   */
-  static async getFavoritesByUserId(
-    userId: string,
-    page: number = 1,
-    pageSize: number = 100
-  ): Promise<{ favorites: Favorite[]; total: number }> {
-    const offset = (page - 1) * pageSize
-
-    // 获取总数
-    const countSql = 'SELECT COUNT(*) as total FROM favorites WHERE user_id = ?'
-    const countResults = await query<{ total: number }[]>(countSql, [userId])
-    const total = countResults[0]?.total || 0
-
-    // 获取列表
-    const sql =
-      'SELECT * FROM favorites WHERE user_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?'
-    const favorites = await query<Favorite[]>(sql, [userId, pageSize, offset])
-
-    return { favorites, total }
-  }
-
-  // ==================== 评论相关方法 ====================
-
-  /**
-   * 根据ID获取评论
+   * 根据ID查询评论
    * @param id 评论ID
    * @returns Promise<Comment | null> 评论信息
    */
-  static async getCommentById(id: string): Promise<Comment | null> {
-    const sql = 'SELECT * FROM comments WHERE id = ?'
+  static async findById(id: string): Promise<Comment | null> {
+    const sql = `
+      SELECT id, wish_id, author, author_id, content, created_at, updated_at
+      FROM comments
+      WHERE id = ?
+    `
     const results = await query<Comment[]>(sql, [id])
-    return results.length > 0 ? results[0] : null
+
+    if (results.length === 0) {
+      return null
+    }
+
+    return results[0]
   }
 
   /**
-   * 创建评论
+   * 创建新评论
    * @param commentData 评论数据
    * @returns Promise<Comment> 创建的评论信息
    */
-  static async createComment(commentData: CreateCommentData): Promise<Comment> {
-    // 验证内容不能为空
+  static async create(commentData: CreateCommentData): Promise<Comment> {
+    // 验证必填字段
+    if (!commentData.wish_id || commentData.wish_id.trim().length === 0) {
+      throw new AppError('愿望ID不能为空', 400, 'INVALID_INPUT')
+    }
     if (!commentData.content || commentData.content.trim().length === 0) {
-      throw new AppError('评论内容不能为空', 400, 'INVALID_COMMENT_CONTENT')
+      throw new AppError('评论内容不能为空', 400, 'INVALID_INPUT')
+    }
+    if (!commentData.author || commentData.author.trim().length === 0) {
+      throw new AppError('评论作者不能为空', 400, 'INVALID_INPUT')
     }
 
-    // 验证内容长度（最多5000字符）
-    if (commentData.content.length > 5000) {
-      throw new AppError('评论内容不能超过5000字符', 400, 'COMMENT_TOO_LONG')
-    }
-
+    // 生成UUID
     const id = this.generateUUID()
+
     const sql = `
       INSERT INTO comments (id, wish_id, author, author_id, content)
       VALUES (?, ?, ?, ?, ?)
     `
     await query(sql, [
       id,
-      commentData.wish_id,
-      commentData.author,
+      commentData.wish_id.trim(),
+      commentData.author.trim(),
       commentData.author_id || null,
       commentData.content.trim()
     ])
 
     // 返回创建的评论
-    const comment = await this.getCommentById(id)
-    if (!comment) {
+    const createdComment = await this.findById(id)
+    if (!createdComment) {
       throw new AppError('创建评论失败', 500, 'CREATE_COMMENT_FAILED')
     }
 
-    return comment
+    return createdComment
   }
 
   /**
-   * 更新评论
+   * 更新评论信息
    * @param id 评论ID
-   * @param commentData 评论数据
-   * @param userId 用户ID（用于权限验证）
-   * @param isAdmin 是否为管理员
+   * @param commentData 更新的评论数据
    * @returns Promise<Comment> 更新后的评论信息
    */
-  static async updateComment(
-    id: string,
-    commentData: UpdateCommentData,
-    userId?: string,
-    isAdmin: boolean = false
-  ): Promise<Comment> {
-    // 获取评论
-    const comment = await this.getCommentById(id)
-    if (!comment) {
+  static async update(id: string, commentData: UpdateCommentData): Promise<Comment> {
+    // 检查评论是否存在
+    const existingComment = await this.findById(id)
+    if (!existingComment) {
       throw new AppError('评论不存在', 404, 'COMMENT_NOT_FOUND')
     }
 
-    // 权限验证：只有管理员或评论作者可以更新
-    if (!isAdmin && (!userId || comment.author_id !== userId)) {
-      throw new AppError('您没有权限修改此评论', 403, 'FORBIDDEN')
+    // 验证更新数据
+    if (commentData.content !== undefined) {
+      if (!commentData.content || commentData.content.trim().length === 0) {
+        throw new AppError('评论内容不能为空', 400, 'INVALID_INPUT')
+      }
     }
 
-    // 验证内容不能为空
-    if (!commentData.content || commentData.content.trim().length === 0) {
-      throw new AppError('评论内容不能为空', 400, 'INVALID_COMMENT_CONTENT')
+    // 构建更新SQL
+    const updates: string[] = []
+    const values: any[] = []
+
+    if (commentData.content !== undefined) {
+      updates.push('content = ?')
+      values.push(commentData.content.trim())
     }
 
-    // 验证内容长度（最多5000字符）
-    if (commentData.content.length > 5000) {
-      throw new AppError('评论内容不能超过5000字符', 400, 'COMMENT_TOO_LONG')
+    if (updates.length === 0) {
+      return existingComment
     }
 
-    const sql = 'UPDATE comments SET content = ? WHERE id = ?'
-    await query(sql, [commentData.content.trim(), id])
+    values.push(id)
+
+    const sql = `
+      UPDATE comments
+      SET ${updates.join(', ')}, updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `
+    await query(sql, values)
 
     // 返回更新后的评论
-    const updatedComment = await this.getCommentById(id)
+    const updatedComment = await this.findById(id)
     if (!updatedComment) {
       throw new AppError('更新评论失败', 500, 'UPDATE_COMMENT_FAILED')
     }
@@ -423,92 +210,458 @@ export class InteractionModel {
   /**
    * 删除评论
    * @param id 评论ID
-   * @param userId 用户ID（用于权限验证）
-   * @param isAdmin 是否为管理员
-   * @returns Promise<boolean> 是否成功删除
+   * @returns Promise<void>
    */
-  static async deleteComment(
-    id: string,
-    userId?: string,
-    isAdmin: boolean = false
-  ): Promise<boolean> {
-    // 获取评论
-    const comment = await this.getCommentById(id)
-    if (!comment) {
+  static async delete(id: string): Promise<void> {
+    // 检查评论是否存在
+    const existingComment = await this.findById(id)
+    if (!existingComment) {
       throw new AppError('评论不存在', 404, 'COMMENT_NOT_FOUND')
     }
 
-    // 权限验证：只有管理员或评论作者可以删除
-    if (!isAdmin && (!userId || comment.author_id !== userId)) {
-      throw new AppError('您没有权限删除此评论', 403, 'FORBIDDEN')
-    }
-
     const sql = 'DELETE FROM comments WHERE id = ?'
-    const result = await query(sql, [id])
-    return (result as any).affectedRows > 0
+    await query(sql, [id])
   }
 
   /**
-   * 获取愿望的评论列表
+   * 查询评论列表
    * @param options 查询选项
    * @returns Promise<CommentQueryResult> 评论列表和分页信息
    */
-  static async getCommentsByWishId(options: CommentQueryOptions): Promise<CommentQueryResult> {
-    const { wish_id, page = 1, pageSize = 20, sortBy = 'created_at', sortOrder = 'DESC' } = options
-
+  static async findAll(options: CommentQueryOptions = {}): Promise<CommentQueryResult> {
+    const page = options.page || 1
+    const pageSize = options.pageSize || 20
+    const sortBy = options.sortBy || 'created_at'
+    const sortOrder = options.sortOrder || 'DESC'
     const offset = (page - 1) * pageSize
 
-    // 获取总数
-    const countSql = 'SELECT COUNT(*) as total FROM comments WHERE wish_id = ?'
-    const countResults = await query<{ total: number }[]>(countSql, [wish_id])
+    // 构建WHERE条件
+    const conditions: string[] = []
+    const values: any[] = []
+
+    if (options.wish_id) {
+      conditions.push('wish_id = ?')
+      values.push(options.wish_id)
+    }
+
+    if (options.author_id) {
+      conditions.push('author_id = ?')
+      values.push(options.author_id)
+    }
+
+    const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : ''
+
+    // 查询总数
+    const countSql = `SELECT COUNT(*) as total FROM comments ${whereClause}`
+    const countResults = await query<{ total: number }[]>(countSql, values)
     const total = countResults[0]?.total || 0
 
-    // 获取列表
+    // 查询评论列表
     const sql = `
-      SELECT * FROM comments
-      WHERE wish_id = ?
+      SELECT id, wish_id, author, author_id, content, created_at, updated_at
+      FROM comments
+      ${whereClause}
       ORDER BY ${sortBy} ${sortOrder}
       LIMIT ? OFFSET ?
     `
-    const comments = await query<Comment[]>(sql, [wish_id, pageSize, offset])
-
-    const totalPages = Math.ceil(total / pageSize)
+    const comments = await query<Comment[]>(sql, [...values, pageSize, offset])
 
     return {
       comments,
       total,
       page,
       pageSize,
-      totalPages
+      totalPages: Math.ceil(total / pageSize)
     }
   }
 
   /**
-   * 获取用户的评论列表
-   * @param userId 用户ID
-   * @param page 页码
-   * @param pageSize 每页数量
-   * @returns Promise<{ comments: Comment[]; total: number }> 评论列表和总数
+   * 根据愿望ID查询评论列表
+   * @param wishId 愿望ID
+   * @param options 查询选项
+   * @returns Promise<CommentQueryResult> 评论列表和分页信息
    */
-  static async getCommentsByUserId(
-    userId: string,
-    page: number = 1,
-    pageSize: number = 20
-  ): Promise<{ comments: Comment[]; total: number }> {
-    const offset = (page - 1) * pageSize
+  static async findByWishId(
+    wishId: string,
+    options: Omit<CommentQueryOptions, 'wish_id'> = {}
+  ): Promise<CommentQueryResult> {
+    return this.findAll({ ...options, wish_id: wishId })
+  }
 
-    // 获取总数
-    const countSql = 'SELECT COUNT(*) as total FROM comments WHERE author_id = ?'
-    const countResults = await query<{ total: number }[]>(countSql, [userId])
-    const total = countResults[0]?.total || 0
+  /**
+   * 根据用户ID查询评论列表
+   * @param authorId 用户ID
+   * @param options 查询选项
+   * @returns Promise<CommentQueryResult> 评论列表和分页信息
+   */
+  static async findByAuthorId(
+    authorId: string,
+    options: Omit<CommentQueryOptions, 'author_id'> = {}
+  ): Promise<CommentQueryResult> {
+    return this.findAll({ ...options, author_id: authorId })
+  }
 
-    // 获取列表
-    const sql =
-      'SELECT * FROM comments WHERE author_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?'
-    const comments = await query<Comment[]>(sql, [userId, pageSize, offset])
-
-    return { comments, total }
+  /**
+   * 生成UUID（简化版本）
+   * @returns string UUID字符串
+   */
+  private static generateUUID(): string {
+    return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}-${Math.random().toString(36).substr(2, 9)}`
   }
 }
 
-export default InteractionModel
+/**
+ * 点赞模型类
+ * 提供点赞相关的数据库操作方法
+ */
+export class LikeModel {
+  /**
+   * 根据ID查询点赞记录
+   * @param id 点赞ID
+   * @returns Promise<Like | null> 点赞信息
+   */
+  static async findById(id: string): Promise<Like | null> {
+    const sql = `
+      SELECT id, wish_id, user_id, created_at
+      FROM likes
+      WHERE id = ?
+    `
+    const results = await query<Like[]>(sql, [id])
+
+    if (results.length === 0) {
+      return null
+    }
+
+    return results[0]
+  }
+
+  /**
+   * 根据愿望ID和用户ID查询点赞记录
+   * @param wishId 愿望ID
+   * @param userId 用户ID
+   * @returns Promise<Like | null> 点赞信息
+   */
+  static async findByWishAndUser(wishId: string, userId: string): Promise<Like | null> {
+    const sql = `
+      SELECT id, wish_id, user_id, created_at
+      FROM likes
+      WHERE wish_id = ? AND user_id = ?
+    `
+    const results = await query<Like[]>(sql, [wishId, userId])
+
+    if (results.length === 0) {
+      return null
+    }
+
+    return results[0]
+  }
+
+  /**
+   * 创建点赞记录
+   * @param likeData 点赞数据
+   * @returns Promise<Like> 创建的点赞信息
+   */
+  static async create(likeData: CreateLikeData): Promise<Like> {
+    // 验证必填字段
+    if (!likeData.wish_id || likeData.wish_id.trim().length === 0) {
+      throw new AppError('愿望ID不能为空', 400, 'INVALID_INPUT')
+    }
+    if (!likeData.user_id || likeData.user_id.trim().length === 0) {
+      throw new AppError('用户ID不能为空', 400, 'INVALID_INPUT')
+    }
+
+    // 检查是否已经点赞
+    const existingLike = await this.findByWishAndUser(likeData.wish_id, likeData.user_id)
+    if (existingLike) {
+      throw new AppError('已经点赞过该愿望', 400, 'ALREADY_LIKED')
+    }
+
+    // 生成UUID
+    const id = this.generateUUID()
+
+    const sql = `
+      INSERT INTO likes (id, wish_id, user_id)
+      VALUES (?, ?, ?)
+    `
+    await query(sql, [id, likeData.wish_id.trim(), likeData.user_id.trim()])
+
+    // 返回创建的点赞记录
+    const createdLike = await this.findById(id)
+    if (!createdLike) {
+      throw new AppError('创建点赞记录失败', 500, 'CREATE_LIKE_FAILED')
+    }
+
+    return createdLike
+  }
+
+  /**
+   * 删除点赞记录（取消点赞）
+   * @param wishId 愿望ID
+   * @param userId 用户ID
+   * @returns Promise<void>
+   */
+  static async delete(wishId: string, userId: string): Promise<void> {
+    // 检查点赞记录是否存在
+    const existingLike = await this.findByWishAndUser(wishId, userId)
+    if (!existingLike) {
+      throw new AppError('未找到点赞记录', 404, 'NOT_LIKED')
+    }
+
+    const sql = 'DELETE FROM likes WHERE wish_id = ? AND user_id = ?'
+    await query(sql, [wishId, userId])
+  }
+
+  /**
+   * 根据愿望ID查询点赞列表
+   * @param wishId 愿望ID
+   * @returns Promise<Like[]> 点赞列表
+   */
+  static async findByWishId(wishId: string): Promise<Like[]> {
+    const sql = `
+      SELECT id, wish_id, user_id, created_at
+      FROM likes
+      WHERE wish_id = ?
+      ORDER BY created_at DESC
+    `
+    return await query<Like[]>(sql, [wishId])
+  }
+
+  /**
+   * 根据用户ID查询点赞列表
+   * @param userId 用户ID
+   * @returns Promise<Like[]> 点赞列表
+   */
+  static async findByUserId(userId: string): Promise<Like[]> {
+    const sql = `
+      SELECT id, wish_id, user_id, created_at
+      FROM likes
+      WHERE user_id = ?
+      ORDER BY created_at DESC
+    `
+    return await query<Like[]>(sql, [userId])
+  }
+
+  /**
+   * 统计愿望的点赞数
+   * @param wishId 愿望ID
+   * @returns Promise<number> 点赞数
+   */
+  static async countByWishId(wishId: string): Promise<number> {
+    const sql = 'SELECT COUNT(*) as count FROM likes WHERE wish_id = ?'
+    const results = await query<{ count: number }[]>(sql, [wishId])
+    return results[0]?.count || 0
+  }
+
+  /**
+   * 检查用户是否已点赞
+   * @param wishId 愿望ID
+   * @param userId 用户ID
+   * @returns Promise<boolean> 是否已点赞
+   */
+  static async isLiked(wishId: string, userId: string): Promise<boolean> {
+    const like = await this.findByWishAndUser(wishId, userId)
+    return like !== null
+  }
+
+  /**
+   * 生成UUID（简化版本）
+   * @returns string UUID字符串
+   */
+  private static generateUUID(): string {
+    return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}-${Math.random().toString(36).substr(2, 9)}`
+  }
+}
+
+/**
+ * 收藏模型类
+ * 提供收藏相关的数据库操作方法
+ */
+export class FavoriteModel {
+  /**
+   * 根据ID查询收藏记录
+   * @param id 收藏ID
+   * @returns Promise<Favorite | null> 收藏信息
+   */
+  static async findById(id: string): Promise<Favorite | null> {
+    const sql = `
+      SELECT id, wish_id, user_id, created_at
+      FROM favorites
+      WHERE id = ?
+    `
+    const results = await query<Favorite[]>(sql, [id])
+
+    if (results.length === 0) {
+      return null
+    }
+
+    return results[0]
+  }
+
+  /**
+   * 根据愿望ID和用户ID查询收藏记录
+   * @param wishId 愿望ID
+   * @param userId 用户ID
+   * @returns Promise<Favorite | null> 收藏信息
+   */
+  static async findByWishAndUser(wishId: string, userId: string): Promise<Favorite | null> {
+    const sql = `
+      SELECT id, wish_id, user_id, created_at
+      FROM favorites
+      WHERE wish_id = ? AND user_id = ?
+    `
+    const results = await query<Favorite[]>(sql, [wishId, userId])
+
+    if (results.length === 0) {
+      return null
+    }
+
+    return results[0]
+  }
+
+  /**
+   * 创建收藏记录
+   * @param favoriteData 收藏数据
+   * @returns Promise<Favorite> 创建的收藏信息
+   */
+  static async create(favoriteData: CreateFavoriteData): Promise<Favorite> {
+    // 验证必填字段
+    if (!favoriteData.wish_id || favoriteData.wish_id.trim().length === 0) {
+      throw new AppError('愿望ID不能为空', 400, 'INVALID_INPUT')
+    }
+    if (!favoriteData.user_id || favoriteData.user_id.trim().length === 0) {
+      throw new AppError('用户ID不能为空', 400, 'INVALID_INPUT')
+    }
+
+    // 检查是否已经收藏
+    const existingFavorite = await this.findByWishAndUser(
+      favoriteData.wish_id,
+      favoriteData.user_id
+    )
+    if (existingFavorite) {
+      throw new AppError('已经收藏过该愿望', 400, 'ALREADY_FAVORITED')
+    }
+
+    // 生成UUID
+    const id = this.generateUUID()
+
+    const sql = `
+      INSERT INTO favorites (id, wish_id, user_id)
+      VALUES (?, ?, ?)
+    `
+    await query(sql, [id, favoriteData.wish_id.trim(), favoriteData.user_id.trim()])
+
+    // 返回创建的收藏记录
+    const createdFavorite = await this.findById(id)
+    if (!createdFavorite) {
+      throw new AppError('创建收藏记录失败', 500, 'CREATE_FAVORITE_FAILED')
+    }
+
+    return createdFavorite
+  }
+
+  /**
+   * 删除收藏记录（取消收藏）
+   * @param wishId 愿望ID
+   * @param userId 用户ID
+   * @returns Promise<void>
+   */
+  static async delete(wishId: string, userId: string): Promise<void> {
+    // 检查收藏记录是否存在
+    const existingFavorite = await this.findByWishAndUser(wishId, userId)
+    if (!existingFavorite) {
+      throw new AppError('未找到收藏记录', 404, 'NOT_FAVORITED')
+    }
+
+    const sql = 'DELETE FROM favorites WHERE wish_id = ? AND user_id = ?'
+    await query(sql, [wishId, userId])
+  }
+
+  /**
+   * 根据愿望ID查询收藏列表
+   * @param wishId 愿望ID
+   * @returns Promise<Favorite[]> 收藏列表
+   */
+  static async findByWishId(wishId: string): Promise<Favorite[]> {
+    const sql = `
+      SELECT id, wish_id, user_id, created_at
+      FROM favorites
+      WHERE wish_id = ?
+      ORDER BY created_at DESC
+    `
+    return await query<Favorite[]>(sql, [wishId])
+  }
+
+  /**
+   * 根据用户ID查询收藏列表（分页）
+   * @param userId 用户ID
+   * @param options 查询选项
+   * @returns Promise<{ favorites: Favorite[], total: number, page: number, pageSize: number, totalPages: number }> 收藏列表和分页信息
+   */
+  static async findByUserId(
+    userId: string,
+    options: { page?: number; pageSize?: number } = {}
+  ): Promise<{
+    favorites: Favorite[]
+    total: number
+    page: number
+    pageSize: number
+    totalPages: number
+  }> {
+    const page = options.page || 1
+    const pageSize = options.pageSize || 20
+    const offset = (page - 1) * pageSize
+
+    // 查询总数
+    const countSql = 'SELECT COUNT(*) as total FROM favorites WHERE user_id = ?'
+    const countResults = await query<{ total: number }[]>(countSql, [userId])
+    const total = countResults[0]?.total || 0
+
+    // 查询收藏列表
+    const sql = `
+      SELECT id, wish_id, user_id, created_at
+      FROM favorites
+      WHERE user_id = ?
+      ORDER BY created_at DESC
+      LIMIT ? OFFSET ?
+    `
+    const favorites = await query<Favorite[]>(sql, [userId, pageSize, offset])
+
+    return {
+      favorites,
+      total,
+      page,
+      pageSize,
+      totalPages: Math.ceil(total / pageSize)
+    }
+  }
+
+  /**
+   * 统计愿望的收藏数
+   * @param wishId 愿望ID
+   * @returns Promise<number> 收藏数
+   */
+  static async countByWishId(wishId: string): Promise<number> {
+    const sql = 'SELECT COUNT(*) as count FROM favorites WHERE wish_id = ?'
+    const results = await query<{ count: number }[]>(sql, [wishId])
+    return results[0]?.count || 0
+  }
+
+  /**
+   * 检查用户是否已收藏
+   * @param wishId 愿望ID
+   * @param userId 用户ID
+   * @returns Promise<boolean> 是否已收藏
+   */
+  static async isFavorited(wishId: string, userId: string): Promise<boolean> {
+    const favorite = await this.findByWishAndUser(wishId, userId)
+    return favorite !== null
+  }
+
+  /**
+   * 生成UUID（简化版本）
+   * @returns string UUID字符串
+   */
+  private static generateUUID(): string {
+    return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}-${Math.random().toString(36).substr(2, 9)}`
+  }
+}
