@@ -69,7 +69,7 @@ task: Build a Web page app in Vue
 ### Phase 5: User Story - 愿望提交功能
 
 - [ ] T030 [测试] [P] 为愿望提交接口编写测试 `backend/tests/wish-create.spec.ts`
-- [ ] T031 [数据模型] 定义愿望表单验证规则 `frontend/src/utils/validation.ts`
+- [x] T031 [数据模型] 定义愿望表单验证规则 `src/utils/validation.js`
 - [ ] T032 [业务逻辑] 实现愿望创建服务 `backend/src/services/WishCreateService.ts`
 - [ ] T033 [API] 实现愿望提交相关路由 `backend/src/controllers/WishCreateController.ts`
 - [ ] T034 [UI] 创建愿望提交页面 `frontend/src/pages/WishSubmit/index.tsx`
