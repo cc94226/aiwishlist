@@ -3,8 +3,8 @@
 # DO NOT EDIT - regenerated on task file change
 
 source_file: RALPH_TASK.md
-source_mtime: 1769588499
-generated_at: 2026-01-28T08:21:46Z
+source_mtime: 1769588523
+generated_at: 2026-01-28T08:22:16Z
 
 tasks:
   - id: "line_26"
@@ -163,9 +163,9 @@ tasks:
     raw_marker: -
   - id: "line_54"
     line_number: 54
-    status: pending
+    status: completed
     parallel_group: 999999
-    description: T017.4 [测试] 创建前端认证系统完整测试套件 `frontend/src/**/__tests__/*.test.tsx`
+    description: T017.4 [测试] 创建前端认证系统完整测试套件 `src/views/__tests__/*.test.js` (Vue项目已实现)
     indent_level: 0
     raw_marker: -
   - id: "line_58"
