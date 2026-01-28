@@ -816,6 +816,25 @@ Phase 3任务项中，T012已完成。认证接口的测试用例已完整编写
 
 **已完成的工作：**
 
+- ✅ T017.4: 创建前端认证系统完整测试套件
+  - 创建Login.vue组件测试文件（src/views/__tests__/Login.test.js）
+    - 测试组件渲染、表单验证、登录功能、已登录用户重定向、记住我功能
+    - 共9个测试用例，全部通过
+  - 创建Register.vue组件测试文件（src/views/__tests__/Register.test.js）
+    - 测试组件渲染、表单验证（姓名、邮箱、密码、确认密码）、注册功能、已登录用户重定向
+    - 共11个测试用例，全部通过
+  - 创建路由守卫guards.js测试文件（src/router/__tests__/guards.test.js）
+    - 测试requireAuth、requireAdmin、redirectIfAuthenticated三个路由守卫
+    - 共8个测试用例，全部通过
+  - 安装测试依赖（@vue/test-utils, vitest, @vitest/ui, jsdom）
+  - 添加测试脚本到package.json（test, test:ui, test:coverage）
+  - 所有38个测试用例全部通过
+
+**当前状态：**
+Phase 3任务项中，T017.4已完成。前端认证系统的完整测试套件已创建，覆盖了登录、注册、路由守卫等核心功能。
+
+**已完成的工作（续）：**
+
 - ✅ T023: 实现愿望查询服务（backend/src/services/WishService.ts）
   - 创建WishService类，提供完整的愿望查询业务逻辑
   - 实现getWishList方法 - 获取愿望列表（支持分页、筛选、排序、搜索）
