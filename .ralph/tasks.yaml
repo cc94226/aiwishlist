@@ -3,8 +3,8 @@
 # DO NOT EDIT - regenerated on task file change
 
 source_file: RALPH_TASK.md
-source_mtime: 1769589343
-generated_at: 2026-01-28T08:36:04Z
+source_mtime: 1769589432
+generated_at: 2026-01-28T08:37:14Z
 
 tasks:
   - id: "line_26"
@@ -401,9 +401,9 @@ tasks:
     raw_marker: -
   - id: "line_103"
     line_number: 103
-    status: pending
+    status: completed
     parallel_group: 999999
-    description: T053 [配置] 实现错误边界和异常处理 `frontend/src/components/ErrorBoundary/index.tsx`
+    description: T053 [配置] 实现错误边界和异常处理 `src/components/ErrorBoundary/index.vue`
     indent_level: 0
     raw_marker: -
   - id: "line_104"

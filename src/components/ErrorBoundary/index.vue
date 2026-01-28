@@ -8,11 +8,15 @@
         <button class="btn-retry" @click="handleRetry">重试</button>
         <button class="btn-home" @click="handleGoHome">返回首页</button>
       </div>
-      <details v-if="showDetails || (process.env.NODE_ENV === 'development')" class="error-details">
+      <details v-if="showDetails || process.env.NODE_ENV === 'development'" class="error-details">
         <summary @click="toggleDetails">错误详情</summary>
         <pre class="error-stack">{{ errorStack }}</pre>
       </details>
-      <button v-if="!showDetails && process.env.NODE_ENV === 'development'" class="btn-details" @click="toggleDetails">
+      <button
+        v-if="!showDetails && process.env.NODE_ENV === 'development'"
+        class="btn-details"
+        @click="toggleDetails"
+      >
         显示错误详情
       </button>
     </div>
@@ -34,64 +38,68 @@ export default {
   computed: {
     errorMessage() {
       if (!this.error) return '发生未知错误'
-      
+
       // 根据错误类型返回友好的错误消息
       const errorName = this.error.name || ''
       const errorMessage = this.error.message || ''
-      
+
       // 处理常见的错误类型
       if (errorName === 'ChunkLoadError' || errorMessage.includes('chunk')) {
         return '组件加载失败，请刷新页面重试'
       }
-      
-      if (errorName === 'NetworkError' || errorMessage.includes('network') || errorMessage.includes('fetch')) {
+
+      if (
+        errorName === 'NetworkError' ||
+        errorMessage.includes('network') ||
+        errorMessage.includes('fetch')
+      ) {
         return '网络连接失败，请检查网络设置'
       }
-      
+
       if (errorName === 'TypeError' && errorMessage.includes('undefined')) {
         return '数据加载异常，请刷新页面重试'
       }
-      
+
       if (errorName === 'SyntaxError') {
         return '代码解析错误，请联系管理员'
       }
-      
+
       if (errorMessage.includes('timeout') || errorMessage.includes('超时')) {
         return '请求超时，请稍后重试'
       }
-      
+
       if (errorMessage.includes('404') || errorMessage.includes('not found')) {
         return '请求的资源不存在'
       }
-      
+
       if (errorMessage.includes('401') || errorMessage.includes('unauthorized')) {
         return '未授权，请先登录'
       }
-      
+
       if (errorMessage.includes('403') || errorMessage.includes('forbidden')) {
         return '权限不足，无法执行此操作'
       }
-      
+
       if (errorMessage.includes('500') || errorMessage.includes('server error')) {
         return '服务器错误，请稍后重试'
       }
-      
+
       // 如果有错误消息，返回错误消息（限制长度）
       if (errorMessage && errorMessage.length > 0) {
         return errorMessage.length > 100 ? errorMessage.substring(0, 100) + '...' : errorMessage
       }
-      
+
       return '发生错误，请稍后重试'
     },
     errorStack() {
       if (!this.error) return ''
-      
+
       let stack = this.error.stack || ''
-      
+
       if (this.errorInfo && this.errorInfo.componentStack) {
         stack += '\n\n组件堆栈:\n' + this.errorInfo.componentStack
       }
-      
+
       return stack
     }
   },
@@ -103,10 +111,10 @@ export default {
       componentStack: info,
       instance,
       timestamp: new Date().toISOString(),
-      url: window.location.href,
-      userAgent: navigator.userAgent
+      url: typeof window !== 'undefined' ? window.location.href : 'unknown',
+      userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'unknown'
     }
-    
+
     // 记录错误到控制台
     console.error('ErrorBoundary捕获到错误:', {
       error: err,
@@ -115,10 +123,10 @@ export default {
       url: window.location.href,
       timestamp: new Date().toISOString()
     })
-    
+
     // 发送错误报告到服务器
     this.reportError(err, info)
-    
+
     // 返回false阻止错误继续传播
     return false
   },
@@ -140,7 +148,7 @@ export default {
       this.error = null
       this.errorInfo = null
       this.showDetails = false
-      
+
       // 触发重新渲染
       this.$forceUpdate()
     },
@@ -157,7 +165,6 @@ export default {
       const _unused = { err, errorInfo } // 保留参数以便将来使用
       if (process.env.NODE_ENV === 'production') {
         // 示例：发送错误到监控服务
-         
         // const userAgent = typeof navigator !== 'undefined' ? navigator.userAgent : 'unknown'
         // fetch('/api/errors', {
         //   method: 'POST',
@@ -195,9 +202,10 @@ export default {
       // 处理未捕获的Promise拒绝
       if (!this.hasError) {
         this.hasError = true
-        const error = event.reason instanceof Error 
-          ? event.reason 
-          : new Error(String(event.reason || 'Promise被拒绝'))
+        const error =
+          event.reason instanceof Error
+            ? event.reason
+            : new Error(String(event.reason || 'Promise被拒绝'))
         this.error = error
         this.errorInfo = {
           type: 'unhandledrejection',

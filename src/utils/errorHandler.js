@@ -137,8 +137,8 @@ class ErrorHandler {
         type: error.type,
         stack: error.stack,
         timestamp: error.timestamp,
-        userAgent: navigator.userAgent,
-        url: window.location.href,
+        userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'unknown',
+        url: typeof window !== 'undefined' ? window.location.href : 'unknown',
         ...errorInfo
       }
 
@@ -168,7 +168,9 @@ class ErrorHandler {
    */
   getFriendlyMessage(error) {
     const appError = AppError.fromError(error)
-    return appError.message || ErrorMessages[appError.type] || ErrorMessages[ErrorTypes.UNKNOWN_ERROR]
+    return (
+      appError.message || ErrorMessages[appError.type] || ErrorMessages[ErrorTypes.UNKNOWN_ERROR]
+    )
   }
 }
 
@@ -178,13 +180,64 @@ export const errorHandler = new ErrorHandler()
 /**
  * 设置全局错误处理
  */
-export function setupGlobalErrorHandling(app) {
+export function setupGlobalErrorHandling(app, router = null) {
   // Vue应用错误处理
   app.config.errorHandler = (err, instance, info) => {
     errorHandler.handleError(err, {
       type: 'vue',
       component: instance?.$options?.name || 'Unknown',
-      info
+      info,
+      url: window.location.href,
+      timestamp: new Date().toISOString()
+    })
+  }
+
+  // Vue警告处理
+  app.config.warnHandler = (msg, instance, trace) => {
+    if (process.env.NODE_ENV === 'development') {
+      console.warn('Vue警告:', {
+        message: msg,
+        instance: instance,
+        trace: trace,
+        url: window.location.href,
+        timestamp: new Date().toISOString()
+      })
+    }
+  }
+
+  // 路由错误处理
+  if (router) {
+    router.onError(error => {
+      console.error('路由错误:', error)
+
+      // 处理常见的路由错误
+      if (error.name === 'ChunkLoadError' || error.message?.includes('chunk')) {
+        // 代码分割加载失败，尝试重新加载
+        console.warn('代码块加载失败，尝试重新加载页面')
+        errorHandler.handleError(error, {
+          type: 'router',
+          errorType: 'ChunkLoadError',
+          url: window.location.href
+        })
+
+        // 延迟重新加载，给用户时间看到错误信息
+        setTimeout(() => {
+          window.location.reload()
+        }, 2000)
+        return
+      }
+
+      // 其他路由错误
+      errorHandler.handleError(error, {
+        type: 'router',
+        url: window.location.href
+      })
+
+      // 跳转到首页
+      router.push('/').catch(() => {
+        console.error('路由跳转失败，使用window.location')
+        window.location.href = '/'
+      })
     })
   }
 
@@ -194,17 +247,28 @@ export function setupGlobalErrorHandling(app) {
       type: 'global',
       filename: event.filename,
       lineno: event.lineno,
-      colno: event.colno
+      colno: event.colno,
+      url: window.location.href,
+      timestamp: new Date().toISOString()
     })
   })
 
   // 未处理的Promise拒绝
   window.addEventListener('unhandledrejection', event => {
-    errorHandler.handleError(event.reason || new Error('未处理的Promise拒绝'), {
-      type: 'unhandledrejection'
+    const error =
+      event.reason instanceof Error
+        ? event.reason
+        : new Error(String(event.reason || '未处理的Promise拒绝'))
+
+    errorHandler.handleError(error, {
+      type: 'unhandledrejection',
+      reason: String(event.reason),
+      url: window.location.href,
+      timestamp: new Date().toISOString()
     })
-    // 阻止默认行为
-    event.preventDefault()
+
+    // 阻止默认行为（在控制台显示错误）
+    // event.preventDefault()
   })
 }
 

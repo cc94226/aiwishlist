@@ -32,7 +32,8 @@ export default [
         clearTimeout: 'readonly',
         clearInterval: 'readonly',
         requestIdleCallback: 'readonly',
-        cancelIdleCallback: 'readonly'
+        cancelIdleCallback: 'readonly',
+        navigator: 'readonly'
       }
     },
     rules: {

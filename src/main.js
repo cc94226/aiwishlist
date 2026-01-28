@@ -10,8 +10,8 @@ initDefaultAdmin()
 
 const app = createApp(App)
 
-// 设置全局错误处理
-setupGlobalErrorHandling(app)
+// 设置全局错误处理（传入router以支持路由错误处理）
+setupGlobalErrorHandling(app, router)
 
 // 全局警告处理
 app.config.warnHandler = (msg, instance, trace) => {

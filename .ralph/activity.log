@@ -937,3 +937,12 @@ Ralph Session Started: 2026年 1月28日 星期三 16时36分07秒 CST
 [16:37:08] 🔴 READ src/main.js (26 lines, ~2.5KB)
 [16:37:10] 🔴 READ src/utils/api.js (320 lines, ~31.2KB)
 [16:37:10] 🔴 WARN: Approaching token limit (74813 >= 70000)
+[16:37:14] 🔴 READ src/utils/errorHandler.js (231 lines, ~22.5KB)
+[16:37:14] 🔴 ROTATE: Token threshold reached (80596 >= 80000)
+
+═══════════════════════════════════════════════════════════════
+Ralph Session Started: 2026年 1月28日 星期三 16时37分16秒 CST
+═══════════════════════════════════════════════════════════════
+[16:37:17] 🔴 TOKENS: 80596 / 80000 (100%) - rotation imminent [read:311KB write:0KB assist:0KB shell:0KB]
+[16:37:23] 🔴 ROTATE: Token threshold reached (80604 >= 80000)
+[16:37:25] 🟢 SESSION START: model=Composer 1
