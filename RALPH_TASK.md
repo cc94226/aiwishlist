@@ -73,7 +73,7 @@ task: Build a Web page app in Vue
 - [ ] T032 [业务逻辑] 实现愿望创建服务 `backend/src/services/WishCreateService.ts`
 - [ ] T033 [API] 实现愿望提交相关路由 `backend/src/controllers/WishCreateController.ts`
 - [x] T034 [UI] 创建愿望提交页面 `src/views/SubmitWish.vue` (Vue项目已实现)
-- [ ] T035 [UI] 创建愿望表单组件 `frontend/src/components/WishForm/index.tsx`
+- [x] T035 [UI] 创建愿望表单组件 `src/views/SubmitWish.vue` (Vue项目中已实现愿望表单功能)
 
 ### Phase 6: User Story - 互动功能 (点赞、收藏、评论)
 
