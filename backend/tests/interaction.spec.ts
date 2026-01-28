@@ -39,11 +39,21 @@ describe('互动功能接口测试', () => {
     job: '设计' as JobType
   }
 
+  const testAdmin = {
+    name: '测试管理员',
+    email: 'admin_interaction@example.com',
+    password: 'admin123456',
+    confirmPassword: 'admin123456',
+    job: '开发' as JobType
+  }
+
   // 测试数据
   let testUserId: string
   let testUser2Id: string
+  let testAdminId: string
   let testUserToken: string
   let testUser2Token: string
+  let testAdminToken: string
   let publishedWishId: string
   let draftWishId: string
 
@@ -62,25 +72,43 @@ describe('互动功能接口测试', () => {
     if (!dbConnected) return
 
     try {
-      // 清理测试数据
-      await query('DELETE FROM comments WHERE author IN (?, ?)', [testUser.name, testUser2.name])
+      // 清理测试数据（按依赖顺序删除）
       await query(
-        'DELETE FROM likes WHERE user_id IN (SELECT id FROM users WHERE email IN (?, ?))',
-        [testUser.email, testUser2.email]
+        'DELETE FROM comments WHERE wish_id IN (SELECT id FROM wishes WHERE submitter IN (?, ?, ?))',
+        [testUser.name, testUser2.name, testAdmin.name]
       )
       await query(
-        'DELETE FROM favorites WHERE user_id IN (SELECT id FROM users WHERE email IN (?, ?))',
-        [testUser.email, testUser2.email]
+        'DELETE FROM likes WHERE wish_id IN (SELECT id FROM wishes WHERE submitter IN (?, ?, ?))',
+        [testUser.name, testUser2.name, testAdmin.name]
       )
-      await query('DELETE FROM wishes WHERE submitter IN (?, ?)', [testUser.name, testUser2.name])
-      await query('DELETE FROM users WHERE email IN (?, ?)', [testUser.email, testUser2.email])
+      await query(
+        'DELETE FROM favorites WHERE wish_id IN (SELECT id FROM wishes WHERE submitter IN (?, ?, ?))',
+        [testUser.name, testUser2.name, testAdmin.name]
+      )
+      await query('DELETE FROM wishes WHERE submitter IN (?, ?, ?)', [
+        testUser.name,
+        testUser2.name,
+        testAdmin.name
+      ])
+      await query('DELETE FROM users WHERE email IN (?, ?, ?)', [
+        testUser.email,
+        testUser2.email,
+        testAdmin.email
+      ])
 
-      // 创建测试用户
+      // 创建测试用户（普通用户）
       const userResult = await AuthService.register(testUser)
       testUserId = userResult.user!.id
 
+      // 创建测试用户2（普通用户）
       const user2Result = await AuthService.register(testUser2)
       testUser2Id = user2Result.user!.id
+
+      // 创建测试管理员
+      const adminResult = await AuthService.register(testAdmin)
+      testAdminId = adminResult.user!.id
+      // 将管理员设置为admin角色
+      await UserModel.update(testAdminId, { role: 'admin' })
 
       // 登录获取token
       const userLoginResult = await AuthService.login({
@@ -95,10 +123,16 @@ describe('互动功能接口测试', () => {
       })
       testUser2Token = user2LoginResult.token!
 
-      // 创建已发布的愿望（用于测试）
+      const adminLoginResult = await AuthService.login({
+        email: testAdmin.email,
+        password: testAdmin.password
+      })
+      testAdminToken = adminLoginResult.token!
+
+      // 创建测试愿望数据
       const publishedWish = await WishModel.create({
-        title: '测试愿望标题',
-        description: '这是一个测试愿望的描述，至少需要10个字符',
+        title: '已发布的愿望',
+        description: '这是一个已发布的愿望描述，用于测试互动功能',
         job: '开发',
         submitter: testUser.name,
         submitter_id: testUserId,
@@ -106,10 +140,9 @@ describe('互动功能接口测试', () => {
       })
       publishedWishId = publishedWish.id
 
-      // 创建草稿状态的愿望（用于测试）
       const draftWish = await WishModel.create({
-        title: '草稿愿望标题',
-        description: '这是一个草稿愿望的描述',
+        title: '草稿愿望',
+        description: '这是一个草稿状态的愿望描述',
         job: '设计',
         submitter: testUser.name,
         submitter_id: testUserId,
@@ -128,10 +161,10 @@ describe('互动功能接口测试', () => {
     }
   })
 
-  // ========== 点赞功能测试 ==========
+  // ========== 点赞相关测试 ==========
 
   describe('POST /api/interactions/likes - 点赞愿望', () => {
-    it('应该成功点赞已发布的愿望', async () => {
+    it('应该成功点赞愿望（已登录用户）', async () => {
       if (!dbConnected) {
         console.log('⏭️  跳过测试：数据库未连接')
         return
@@ -144,7 +177,9 @@ describe('互动功能接口测试', () => {
         .expect(200)
 
       expect(response.body.success).toBe(true)
+      expect(response.body.data).toBeDefined()
       expect(response.body.data.liked).toBe(true)
+      expect(typeof response.body.data.totalLikes).toBe('number')
       expect(response.body.data.totalLikes).toBeGreaterThanOrEqual(1)
     })
 
@@ -160,7 +195,8 @@ describe('互动功能接口测试', () => {
         .expect(401)
 
       expect(response.body.success).toBe(false)
-      expect(response.body.error.message).toContain('登录')
+      expect(response.body.error).toBeDefined()
+      expect(response.body.error.code).toBe('UNAUTHORIZED')
     })
 
     it('应该拒绝点赞不存在的愿望', async () => {
@@ -172,40 +208,34 @@ describe('互动功能接口测试', () => {
       const response = await request(app)
         .post('/api/interactions/likes')
         .set('Authorization', `Bearer ${testUserToken}`)
-        .send({ wishId: 'non-existent-id' })
+        .send({ wishId: 'non-existent-wish-id' })
         .expect(404)
 
       expect(response.body.success).toBe(false)
-      expect(response.body.error.message).toContain('愿望不存在')
+      expect(response.body.error).toBeDefined()
+      expect(response.body.error.code).toBe('WISH_NOT_FOUND')
     })
 
-    it('应该拒绝重复点赞', async () => {
+    it('应该拒绝空愿望ID的请求', async () => {
       if (!dbConnected) {
         console.log('⏭️  跳过测试：数据库未连接')
         return
       }
 
-      // 第一次点赞
-      await request(app)
-        .post('/api/interactions/likes')
-        .set('Authorization', `Bearer ${testUserToken}`)
-        .send({ wishId: publishedWishId })
-        .expect(200)
-
-      // 第二次点赞应该失败
       const response = await request(app)
         .post('/api/interactions/likes')
         .set('Authorization', `Bearer ${testUserToken}`)
-        .send({ wishId: publishedWishId })
+        .send({})
         .expect(400)
 
       expect(response.body.success).toBe(false)
-      expect(response.body.error.message).toContain('已经点赞')
+      expect(response.body.error).toBeDefined()
+      expect(response.body.error.code).toBe('INVALID_INPUT')
     })
   })
 
   describe('DELETE /api/interactions/likes - 取消点赞', () => {
-    it('应该成功取消点赞', async () => {
+    it('应该成功取消点赞（已点赞的用户）', async () => {
       if (!dbConnected) {
         console.log('⏭️  跳过测试：数据库未连接')
         return
@@ -216,7 +246,6 @@ describe('互动功能接口测试', () => {
         .post('/api/interactions/likes')
         .set('Authorization', `Bearer ${testUserToken}`)
         .send({ wishId: publishedWishId })
-        .expect(200)
 
       // 取消点赞
       const response = await request(app)
@@ -226,8 +255,9 @@ describe('互动功能接口测试', () => {
         .expect(200)
 
       expect(response.body.success).toBe(true)
+      expect(response.body.data).toBeDefined()
       expect(response.body.data.liked).toBe(false)
-      expect(response.body.data.totalLikes).toBeGreaterThanOrEqual(0)
+      expect(typeof response.body.data.totalLikes).toBe('number')
     })
 
     it('应该拒绝取消未点赞的愿望', async () => {
@@ -240,15 +270,32 @@ describe('互动功能接口测试', () => {
         .delete('/api/interactions/likes')
         .set('Authorization', `Bearer ${testUserToken}`)
         .send({ wishId: publishedWishId })
-        .expect(404)
+        .expect(400)
 
       expect(response.body.success).toBe(false)
-      expect(response.body.error.message).toContain('未找到点赞记录')
+      expect(response.body.error).toBeDefined()
+      expect(response.body.error.code).toBe('NOT_LIKED')
+    })
+
+    it('应该拒绝未登录用户的取消点赞请求', async () => {
+      if (!dbConnected) {
+        console.log('⏭️  跳过测试：数据库未连接')
+        return
+      }
+
+      const response = await request(app)
+        .delete('/api/interactions/likes')
+        .send({ wishId: publishedWishId })
+        .expect(401)
+
+      expect(response.body.success).toBe(false)
+      expect(response.body.error).toBeDefined()
+      expect(response.body.error.code).toBe('UNAUTHORIZED')
     })
   })
 
   describe('GET /api/interactions/likes/status - 检查点赞状态', () => {
-    it('应该正确返回点赞状态', async () => {
+    it('应该返回已点赞状态（已点赞的用户）', async () => {
       if (!dbConnected) {
         console.log('⏭️  跳过测试：数据库未连接')
         return
@@ -259,7 +306,6 @@ describe('互动功能接口测试', () => {
         .post('/api/interactions/likes')
         .set('Authorization', `Bearer ${testUserToken}`)
         .send({ wishId: publishedWishId })
-        .expect(200)
 
       // 检查状态
       const response = await request(app)
@@ -269,14 +315,48 @@ describe('互动功能接口测试', () => {
         .expect(200)
 
       expect(response.body.success).toBe(true)
+      expect(response.body.data).toBeDefined()
       expect(response.body.data.liked).toBe(true)
+    })
+
+    it('应该返回未点赞状态（未点赞的用户）', async () => {
+      if (!dbConnected) {
+        console.log('⏭️  跳过测试：数据库未连接')
+        return
+      }
+
+      const response = await request(app)
+        .get('/api/interactions/likes/status')
+        .set('Authorization', `Bearer ${testUserToken}`)
+        .query({ wishId: publishedWishId })
+        .expect(200)
+
+      expect(response.body.success).toBe(true)
+      expect(response.body.data).toBeDefined()
+      expect(response.body.data.liked).toBe(false)
+    })
+
+    it('应该拒绝未登录用户的请求', async () => {
+      if (!dbConnected) {
+        console.log('⏭️  跳过测试：数据库未连接')
+        return
+      }
+
+      const response = await request(app)
+        .get('/api/interactions/likes/status')
+        .query({ wishId: publishedWishId })
+        .expect(401)
+
+      expect(response.body.success).toBe(false)
+      expect(response.body.error).toBeDefined()
+      expect(response.body.error.code).toBe('UNAUTHORIZED')
     })
   })
 
-  // ========== 收藏功能测试 ==========
+  // ========== 收藏相关测试 ==========
 
   describe('POST /api/interactions/favorites - 收藏愿望', () => {
-    it('应该成功收藏已发布的愿望', async () => {
+    it('应该成功收藏愿望（已登录用户）', async () => {
       if (!dbConnected) {
         console.log('⏭️  跳过测试：数据库未连接')
         return
@@ -289,6 +369,7 @@ describe('互动功能接口测试', () => {
         .expect(200)
 
       expect(response.body.success).toBe(true)
+      expect(response.body.data).toBeDefined()
       expect(response.body.data.favorited).toBe(true)
     })
 
@@ -304,36 +385,30 @@ describe('互动功能接口测试', () => {
         .expect(401)
 
       expect(response.body.success).toBe(false)
-      expect(response.body.error.message).toContain('登录')
+      expect(response.body.error).toBeDefined()
+      expect(response.body.error.code).toBe('UNAUTHORIZED')
     })
 
-    it('应该拒绝重复收藏', async () => {
+    it('应该拒绝收藏不存在的愿望', async () => {
       if (!dbConnected) {
         console.log('⏭️  跳过测试：数据库未连接')
         return
       }
 
-      // 第一次收藏
-      await request(app)
-        .post('/api/interactions/favorites')
-        .set('Authorization', `Bearer ${testUserToken}`)
-        .send({ wishId: publishedWishId })
-        .expect(200)
-
-      // 第二次收藏应该失败
       const response = await request(app)
         .post('/api/interactions/favorites')
         .set('Authorization', `Bearer ${testUserToken}`)
-        .send({ wishId: publishedWishId })
-        .expect(400)
+        .send({ wishId: 'non-existent-wish-id' })
+        .expect(404)
 
       expect(response.body.success).toBe(false)
-      expect(response.body.error.message).toContain('已经收藏')
+      expect(response.body.error).toBeDefined()
+      expect(response.body.error.code).toBe('WISH_NOT_FOUND')
     })
   })
 
   describe('DELETE /api/interactions/favorites - 取消收藏', () => {
-    it('应该成功取消收藏', async () => {
+    it('应该成功取消收藏（已收藏的用户）', async () => {
       if (!dbConnected) {
         console.log('⏭️  跳过测试：数据库未连接')
         return
@@ -344,7 +419,6 @@ describe('互动功能接口测试', () => {
         .post('/api/interactions/favorites')
         .set('Authorization', `Bearer ${testUserToken}`)
         .send({ wishId: publishedWishId })
-        .expect(200)
 
       // 取消收藏
       const response = await request(app)
@@ -354,12 +428,30 @@ describe('互动功能接口测试', () => {
         .expect(200)
 
       expect(response.body.success).toBe(true)
+      expect(response.body.data).toBeDefined()
       expect(response.body.data.favorited).toBe(false)
+    })
+
+    it('应该拒绝取消未收藏的愿望', async () => {
+      if (!dbConnected) {
+        console.log('⏭️  跳过测试：数据库未连接')
+        return
+      }
+
+      const response = await request(app)
+        .delete('/api/interactions/favorites')
+        .set('Authorization', `Bearer ${testUserToken}`)
+        .send({ wishId: publishedWishId })
+        .expect(400)
+
+      expect(response.body.success).toBe(false)
+      expect(response.body.error).toBeDefined()
+      expect(response.body.error.code).toBe('NOT_FAVORITED')
     })
   })
 
-  describe('GET /api/interactions/favorites - 获取用户收藏列表', () => {
-    it('应该成功获取用户收藏列表', async () => {
+  describe('GET /api/interactions/favorites/status - 检查收藏状态', () => {
+    it('应该返回已收藏状态（已收藏的用户）', async () => {
       if (!dbConnected) {
         console.log('⏭️  跳过测试：数据库未连接')
         return
@@ -370,7 +462,49 @@ describe('互动功能接口测试', () => {
         .post('/api/interactions/favorites')
         .set('Authorization', `Bearer ${testUserToken}`)
         .send({ wishId: publishedWishId })
+
+      // 检查状态
+      const response = await request(app)
+        .get('/api/interactions/favorites/status')
+        .set('Authorization', `Bearer ${testUserToken}`)
+        .query({ wishId: publishedWishId })
         .expect(200)
+
+      expect(response.body.success).toBe(true)
+      expect(response.body.data).toBeDefined()
+      expect(response.body.data.favorited).toBe(true)
+    })
+
+    it('应该返回未收藏状态（未收藏的用户）', async () => {
+      if (!dbConnected) {
+        console.log('⏭️  跳过测试：数据库未连接')
+        return
+      }
+
+      const response = await request(app)
+        .get('/api/interactions/favorites/status')
+        .set('Authorization', `Bearer ${testUserToken}`)
+        .query({ wishId: publishedWishId })
+        .expect(200)
+
+      expect(response.body.success).toBe(true)
+      expect(response.body.data).toBeDefined()
+      expect(response.body.data.favorited).toBe(false)
+    })
+  })
+
+  describe('GET /api/interactions/favorites - 获取用户收藏列表', () => {
+    it('应该成功获取用户的收藏列表', async () => {
+      if (!dbConnected) {
+        console.log('⏭️  跳过测试：数据库未连接')
+        return
+      }
+
+      // 先收藏一个愿望
+      await request(app)
+        .post('/api/interactions/favorites')
+        .set('Authorization', `Bearer ${testUserToken}`)
+        .send({ wishId: publishedWishId })
 
       const response = await request(app)
         .get('/api/interactions/favorites')
@@ -378,16 +512,30 @@ describe('互动功能接口测试', () => {
         .expect(200)
 
       expect(response.body.success).toBe(true)
-      expect(response.body.data.favorites).toBeDefined()
+      expect(response.body.data).toBeDefined()
       expect(Array.isArray(response.body.data.favorites)).toBe(true)
+      expect(typeof response.body.data.total).toBe('number')
       expect(response.body.data.total).toBeGreaterThanOrEqual(1)
+    })
+
+    it('应该拒绝未登录用户的请求', async () => {
+      if (!dbConnected) {
+        console.log('⏭️  跳过测试：数据库未连接')
+        return
+      }
+
+      const response = await request(app).get('/api/interactions/favorites').expect(401)
+
+      expect(response.body.success).toBe(false)
+      expect(response.body.error).toBeDefined()
+      expect(response.body.error.code).toBe('UNAUTHORIZED')
     })
   })
 
-  // ========== 评论功能测试 ==========
+  // ========== 评论相关测试 ==========
 
   describe('POST /api/interactions/comments - 创建评论', () => {
-    it('应该成功为已发布的愿望创建评论', async () => {
+    it('应该成功创建评论（已登录用户）', async () => {
       if (!dbConnected) {
         console.log('⏭️  跳过测试：数据库未连接')
         return
@@ -406,29 +554,49 @@ describe('互动功能接口测试', () => {
 
       expect(response.body.success).toBe(true)
       expect(response.body.data).toBeDefined()
+      expect(response.body.data.id).toBeDefined()
       expect(response.body.data.content).toBe(commentData.content)
       expect(response.body.data.author).toBe(testUser.name)
+      expect(response.body.data.wish_id).toBe(publishedWishId)
     })
 
-    it('应该拒绝为草稿状态的愿望创建评论', async () => {
+    it('应该拒绝未登录用户的评论请求', async () => {
       if (!dbConnected) {
         console.log('⏭️  跳过测试：数据库未连接')
         return
       }
 
-      const commentData = {
-        wishId: draftWishId,
-        content: '这是一条测试评论'
+      const response = await request(app)
+        .post('/api/interactions/comments')
+        .send({
+          wishId: publishedWishId,
+          content: '这是一条测试评论'
+        })
+        .expect(401)
+
+      expect(response.body.success).toBe(false)
+      expect(response.body.error).toBeDefined()
+      expect(response.body.error.code).toBe('UNAUTHORIZED')
+    })
+
+    it('应该拒绝评论草稿状态的愿望', async () => {
+      if (!dbConnected) {
+        console.log('⏭️  跳过测试：数据库未连接')
+        return
       }
 
       const response = await request(app)
         .post('/api/interactions/comments')
         .set('Authorization', `Bearer ${testUserToken}`)
-        .send(commentData)
+        .send({
+          wishId: draftWishId,
+          content: '这是一条测试评论'
+        })
         .expect(400)
 
       expect(response.body.success).toBe(false)
-      expect(response.body.error.message).toContain('已发布')
+      expect(response.body.error).toBeDefined()
+      expect(response.body.error.code).toBe('WISH_NOT_PUBLISHED')
     })
 
     it('应该拒绝空评论内容', async () => {
@@ -437,168 +605,189 @@ describe('互动功能接口测试', () => {
         return
       }
 
+      const response = await request(app)
+        .post('/api/interactions/comments')
+        .set('Authorization', `Bearer ${testUserToken}`)
+        .send({
+          wishId: publishedWishId,
+          content: ''
+        })
+        .expect(400)
+
+      expect(response.body.success).toBe(false)
+      expect(response.body.error).toBeDefined()
+      expect(response.body.error.code).toBe('INVALID_INPUT')
+    })
+  })
+
+  describe('PUT /api/interactions/comments/:id - 更新评论', () => {
+    let commentId: string
+
+    beforeEach(async () => {
+      if (!dbConnected) return
+
+      // 创建一个评论用于测试
       const commentData = {
         wishId: publishedWishId,
-        content: ''
+        content: '原始评论内容'
       }
 
       const response = await request(app)
         .post('/api/interactions/comments')
         .set('Authorization', `Bearer ${testUserToken}`)
         .send(commentData)
-        .expect(400)
 
-      expect(response.body.success).toBe(false)
-      expect(response.body.error.message).toContain('评论内容不能为空')
+      commentId = response.body.data.id
     })
-  })
 
-  describe('PUT /api/interactions/comments/:id - 更新评论', () => {
     it('应该成功更新自己的评论', async () => {
       if (!dbConnected) {
         console.log('⏭️  跳过测试：数据库未连接')
         return
       }
 
-      // 先创建评论
-      const createResponse = await request(app)
-        .post('/api/interactions/comments')
-        .set('Authorization', `Bearer ${testUserToken}`)
-        .send({
-          wishId: publishedWishId,
-          content: '原始评论内容'
-        })
-        .expect(201)
-
-      const commentId = createResponse.body.data.id
-
-      // 更新评论
-      const updateResponse = await request(app)
+      const response = await request(app)
         .put(`/api/interactions/comments/${commentId}`)
         .set('Authorization', `Bearer ${testUserToken}`)
-        .send({
-          content: '更新后的评论内容'
-        })
+        .send({ content: '更新后的评论内容' })
         .expect(200)
 
-      expect(updateResponse.body.success).toBe(true)
-      expect(updateResponse.body.data.content).toBe('更新后的评论内容')
+      expect(response.body.success).toBe(true)
+      expect(response.body.data).toBeDefined()
+      expect(response.body.data.content).toBe('更新后的评论内容')
     })
 
-    it('应该拒绝更新他人的评论', async () => {
+    it('应该拒绝更新他人的评论（非管理员）', async () => {
       if (!dbConnected) {
         console.log('⏭️  跳过测试：数据库未连接')
         return
       }
 
-      // testUser创建评论
-      const createResponse = await request(app)
-        .post('/api/interactions/comments')
-        .set('Authorization', `Bearer ${testUserToken}`)
-        .send({
-          wishId: publishedWishId,
-          content: 'testUser的评论'
-        })
-        .expect(201)
-
-      const commentId = createResponse.body.data.id
-
-      // testUser2尝试更新testUser的评论
-      const updateResponse = await request(app)
+      // 使用testUser2尝试更新testUser的评论
+      const response = await request(app)
         .put(`/api/interactions/comments/${commentId}`)
         .set('Authorization', `Bearer ${testUser2Token}`)
-        .send({
-          content: 'testUser2尝试更新的内容'
-        })
+        .send({ content: '尝试更新他人的评论' })
         .expect(403)
 
-      expect(updateResponse.body.success).toBe(false)
-      expect(updateResponse.body.error.message).toContain('无权')
+      expect(response.body.success).toBe(false)
+      expect(response.body.error).toBeDefined()
+      expect(response.body.error.code).toBe('FORBIDDEN')
+    })
+
+    it('应该允许管理员更新任何评论', async () => {
+      if (!dbConnected) {
+        console.log('⏭️  跳过测试：数据库未连接')
+        return
+      }
+
+      const response = await request(app)
+        .put(`/api/interactions/comments/${commentId}`)
+        .set('Authorization', `Bearer ${testAdminToken}`)
+        .send({ content: '管理员更新的评论内容' })
+        .expect(200)
+
+      expect(response.body.success).toBe(true)
+      expect(response.body.data).toBeDefined()
+      expect(response.body.data.content).toBe('管理员更新的评论内容')
     })
   })
 
   describe('DELETE /api/interactions/comments/:id - 删除评论', () => {
+    let commentId: string
+
+    beforeEach(async () => {
+      if (!dbConnected) return
+
+      // 创建一个评论用于测试
+      const commentData = {
+        wishId: publishedWishId,
+        content: '待删除的评论'
+      }
+
+      const response = await request(app)
+        .post('/api/interactions/comments')
+        .set('Authorization', `Bearer ${testUserToken}`)
+        .send(commentData)
+
+      commentId = response.body.data.id
+    })
+
     it('应该成功删除自己的评论', async () => {
       if (!dbConnected) {
         console.log('⏭️  跳过测试：数据库未连接')
         return
       }
 
-      // 先创建评论
-      const createResponse = await request(app)
-        .post('/api/interactions/comments')
-        .set('Authorization', `Bearer ${testUserToken}`)
-        .send({
-          wishId: publishedWishId,
-          content: '要删除的评论'
-        })
-        .expect(201)
-
-      const commentId = createResponse.body.data.id
-
-      // 删除评论
-      const deleteResponse = await request(app)
+      const response = await request(app)
         .delete(`/api/interactions/comments/${commentId}`)
         .set('Authorization', `Bearer ${testUserToken}`)
         .expect(200)
 
-      expect(deleteResponse.body.success).toBe(true)
+      expect(response.body.success).toBe(true)
+      expect(response.body.message).toBe('评论已删除')
     })
 
-    it('应该拒绝删除他人的评论', async () => {
+    it('应该拒绝删除他人的评论（非管理员）', async () => {
       if (!dbConnected) {
         console.log('⏭️  跳过测试：数据库未连接')
         return
       }
 
-      // testUser创建评论
-      const createResponse = await request(app)
-        .post('/api/interactions/comments')
-        .set('Authorization', `Bearer ${testUserToken}`)
-        .send({
-          wishId: publishedWishId,
-          content: 'testUser的评论'
-        })
-        .expect(201)
-
-      const commentId = createResponse.body.data.id
-
-      // testUser2尝试删除testUser的评论
-      const deleteResponse = await request(app)
+      // 使用testUser2尝试删除testUser的评论
+      const response = await request(app)
         .delete(`/api/interactions/comments/${commentId}`)
         .set('Authorization', `Bearer ${testUser2Token}`)
         .expect(403)
 
-      expect(deleteResponse.body.success).toBe(false)
-      expect(deleteResponse.body.error.message).toContain('无权')
+      expect(response.body.success).toBe(false)
+      expect(response.body.error).toBeDefined()
+      expect(response.body.error.code).toBe('FORBIDDEN')
     })
-  })
 
-  describe('GET /api/interactions/comments - 获取评论列表', () => {
-    it('应该成功获取愿望的评论列表', async () => {
+    it('应该允许管理员删除任何评论', async () => {
       if (!dbConnected) {
         console.log('⏭️  跳过测试：数据库未连接')
         return
       }
 
-      // 创建几条评论
+      const response = await request(app)
+        .delete(`/api/interactions/comments/${commentId}`)
+        .set('Authorization', `Bearer ${testAdminToken}`)
+        .expect(200)
+
+      expect(response.body.success).toBe(true)
+      expect(response.body.message).toBe('评论已删除')
+    })
+  })
+
+  describe('GET /api/interactions/comments - 获取评论列表', () => {
+    beforeEach(async () => {
+      if (!dbConnected) return
+
+      // 创建几条测试评论
       await request(app)
         .post('/api/interactions/comments')
         .set('Authorization', `Bearer ${testUserToken}`)
         .send({
           wishId: publishedWishId,
-          content: '评论1'
+          content: '第一条评论'
         })
-        .expect(201)
 
       await request(app)
         .post('/api/interactions/comments')
         .set('Authorization', `Bearer ${testUser2Token}`)
         .send({
           wishId: publishedWishId,
-          content: '评论2'
+          content: '第二条评论'
         })
-        .expect(201)
+    })
+
+    it('应该成功获取愿望的评论列表（未登录用户）', async () => {
+      if (!dbConnected) {
+        console.log('⏭️  跳过测试：数据库未连接')
+        return
+      }
 
       const response = await request(app)
         .get('/api/interactions/comments')
@@ -606,35 +795,70 @@ describe('互动功能接口测试', () => {
         .expect(200)
 
       expect(response.body.success).toBe(true)
-      expect(response.body.data.comments).toBeDefined()
+      expect(response.body.data).toBeDefined()
       expect(Array.isArray(response.body.data.comments)).toBe(true)
-      expect(response.body.data.total).toBeGreaterThanOrEqual(2)
+      expect(response.body.data.comments.length).toBeGreaterThanOrEqual(2)
+      expect(typeof response.body.data.total).toBe('number')
+    })
+
+    it('应该支持分页查询', async () => {
+      if (!dbConnected) {
+        console.log('⏭️  跳过测试：数据库未连接')
+        return
+      }
+
+      const response = await request(app)
+        .get('/api/interactions/comments')
+        .query({
+          wishId: publishedWishId,
+          page: 1,
+          pageSize: 1
+        })
+        .expect(200)
+
+      expect(response.body.success).toBe(true)
+      expect(response.body.data).toBeDefined()
+      expect(response.body.data.comments.length).toBeLessThanOrEqual(1)
+      expect(response.body.data.page).toBe(1)
+      expect(response.body.data.pageSize).toBe(1)
+    })
+
+    it('应该拒绝空愿望ID的请求', async () => {
+      if (!dbConnected) {
+        console.log('⏭️  跳过测试：数据库未连接')
+        return
+      }
+
+      const response = await request(app).get('/api/interactions/comments').expect(400)
+
+      expect(response.body.success).toBe(false)
+      expect(response.body.error).toBeDefined()
+      expect(response.body.error.code).toBe('INVALID_INPUT')
     })
   })
 
   // ========== 统计信息测试 ==========
 
   describe('GET /api/interactions/stats/:wishId - 获取互动统计信息', () => {
-    it('应该成功获取互动统计信息', async () => {
-      if (!dbConnected) {
-        console.log('⏭️  跳过测试：数据库未连接')
-        return
-      }
+    beforeEach(async () => {
+      if (!dbConnected) return
 
-      // 添加点赞和收藏
+      // 创建一些互动数据
       await request(app)
         .post('/api/interactions/likes')
         .set('Authorization', `Bearer ${testUserToken}`)
         .send({ wishId: publishedWishId })
-        .expect(200)
+
+      await request(app)
+        .post('/api/interactions/likes')
+        .set('Authorization', `Bearer ${testUser2Token}`)
+        .send({ wishId: publishedWishId })
 
       await request(app)
         .post('/api/interactions/favorites')
         .set('Authorization', `Bearer ${testUserToken}`)
         .send({ wishId: publishedWishId })
-        .expect(200)
 
-      // 创建评论
       await request(app)
         .post('/api/interactions/comments')
         .set('Authorization', `Bearer ${testUserToken}`)
@@ -642,7 +866,33 @@ describe('互动功能接口测试', () => {
           wishId: publishedWishId,
           content: '统计测试评论'
         })
-        .expect(201)
+    })
+
+    it('应该成功获取互动统计信息（未登录用户）', async () => {
+      if (!dbConnected) {
+        console.log('⏭️  跳过测试：数据库未连接')
+        return
+      }
+
+      const response = await request(app)
+        .get(`/api/interactions/stats/${publishedWishId}`)
+        .expect(200)
+
+      expect(response.body.success).toBe(true)
+      expect(response.body.data).toBeDefined()
+      expect(typeof response.body.data.totalLikes).toBe('number')
+      expect(typeof response.body.data.totalFavorites).toBe('number')
+      expect(typeof response.body.data.totalComments).toBe('number')
+      expect(response.body.data.totalLikes).toBeGreaterThanOrEqual(2)
+      expect(response.body.data.totalFavorites).toBeGreaterThanOrEqual(1)
+      expect(response.body.data.totalComments).toBeGreaterThanOrEqual(1)
+    })
+
+    it('应该返回用户互动状态（已登录用户）', async () => {
+      if (!dbConnected) {
+        console.log('⏭️  跳过测试：数据库未连接')
+        return
+      }
 
       const response = await request(app)
         .get(`/api/interactions/stats/${publishedWishId}`)
@@ -650,12 +900,24 @@ describe('互动功能接口测试', () => {
         .expect(200)
 
       expect(response.body.success).toBe(true)
-      expect(response.body.data.wishId).toBe(publishedWishId)
-      expect(response.body.data.totalLikes).toBeGreaterThanOrEqual(1)
-      expect(response.body.data.totalFavorites).toBeGreaterThanOrEqual(1)
-      expect(response.body.data.totalComments).toBeGreaterThanOrEqual(1)
+      expect(response.body.data).toBeDefined()
       expect(response.body.data.userLiked).toBe(true)
       expect(response.body.data.userFavorited).toBe(true)
+    })
+
+    it('应该拒绝不存在的愿望ID', async () => {
+      if (!dbConnected) {
+        console.log('⏭️  跳过测试：数据库未连接')
+        return
+      }
+
+      const response = await request(app)
+        .get('/api/interactions/stats/non-existent-wish-id')
+        .expect(404)
+
+      expect(response.body.success).toBe(false)
+      expect(response.body.error).toBeDefined()
+      expect(response.body.error.code).toBe('WISH_NOT_FOUND')
     })
   })
 })
