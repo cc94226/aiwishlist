@@ -279,8 +279,19 @@ Phase 2任务项中，T011和T006已完成。项目现在有了统一的API封�
   - 提供类型验证函数（isValidWish、isValidUser、isValidComment）
   - 导出类型常量和工具函数
 
+- ✅ T031: 定义愿望表单验证规则（src/utils/validation.js）
+  - 定义完整的表单验证规则（标题、描述、岗位、提交者）
+  - 提供字段级验证函数（validateTitle、validateDescription等）
+  - 提供表单级验证函数（validateWishForm）
+  - 提供便捷方法（canSaveAsDraft、canSubmit、getFirstError）
+  - 支持草稿和正式提交的不同验证规则
+
+**当前状态：**
+Phase 2任务项中，T006、T011已完成。Phase 5任务项中，T031已完成。
+项目现在有了完整的类型定义、API封装层和表单验证规则。
+
 **下一步：**
-继续处理下一个未完成的Phase任务项。T003（配置后端项目）不适用于当前Vue项目，将跳过。
+继续处理下一个未完成的Phase任务项。T003、T007-T009、T032-T033为后端相关任务，不适用于当前Vue项目，将跳过。
 
 ### 2026-01-28 16:03:37
 
