@@ -38,7 +38,7 @@ beforeEach(() => {
 })
 
 // 将mock的localStorage设置为全局对象
-// eslint-disable-next-line no-undef
+
 Object.defineProperty(global, 'localStorage', {
   value: localStorageMock,
   writable: true
