@@ -4,6 +4,8 @@ import SubmitWish from '../views/SubmitWish.vue'
 import WishDetail from '../views/WishDetail.vue'
 import AdminPanel from '../views/AdminPanel.vue'
 import UserProfile from '../views/UserProfile.vue'
+import Login from '../views/Login.vue'
+import Register from '../views/Register.vue'
 
 const routes = [
   {
@@ -30,6 +32,16 @@ const routes = [
     path: '/profile',
     name: 'UserProfile',
     component: UserProfile
+  },
+  {
+    path: '/login',
+    name: 'Login',
+    component: Login
+  },
+  {
+    path: '/register',
+    name: 'Register',
+    component: Register
   }
 ]
 
