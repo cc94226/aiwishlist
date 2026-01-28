@@ -402,3 +402,15 @@ Phase 7任务项中，T048已完成。
 
 **当前状态：**
 Phase 3任务项中，T014已完成。项目现在有了完整的认证相关类型定义，便于未来实现完整的认证系统。
+
+**已完成的工作（续）：**
+
+- ✅ T038: 定义互动相关 DTO 类型（shared/types/interaction.js）
+  - 创建互动相关的DTO类型定义文件
+  - 定义点赞、收藏、评论等请求和响应类型
+  - 定义互动错误类型和互动统计信息类型
+  - 提供类型验证函数（isValidLikeRequest、isValidFavoriteRequest、isValidCreateCommentRequest、isValidUpdateCommentRequest）
+  - 使用JSDoc注释提供类型信息，便于代码提示和文档生成
+
+**当前状态：**
+Phase 6任务项中，T038已完成。项目现在有了完整的互动相关类型定义，便于未来实现完整的互动功能API。

@@ -79,7 +79,7 @@ task: Build a Web page app in Vue
 
 - [ ] T036 [测试] [P] 为互动功能编写测试 `backend/tests/interaction.spec.ts`
 - [ ] T037 [数据模型] 定义互动数据模型 `backend/src/models/Interaction.ts`
-- [ ] T038 [数据模型] 定义互动相关 DTO 类型 `shared/types/interaction.ts`
+- [x] T038 [数据模型] 定义互动相关 DTO 类型 `shared/types/interaction.js`
 - [ ] T039 [业务逻辑] 实现互动服务 (点赞、收藏、评论) `backend/src/services/InteractionService.ts`
 - [ ] T040 [API] 实现互动相关路由和控制器 `backend/src/controllers/InteractionController.ts`
 - [x] T041 [UI] 创建点赞组件 `src/views/WishDetail.vue` (Vue项目中已实现点赞功能)
