@@ -126,7 +126,7 @@ export class InteractionService {
     }
 
     // 添加点赞
-    await InteractionModel.addLike(wishId, userId)
+    await LikeModel.create({ wish_id: wishId, user_id: userId })
 
     // 获取更新后的点赞数（数据库触发器会自动更新wishes表的likes字段）
     const updatedWish = await WishModel.findById(wishId)
@@ -155,13 +155,13 @@ export class InteractionService {
     }
 
     // 检查是否已点赞
-    const hasLiked = await InteractionModel.hasLiked(wishId, userId)
+    const hasLiked = await LikeModel.isLiked(wishId, userId)
     if (!hasLiked) {
       throw new AppError('您还没有点赞过这个愿望', 400, 'NOT_LIKED')
     }
 
     // 取消点赞
-    await InteractionModel.removeLike(wishId, userId)
+    await LikeModel.delete(wishId, userId)
 
     // 获取更新后的点赞数（数据库触发器会自动更新wishes表的likes字段）
     const updatedWish = await WishModel.findById(wishId)
@@ -182,7 +182,7 @@ export class InteractionService {
    * @returns Promise<boolean> 是否已点赞
    */
   static async checkLikeStatus(wishId: string, userId: string): Promise<boolean> {
-    return await InteractionModel.hasLiked(wishId, userId)
+    return await LikeModel.isLiked(wishId, userId)
   }
 
   /**
@@ -200,7 +200,7 @@ export class InteractionService {
     }
 
     // 添加收藏
-    await InteractionModel.addFavorite(wishId, userId)
+    await FavoriteModel.create({ wish_id: wishId, user_id: userId })
 
     return {
       favorited: true
@@ -222,13 +222,13 @@ export class InteractionService {
     }
 
     // 检查是否已收藏
-    const hasFavorited = await InteractionModel.hasFavorited(wishId, userId)
+    const hasFavorited = await FavoriteModel.isFavorited(wishId, userId)
     if (!hasFavorited) {
       throw new AppError('您还没有收藏过这个愿望', 400, 'NOT_FAVORITED')
     }
 
     // 取消收藏
-    await InteractionModel.removeFavorite(wishId, userId)
+    await FavoriteModel.delete(wishId, userId)
 
     return {
       favorited: false
@@ -242,7 +242,7 @@ export class InteractionService {
    * @returns Promise<boolean> 是否已收藏
    */
   static async checkFavoriteStatus(wishId: string, userId: string): Promise<boolean> {
-    return await InteractionModel.hasFavorited(wishId, userId)
+    return await FavoriteModel.isFavorited(wishId, userId)
   }
 
   /**
@@ -272,7 +272,7 @@ export class InteractionService {
       author_id: authorId || null
     }
 
-    const comment = await InteractionModel.createComment(commentData)
+    const comment = await CommentModel.create(commentData)
     return comment
   }
 
@@ -284,11 +284,22 @@ export class InteractionService {
   static async updateComment(request: UpdateCommentRequest): Promise<Comment> {
     const { commentId, content, userId, isAdmin = false } = request
 
+    // 检查评论是否存在
+    const existingComment = await CommentModel.findById(commentId)
+    if (!existingComment) {
+      throw new AppError('评论不存在', 404, 'COMMENT_NOT_FOUND')
+    }
+
+    // 权限控制：只有评论作者或管理员可以更新评论
+    if (!isAdmin && existingComment.author_id !== userId) {
+      throw new AppError('无权更新该评论', 403, 'FORBIDDEN')
+    }
+
     const commentData: UpdateCommentData = {
       content
     }
 
-    const comment = await InteractionModel.updateComment(commentId, commentData, userId, isAdmin)
+    const comment = await CommentModel.update(commentId, commentData)
     return comment
   }
 
@@ -300,8 +311,19 @@ export class InteractionService {
   static async deleteComment(request: DeleteCommentRequest): Promise<boolean> {
     const { commentId, userId, isAdmin = false } = request
 
-    const success = await InteractionModel.deleteComment(commentId, userId, isAdmin)
-    return success
+    // 检查评论是否存在
+    const existingComment = await CommentModel.findById(commentId)
+    if (!existingComment) {
+      throw new AppError('评论不存在', 404, 'COMMENT_NOT_FOUND')
+    }
+
+    // 权限控制：只有评论作者或管理员可以删除评论
+    if (!isAdmin && existingComment.author_id !== userId) {
+      throw new AppError('无权删除该评论', 403, 'FORBIDDEN')
+    }
+
+    await CommentModel.delete(commentId)
+    return true
   }
 
   /**
@@ -326,7 +348,12 @@ export class InteractionService {
       sortOrder
     }
 
-    const result = await InteractionModel.getCommentsByWishId(options)
+    const result = await CommentModel.findByWishId(wishId, {
+      page: Math.max(1, page),
+      pageSize: Math.min(Math.max(1, pageSize), 100),
+      sortBy,
+      sortOrder
+    })
     return result
   }
 
@@ -343,17 +370,16 @@ export class InteractionService {
   }> {
     const { userId, page = 1, pageSize = 20 } = request
 
-    const result = await InteractionModel.getFavoritesByUserId(
-      userId,
-      Math.max(1, page),
-      Math.min(Math.max(1, pageSize), 100) // 限制每页最多100条
-    )
+    const result = await FavoriteModel.findByUserId(userId, {
+      page: Math.max(1, page),
+      pageSize: Math.min(Math.max(1, pageSize), 100) // 限制每页最多100条
+    })
 
     return {
       favorites: result.favorites,
       total: result.total,
-      page: Math.max(1, page),
-      pageSize: Math.min(Math.max(1, pageSize), 100)
+      page: result.page,
+      pageSize: result.pageSize
     }
   }
 
@@ -374,12 +400,10 @@ export class InteractionService {
     const totalLikes = wish.likes
 
     // 获取收藏数
-    const favoritesResult = await InteractionModel.getFavoritesByWishId(wishId, 1, 1)
-    const totalFavorites = favoritesResult.total
+    const totalFavorites = await FavoriteModel.countByWishId(wishId)
 
     // 获取评论数
-    const commentsResult = await InteractionModel.getCommentsByWishId({
-      wish_id: wishId,
+    const commentsResult = await CommentModel.findByWishId(wishId, {
       page: 1,
       pageSize: 1
     })
@@ -389,8 +413,8 @@ export class InteractionService {
     let userLiked: boolean | undefined
     let userFavorited: boolean | undefined
     if (userId) {
-      userLiked = await InteractionModel.hasLiked(wishId, userId)
-      userFavorited = await InteractionModel.hasFavorited(wishId, userId)
+      userLiked = await LikeModel.isLiked(wishId, userId)
+      userFavorited = await FavoriteModel.isFavorited(wishId, userId)
     }
 
     return {

@@ -5,6 +5,7 @@ import { requestLogger, errorHandler, notFoundHandler } from './middleware'
 import { testConnection } from './config/database'
 import authRouter from './routes/auth'
 import wishRouter from './routes/wish'
+import interactionRouter from './routes/interaction'
 
 // 加载环境变量
 dotenv.config()
@@ -46,6 +47,9 @@ app.use('/api/auth', authRouter)
 // 愿望路由
 app.use('/api/wishes', wishRouter)
 
+// 互动路由
+app.use('/api/interactions', interactionRouter)
+
 // 404错误处理（必须在所有路由之后）
 app.use(notFoundHandler)
 
@@ -57,7 +61,7 @@ if (process.env.NODE_ENV !== 'test') {
   app.listen(PORT, async () => {
     console.log(`🚀 后端服务运行在 http://localhost:${PORT}`)
     console.log(`📝 API文档: http://localhost:${PORT}/api`)
-    
+
     // 测试数据库连接
     await testConnection()
   })
