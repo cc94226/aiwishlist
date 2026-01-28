@@ -9,8 +9,7 @@ import { AppError } from '../middleware/errorHandler'
 export class InteractionController {
   /**
    * 点赞愿望
-   * POST /api/interactions/like
-   * 需要认证
+   * POST /api/interactions/likes
    */
   static async likeWish(req: Request, res: Response): Promise<void> {
     try {
@@ -43,7 +42,6 @@ export class InteractionController {
 
       res.status(200).json({
         success: true,
-        message: '点赞成功',
         data: result
       })
     } catch (error) {
@@ -52,7 +50,7 @@ export class InteractionController {
           success: false,
           error: {
             message: error.message,
-            code: error.code || 'LIKE_FAILED'
+            code: error.code || 'LIKE_WISH_FAILED'
           }
         })
       } else {
@@ -69,8 +67,7 @@ export class InteractionController {
 
   /**
    * 取消点赞
-   * POST /api/interactions/unlike
-   * 需要认证
+   * DELETE /api/interactions/likes
    */
   static async unlikeWish(req: Request, res: Response): Promise<void> {
     try {
@@ -103,7 +100,6 @@ export class InteractionController {
 
       res.status(200).json({
         success: true,
-        message: '取消点赞成功',
         data: result
       })
     } catch (error) {
@@ -112,7 +108,7 @@ export class InteractionController {
           success: false,
           error: {
             message: error.message,
-            code: error.code || 'UNLIKE_FAILED'
+            code: error.code || 'UNLIKE_WISH_FAILED'
           }
         })
       } else {
@@ -129,12 +125,11 @@ export class InteractionController {
 
   /**
    * 检查点赞状态
-   * GET /api/interactions/like/status/:wishId
-   * 需要认证
+   * GET /api/interactions/likes/status
    */
   static async checkLikeStatus(req: Request, res: Response): Promise<void> {
     try {
-      const { wishId } = req.params
+      const { wishId } = req.query
       const userId = req.user?.id
 
       if (!userId) {
@@ -148,7 +143,7 @@ export class InteractionController {
         return
       }
 
-      if (!wishId) {
+      if (!wishId || typeof wishId !== 'string') {
         res.status(400).json({
           success: false,
           error: {
@@ -190,8 +185,7 @@ export class InteractionController {
 
   /**
    * 收藏愿望
-   * POST /api/interactions/favorite
-   * 需要认证
+   * POST /api/interactions/favorites
    */
   static async favoriteWish(req: Request, res: Response): Promise<void> {
     try {
@@ -224,7 +218,6 @@ export class InteractionController {
 
       res.status(200).json({
         success: true,
-        message: '收藏成功',
         data: result
       })
     } catch (error) {
@@ -233,7 +226,7 @@ export class InteractionController {
           success: false,
           error: {
             message: error.message,
-            code: error.code || 'FAVORITE_FAILED'
+            code: error.code || 'FAVORITE_WISH_FAILED'
           }
         })
       } else {
@@ -250,8 +243,7 @@ export class InteractionController {
 
   /**
    * 取消收藏
-   * POST /api/interactions/unfavorite
-   * 需要认证
+   * DELETE /api/interactions/favorites
    */
   static async unfavoriteWish(req: Request, res: Response): Promise<void> {
     try {
@@ -284,7 +276,6 @@ export class InteractionController {
 
       res.status(200).json({
         success: true,
-        message: '取消收藏成功',
         data: result
       })
     } catch (error) {
@@ -293,7 +284,7 @@ export class InteractionController {
           success: false,
           error: {
             message: error.message,
-            code: error.code || 'UNFAVORITE_FAILED'
+            code: error.code || 'UNFAVORITE_WISH_FAILED'
           }
         })
       } else {
@@ -310,12 +301,11 @@ export class InteractionController {
 
   /**
    * 检查收藏状态
-   * GET /api/interactions/favorite/status/:wishId
-   * 需要认证
+   * GET /api/interactions/favorites/status
    */
   static async checkFavoriteStatus(req: Request, res: Response): Promise<void> {
     try {
-      const { wishId } = req.params
+      const { wishId } = req.query
       const userId = req.user?.id
 
       if (!userId) {
@@ -329,7 +319,7 @@ export class InteractionController {
         return
       }
 
-      if (!wishId) {
+      if (!wishId || typeof wishId !== 'string') {
         res.status(400).json({
           success: false,
           error: {
@@ -372,7 +362,6 @@ export class InteractionController {
   /**
    * 创建评论
    * POST /api/interactions/comments
-   * 需要认证
    */
   static async createComment(req: Request, res: Response): Promise<void> {
     try {
@@ -415,17 +404,14 @@ export class InteractionController {
 
       const comment = await InteractionService.createComment({
         wishId,
-        content,
+        content: content.trim(),
         author: userName,
         authorId: userId
       })
 
       res.status(201).json({
         success: true,
-        message: '评论成功',
-        data: {
-          comment
-        }
+        data: comment
       })
     } catch (error) {
       if (error instanceof AppError) {
@@ -440,7 +426,7 @@ export class InteractionController {
         res.status(500).json({
           success: false,
           error: {
-            message: '评论失败',
+            message: '创建评论失败',
             code: 'INTERNAL_ERROR'
           }
         })
@@ -450,12 +436,11 @@ export class InteractionController {
 
   /**
    * 更新评论
-   * PUT /api/interactions/comments/:commentId
-   * 需要认证
+   * PUT /api/interactions/comments/:id
    */
   static async updateComment(req: Request, res: Response): Promise<void> {
     try {
-      const { commentId } = req.params
+      const { id } = req.params
       const { content } = req.body
       const userId = req.user?.id
       const isAdmin = req.user?.role === 'admin'
@@ -466,6 +451,17 @@ export class InteractionController {
           error: {
             message: '请先登录',
             code: 'UNAUTHORIZED'
+          }
+        })
+        return
+      }
+
+      if (!id) {
+        res.status(400).json({
+          success: false,
+          error: {
+            message: '评论ID不能为空',
+            code: 'INVALID_INPUT'
           }
         })
         return
@@ -483,18 +479,15 @@ export class InteractionController {
       }
 
       const comment = await InteractionService.updateComment({
-        commentId,
-        content,
+        commentId: id,
+        content: content.trim(),
         userId,
         isAdmin
       })
 
       res.status(200).json({
         success: true,
-        message: '更新评论成功',
-        data: {
-          comment
-        }
+        data: comment
       })
     } catch (error) {
       if (error instanceof AppError) {
@@ -519,12 +512,11 @@ export class InteractionController {
 
   /**
    * 删除评论
-   * DELETE /api/interactions/comments/:commentId
-   * 需要认证
+   * DELETE /api/interactions/comments/:id
    */
   static async deleteComment(req: Request, res: Response): Promise<void> {
     try {
-      const { commentId } = req.params
+      const { id } = req.params
       const userId = req.user?.id
       const isAdmin = req.user?.role === 'admin'
 
@@ -539,26 +531,27 @@ export class InteractionController {
         return
       }
 
-      const success = await InteractionService.deleteComment({
-        commentId,
+      if (!id) {
+        res.status(400).json({
+          success: false,
+          error: {
+            message: '评论ID不能为空',
+            code: 'INVALID_INPUT'
+          }
+        })
+        return
+      }
+
+      await InteractionService.deleteComment({
+        commentId: id,
         userId,
         isAdmin
       })
 
-      if (success) {
-        res.status(200).json({
-          success: true,
-          message: '删除评论成功'
-        })
-      } else {
-        res.status(500).json({
-          success: false,
-          error: {
-            message: '删除评论失败',
-            code: 'DELETE_COMMENT_FAILED'
-          }
-        })
-      }
+      res.status(200).json({
+        success: true,
+        message: '评论已删除'
+      })
     } catch (error) {
       if (error instanceof AppError) {
         res.status(error.statusCode).json({
@@ -582,15 +575,13 @@ export class InteractionController {
 
   /**
    * 获取评论列表
-   * GET /api/interactions/comments/:wishId
-   * 可选认证（未登录用户也可以查看评论）
+   * GET /api/interactions/comments
    */
   static async getComments(req: Request, res: Response): Promise<void> {
     try {
-      const { wishId } = req.params
-      const { page, pageSize, sortBy, sortOrder } = req.query
+      const { wishId, page, pageSize, sortBy, sortOrder } = req.query
 
-      if (!wishId) {
+      if (!wishId || typeof wishId !== 'string') {
         res.status(400).json({
           success: false,
           error: {
@@ -637,12 +628,11 @@ export class InteractionController {
   /**
    * 获取用户收藏列表
    * GET /api/interactions/favorites
-   * 需要认证
    */
   static async getFavorites(req: Request, res: Response): Promise<void> {
     try {
-      const userId = req.user?.id
       const { page, pageSize } = req.query
+      const userId = req.user?.id
 
       if (!userId) {
         res.status(401).json({
@@ -689,7 +679,6 @@ export class InteractionController {
   /**
    * 获取互动统计信息
    * GET /api/interactions/stats/:wishId
-   * 可选认证（未登录用户也可以查看统计，但不会显示用户是否点赞/收藏）
    */
   static async getInteractionStats(req: Request, res: Response): Promise<void> {
     try {
@@ -734,5 +723,3 @@ export class InteractionController {
     }
   }
 }
-
-export default InteractionController

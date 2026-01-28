@@ -2,12 +2,10 @@ import {
   LikeModel,
   FavoriteModel,
   CommentModel,
-  Like,
   Favorite,
   Comment,
   CreateCommentData,
   UpdateCommentData,
-  CommentQueryOptions,
   CommentQueryResult
 } from '../models/Interaction'
 import { WishModel } from '../models/Wish'
@@ -338,14 +336,6 @@ export class InteractionService {
     const wish = await WishModel.findById(wishId)
     if (!wish) {
       throw new AppError('愿望不存在', 404, 'WISH_NOT_FOUND')
-    }
-
-    const options: CommentQueryOptions = {
-      wish_id: wishId,
-      page: Math.max(1, page),
-      pageSize: Math.min(Math.max(1, pageSize), 100), // 限制每页最多100条
-      sortBy,
-      sortOrder
     }
 
     const result = await CommentModel.findByWishId(wishId, {
