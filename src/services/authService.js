@@ -56,7 +56,8 @@ export function initDefaultAdmin() {
     id: 'admin-001',
     name: '系统管理员',
     role: 'admin',
-    email: 'admin@example.com'
+    email: 'admin@example.com',
+    job: '开发' // 默认岗位，用于匹配分析演示
   }
   // 如果没有设置用户，默认设置为管理员（仅用于演示）
   if (!getCurrentUser()) {

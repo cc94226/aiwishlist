@@ -10,6 +10,24 @@
       </div>
 
       <div class="detail-body">
+        <!-- 岗位匹配分析 -->
+        <div v-if="matchInfo" class="match-analysis">
+          <h3>岗位匹配分析</h3>
+          <div class="match-content">
+            <div class="match-score">
+              <span class="match-icon">{{ matchInfo.icon }}</span>
+              <span class="match-level" :style="{ color: matchInfo.color }">
+                {{ matchInfo.level }}
+              </span>
+              <span class="match-percentage">匹配度：{{ matchInfo.score }}%</span>
+            </div>
+            <div class="match-details">
+              <p>您的岗位：<strong>{{ matchInfo.userJob }}</strong></p>
+              <p>愿望岗位：<strong>{{ matchInfo.wishJob }}</strong></p>
+            </div>
+          </div>
+        </div>
+
         <div class="wish-info">
           <div class="info-item">
             <span class="label">提交者：</span>
@@ -119,6 +137,7 @@
 <script>
 import { getWishById, likeWish as likeWishService, addComment as addCommentService, updateWish, deleteWish as deleteWishService } from '../services/wishService'
 import { canEditWish, canDeleteWish } from '../services/authService'
+import { getWishMatchInfo } from '../services/matchService'
 
 export default {
   name: 'WishDetail',
@@ -128,7 +147,8 @@ export default {
       newComment: '',
       isFavorited: false,
       showEditDialog: false,
-      editingWish: null
+      editingWish: null,
+      matchInfo: null
     }
   },
   computed: {
@@ -142,11 +162,13 @@ export default {
   mounted() {
     this.loadWish()
     this.loadFavoriteStatus()
+    this.loadMatchInfo()
   },
   watch: {
     '$route.params.id'() {
       this.loadWish()
       this.loadFavoriteStatus()
+      this.loadMatchInfo()
     }
   },
   methods: {
@@ -161,6 +183,11 @@ export default {
     loadFavoriteStatus() {
       const favorites = JSON.parse(localStorage.getItem('favorites') || '[]')
       this.isFavorited = favorites.includes(parseInt(this.$route.params.id))
+    },
+    loadMatchInfo() {
+      if (this.wish) {
+        this.matchInfo = getWishMatchInfo(this.wish)
+      }
     },
     goBack() {
       this.$router.back()
@@ -233,6 +260,7 @@ export default {
         })
         if (updated) {
           this.wish = updated
+          this.loadMatchInfo() // 重新加载匹配信息
           this.closeEditDialog()
           alert('愿望更新成功！')
         }
@@ -323,6 +351,66 @@ export default {
   display: flex;
   flex-direction: column;
   gap: 2rem;
+}
+
+.match-analysis {
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 8px;
+  color: white;
+  margin-bottom: 2rem;
+}
+
+.match-analysis h3 {
+  margin-bottom: 1rem;
+  color: white;
+  font-size: 1.25rem;
+}
+
+.match-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.match-score {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 1.1rem;
+}
+
+.match-icon {
+  font-size: 1.5rem;
+}
+
+.match-level {
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+.match-percentage {
+  margin-left: auto;
+  background-color: rgba(255, 255, 255, 0.2);
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-weight: 500;
+}
+
+.match-details {
+  display: flex;
+  gap: 2rem;
+  font-size: 0.95rem;
+  opacity: 0.9;
+}
+
+.match-details p {
+  margin: 0;
+}
+
+.match-details strong {
+  color: white;
+  font-weight: 600;
 }
 
 .wish-info {

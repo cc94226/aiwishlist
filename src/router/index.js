@@ -3,6 +3,7 @@ import Home from '../views/Home.vue'
 import SubmitWish from '../views/SubmitWish.vue'
 import WishDetail from '../views/WishDetail.vue'
 import AdminPanel from '../views/AdminPanel.vue'
+import UserProfile from '../views/UserProfile.vue'
 
 const routes = [
   {
@@ -24,6 +25,11 @@ const routes = [
     path: '/admin',
     name: 'AdminPanel',
     component: AdminPanel
+  },
+  {
+    path: '/profile',
+    name: 'UserProfile',
+    component: UserProfile
   }
 ]
 
