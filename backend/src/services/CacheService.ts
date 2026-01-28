@@ -109,20 +109,6 @@ export class CacheService {
   }
 
   /**
-   * 批量删除缓存（支持模式匹配，兼容旧接口）
-   * @deprecated 使用deleteByPrefix代替
-   */
-  deletePattern(pattern: string): number {
-    // 简单的模式匹配：如果包含*，则作为前缀处理
-    if (pattern.includes('*')) {
-      const prefix = pattern.replace(/\*.*$/, '')
-      return this.deleteByPrefix(prefix)
-    }
-    // 否则作为前缀处理
-    return this.deleteByPrefix(pattern)
-  }
-
-  /**
    * 批量删除缓存（支持通配符模式）
    */
   deletePattern(pattern: string): number {

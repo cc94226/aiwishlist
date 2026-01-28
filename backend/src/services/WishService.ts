@@ -97,7 +97,7 @@ export class WishService {
         sortOrder
       })
       const cached = cacheService.get<WishQueryResult>(cacheKey)
-      if (cached !== undefined) {
+      if (cached) {
         return cached
       }
     }
@@ -145,7 +145,7 @@ export class WishService {
     if (!userId && !isAdmin) {
       const cacheKey = CacheKeys.wishDetail(id)
       const cached = cacheService.get<Wish>(cacheKey)
-      if (cached !== undefined && cached.status === 'published') {
+      if (cached && cached.status === 'published') {
         return cached
       }
     }
@@ -325,7 +325,7 @@ export class WishService {
     if (!isAdmin) {
       const cacheKey = CacheKeys.popularWishes(pageSize)
       const cached = cacheService.get<WishQueryResult>(cacheKey)
-      if (cached !== undefined) {
+      if (cached) {
         return cached
       }
     }
@@ -373,7 +373,7 @@ export class WishService {
     if (!isAdmin) {
       const cacheKey = CacheKeys.latestWishes(pageSize)
       const cached = cacheService.get<WishQueryResult>(cacheKey)
-      if (cached !== undefined) {
+      if (cached) {
         return cached
       }
     }

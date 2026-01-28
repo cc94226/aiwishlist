@@ -176,9 +176,9 @@ export class InteractionService {
 
     // 清除相关缓存（取消点赞会影响愿望的点赞数）
     const cacheService = getCacheService()
-    await cacheService.delete(CacheKeys.wishDetail(wishId)) // 清除愿望详情缓存
-    await cacheService.deletePattern('wish:list:*') // 清除愿望列表缓存（可能按点赞数排序）
-    await cacheService.deletePattern('wish:popular:*') // 清除热门愿望缓存（按点赞数排序）
+    cacheService.delete(CacheKeys.wishDetail(wishId)) // 清除愿望详情缓存
+    cacheService.deletePattern('wish:list:*') // 清除愿望列表缓存（可能按点赞数排序）
+    cacheService.deletePattern('wish:popular:*') // 清除热门愿望缓存（按点赞数排序）
 
     return {
       liked: false,
@@ -287,7 +287,7 @@ export class InteractionService {
 
     // 清除相关缓存（创建评论会影响愿望的评论数）
     const cacheService = getCacheService()
-    await cacheService.delete(CacheKeys.wishDetail(wishId)) // 清除愿望详情缓存
+    cacheService.delete(CacheKeys.wishDetail(wishId)) // 清除愿望详情缓存
 
     return comment
   }
@@ -319,7 +319,7 @@ export class InteractionService {
 
     // 清除相关缓存（更新评论会影响愿望详情）
     const cacheService = getCacheService()
-    await cacheService.delete(CacheKeys.wishDetail(existingComment.wish_id)) // 清除愿望详情缓存
+    cacheService.delete(CacheKeys.wishDetail(existingComment.wish_id)) // 清除愿望详情缓存
 
     return comment
   }
@@ -348,7 +348,7 @@ export class InteractionService {
 
     // 清除相关缓存（删除评论会影响愿望的评论数）
     const cacheService = getCacheService()
-    await cacheService.delete(CacheKeys.wishDetail(wishId)) // 清除愿望详情缓存
+    cacheService.delete(CacheKeys.wishDetail(wishId)) // 清除愿望详情缓存
 
     return true
   }

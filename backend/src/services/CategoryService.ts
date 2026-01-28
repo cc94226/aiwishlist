@@ -84,7 +84,7 @@ export class CategoryService {
     if (!isAdmin) {
       const cacheKey = CacheKeys.categoryStats(isAdmin)
       const cached = cacheService.get<CategoryStats>(cacheKey)
-      if (cached !== undefined) {
+      if (cached) {
         return cached
       }
     }
