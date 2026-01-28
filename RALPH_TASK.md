@@ -40,7 +40,7 @@ task: Build a Web page app in Vue
 
 ### Phase 3: User Story - 用户认证系统
 
-- [ ] T012 [测试] [P] 为用户注册/登录接口编写测试用例 `backend/tests/auth.spec.ts`
+- [x] T012 [测试] [P] 为用户注册/登录接口编写测试用例 `backend/tests/auth.spec.ts`
 - [x] T013 [数据模型] 定义用户相关数据模型 `backend/src/models/User.ts`
 - [x] T014 [数据模型] 定义认证相关 DTO 类型 `shared/types/auth.js`
 - [x] T015 [业务逻辑] 实现用户服务 (注册、登录、信息管理) `backend/src/services/AuthService.ts`
