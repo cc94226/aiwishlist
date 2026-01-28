@@ -4,6 +4,7 @@ import SubmitWish from '../views/SubmitWish.vue'
 import WishDetail from '../views/WishDetail.vue'
 import AdminPanel from '../views/AdminPanel.vue'
 import UserProfile from '../views/UserProfile.vue'
+import Dashboard from '../views/Dashboard.vue'
 import Login from '../views/Login.vue'
 import Register from '../views/Register.vue'
 import { requireAuth, requireAdmin, redirectIfAuthenticated } from './guards'
@@ -34,6 +35,12 @@ const routes = [
     path: '/profile',
     name: 'UserProfile',
     component: UserProfile,
+    beforeEnter: requireAuth // 需要登录
+  },
+  {
+    path: '/dashboard',
+    name: 'Dashboard',
+    component: Dashboard,
     beforeEnter: requireAuth // 需要登录
   },
   {
