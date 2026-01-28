@@ -566,3 +566,17 @@ Phase 1任务项中，T003已完成。后端项目基础结构已建立，可以
 - Node.js + Express + TypeScript
 - 使用tsx进行开发模式热重载
 - 使用tsc进行生产构建
+
+**已完成的工作（续）：**
+
+- ✅ T007: 设计数据库表结构 (MySQL)
+  - 创建database/migrations/001_create_tables.sql迁移文件
+  - 设计5个核心表：users（用户表）、wishes（愿望表）、comments（评论表）、likes（点赞表）、favorites（收藏表）
+  - 定义完整的外键关系和索引优化
+  - 创建触发器自动维护wishes表的likes字段
+  - 初始化默认管理员账户
+  - 使用UTF8MB4字符集支持emoji和特殊字符
+  - 所有表包含created_at和updated_at时间戳字段
+
+**当前状态：**
+Phase 2任务项中，T007已完成。数据库表结构设计完成，支持用户认证、愿望管理、互动功能（点赞、收藏、评论）等所有核心功能。
