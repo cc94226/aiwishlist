@@ -28,14 +28,16 @@ describe('useAuth', () => {
   describe('isAuthenticated 计算属性', () => {
     it('未登录时应该返回false', () => {
       authService.getCurrentUser.mockReturnValue(null)
-      const { isAuthenticated } = useAuth()
+      const { isAuthenticated, refreshUser } = useAuth()
+      refreshUser() // 刷新状态
       expect(isAuthenticated.value).toBe(false)
     })
 
     it('已登录时应该返回true', () => {
       const mockUser = { id: 'user-1', name: '测试用户' }
       authService.getCurrentUser.mockReturnValue(mockUser)
-      const { isAuthenticated } = useAuth()
+      const { isAuthenticated, refreshUser } = useAuth()
+      refreshUser() // 刷新状态
       expect(isAuthenticated.value).toBe(true)
     })
   })

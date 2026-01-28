@@ -4,6 +4,7 @@ import dotenv from 'dotenv'
 import { requestLogger, errorHandler, notFoundHandler } from './middleware'
 import { testConnection } from './config/database'
 import authRouter from './routes/auth'
+import wishRouter from './routes/wish'
 
 // 加载环境变量
 dotenv.config()
@@ -41,6 +42,9 @@ app.get('/api', (_req: Request, res: Response) => {
 
 // 认证路由
 app.use('/api/auth', authRouter)
+
+// 愿望路由
+app.use('/api/wishes', wishRouter)
 
 // 404错误处理（必须在所有路由之后）
 app.use(notFoundHandler)
