@@ -1,6 +1,7 @@
 import js from '@eslint/js'
 import vue from 'eslint-plugin-vue'
 import prettier from 'eslint-config-prettier'
+import globals from 'globals'
 
 export default [
   js.configs.recommended,
@@ -40,5 +41,14 @@ export default [
   },
   {
     ignores: ['node_modules/**', 'dist/**', 'build/**']
+  },
+  {
+    files: ['**/*.test.js', '**/__tests__/**/*.js', '**/test/**/*.js'],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+        ...globals.vitest
+      }
+    }
   }
 ]
