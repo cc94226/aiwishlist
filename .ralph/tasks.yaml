@@ -3,8 +3,8 @@
 # DO NOT EDIT - regenerated on task file change
 
 source_file: RALPH_TASK.md
-source_mtime: 1769588087
-generated_at: 2026-01-28T08:14:59Z
+source_mtime: 1769588122
+generated_at: 2026-01-28T08:17:00Z
 
 tasks:
   - id: "line_26"
@@ -177,7 +177,7 @@ tasks:
     raw_marker: -
   - id: "line_59"
     line_number: 59
-    status: pending
+    status: completed
     parallel_group: 999999
     description: T021 [数据模型] 定义愿望数据模型 `backend/src/models/Wish.ts`
     indent_level: 0

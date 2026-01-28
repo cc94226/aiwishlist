@@ -48,13 +48,15 @@ app.use(notFoundHandler)
 // 错误处理中间件（必须在最后）
 app.use(errorHandler)
 
-// 启动服务器
-app.listen(PORT, async () => {
-  console.log(`🚀 后端服务运行在 http://localhost:${PORT}`)
-  console.log(`📝 API文档: http://localhost:${PORT}/api`)
-  
-  // 测试数据库连接
-  await testConnection()
-})
+// 启动服务器（仅在非测试环境）
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(PORT, async () => {
+    console.log(`🚀 后端服务运行在 http://localhost:${PORT}`)
+    console.log(`📝 API文档: http://localhost:${PORT}/api`)
+    
+    // 测试数据库连接
+    await testConnection()
+  })
+}
 
 export default app
