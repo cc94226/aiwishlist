@@ -1365,6 +1365,32 @@ Phase 7任务项中，T044已完成。个人中心功能的测试用例已完整
 
 **Session 11 started** (model: composer-1)
 
+### 2026-01-28 (当前会话 - Session 11 - Iteration 11)
+
+**已完成的工作：**
+
+- ✅ T044: 为个人中心功能编写测试用例（backend/tests/profile.spec.ts）
+  - 创建完整的个人中心接口测试文件
+  - 测试GET /api/profile/me - 获取当前用户个人资料（包含统计信息）
+  - 测试GET /api/profile/:userId - 获取指定用户个人资料（包含权限控制）
+  - 测试GET /api/profile/:userId/wishes - 获取用户愿望列表（支持分页、状态筛选、排序）
+  - 测试GET /api/profile/:userId/favorites - 获取用户收藏列表（支持分页）
+  - 测试GET /api/profile/:userId/stats/wishes - 获取用户愿望统计信息
+  - 测试GET /api/profile/:userId/stats/interactions - 获取用户互动统计信息
+  - 测试权限控制：普通用户只能查看自己的数据，管理员可以查看所有用户的数据
+  - 测试错误处理：未登录、权限不足、用户不存在等情况
+  - 包含数据库连接检查和测试数据清理
+  - 参考auth.spec.ts和wish.spec.ts的结构，使用supertest进行HTTP测试
+  - 修复WishModel.create调用，添加submitter字段
+  - 修复CommentModel.create调用，添加author字段
+  - 修复未使用的变量错误
+
+**当前状态：**
+Phase 7任务项中，T044已完成。个人中心功能的测试用例已完整实现，覆盖了所有API端点和权限控制逻辑。测试文件已创建并通过语法检查。
+
+**下一步：**
+继续处理下一个未完成的Phase任务项。Phase 7的所有任务（T044-T050）均已完成，可以开始Phase 8的收尾优化任务。
+
 ### 2026-01-28 (当前会话 - Session 8 - Iteration 8)
 
 **已完成的工作：**
