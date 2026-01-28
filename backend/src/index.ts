@@ -3,6 +3,7 @@ import cors from 'cors'
 import dotenv from 'dotenv'
 import { requestLogger, errorHandler, notFoundHandler } from './middleware'
 import { testConnection } from './config/database'
+import authRouter from './routes/auth'
 
 // 加载环境变量
 dotenv.config()
@@ -37,6 +38,9 @@ app.get('/health/db', async (_req: Request, res: Response) => {
 app.get('/api', (_req: Request, res: Response) => {
   res.json({ message: 'AI工具需求愿望收集平台 API' })
 })
+
+// 认证路由
+app.use('/api/auth', authRouter)
 
 // 404错误处理（必须在所有路由之后）
 app.use(notFoundHandler)
