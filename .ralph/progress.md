@@ -414,3 +414,15 @@ Phase 3任务项中，T014已完成。项目现在有了完整的认证相关类
 
 **当前状态：**
 Phase 6任务项中，T038已完成。项目现在有了完整的互动相关类型定义，便于未来实现完整的互动功能API。
+
+**已完成的工作（续）：**
+
+- ✅ T022: 定义愿望相关 DTO 类型（shared/types/wish.js）
+  - 创建愿望相关的DTO类型定义文件
+  - 定义创建、更新、删除、查询愿望等请求和响应类型
+  - 定义愿望错误类型和愿望统计信息类型
+  - 提供类型验证函数（isValidCreateWishRequest、isValidUpdateWishRequest、isValidGetWishListRequest、isValidSearchWishRequest）
+  - 使用JSDoc注释提供类型信息，便于代码提示和文档生成
+
+**当前状态：**
+Phase 4任务项中，T022已完成。项目现在有了完整的愿望相关类型定义，便于未来实现完整的愿望功能API。

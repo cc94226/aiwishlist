@@ -57,7 +57,7 @@ task: Build a Web page app in Vue
 
 - [ ] T020 [测试] [P] 为愿望查询接口编写测试 `backend/tests/wish.spec.ts`
 - [ ] T021 [数据模型] 定义愿望数据模型 `backend/src/models/Wish.ts`
-- [ ] T022 [数据模型] 定义愿望相关 DTO 类型 `shared/types/wish.ts`
+- [x] T022 [数据模型] 定义愿望相关 DTO 类型 `shared/types/wish.js`
 - [ ] T023 [业务逻辑] 实现愿望查询服务 (列表、详情、搜索) `backend/src/services/WishService.ts`
 - [ ] T024 [业务逻辑] 实现岗位分类服务 `backend/src/services/CategoryService.ts`
 - [ ] T025 [API] 实现愿望相关路由和控制器 `backend/src/controllers/WishController.ts`
