@@ -3,8 +3,8 @@
 # DO NOT EDIT - regenerated on task file change
 
 source_file: RALPH_TASK.md
-source_mtime: 1769587722
-generated_at: 2026-01-28T08:09:58Z
+source_mtime: 1769587880
+generated_at: 2026-01-28T08:11:27Z
 
 tasks:
   - id: "line_26"
@@ -23,7 +23,7 @@ tasks:
     raw_marker: -
   - id: "line_28"
     line_number: 28
-    status: pending
+    status: completed
     parallel_group: 999999
     description: T003 [配置] 配置后端项目 (Node.js + Express + TypeScript) `backend/package.json`
     indent_level: 0
@@ -51,14 +51,14 @@ tasks:
     raw_marker: -
   - id: "line_35"
     line_number: 35
-    status: pending
+    status: completed
     parallel_group: 999999
     description: T007 [数据模型] 设计数据库表结构 (MySQL) `database/migrations/001_create_tables.sql`
     indent_level: 0
     raw_marker: -
   - id: "line_36"
     line_number: 36
-    status: pending
+    status: completed
     parallel_group: 999999
     description: T008 [配置] 配置数据库连接和基础配置 `backend/src/config/database.ts`
     indent_level: 0
@@ -149,9 +149,9 @@ tasks:
     raw_marker: -
   - id: "line_52"
     line_number: 52
-    status: pending
+    status: completed
     parallel_group: 999999
-    description: T017.2 [UI] 创建Dashboard用户仪表板页面 `frontend/src/pages/Dashboard/index.tsx`
+    description: T017.2 [UI] 创建Dashboard用户仪表板页面 `src/views/Dashboard.vue` (Vue项目已实现)
     indent_level: 0
     raw_marker: -
   - id: "line_53"
