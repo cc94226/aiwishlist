@@ -1325,6 +1325,30 @@ Phase 6任务项中，T036、T037、T038、T039、T040、T041、T042、T043均�
 **下一步：**
 继续处理下一个未完成的Phase任务项。Phase 7（个人中心）可以开始实现。
 
+### 2026-01-28 (当前会话 - Session 10 - Iteration 10)
+
+**已完成的工作：**
+
+- ✅ T044: 为个人中心功能编写测试用例（backend/tests/profile.spec.ts）
+  - 创建完整的个人中心接口测试文件
+  - 测试GET /api/profile/me - 获取当前用户个人资料（包含统计信息）
+  - 测试GET /api/profile/:userId - 获取指定用户个人资料（包含权限控制）
+  - 测试GET /api/profile/:userId/wishes - 获取用户愿望列表（支持分页、筛选、排序）
+  - 测试GET /api/profile/:userId/favorites - 获取用户收藏列表（支持分页）
+  - 测试GET /api/profile/:userId/stats/wishes - 获取用户愿望统计信息
+  - 测试GET /api/profile/:userId/stats/interactions - 获取用户互动统计信息
+  - 测试权限控制：普通用户只能查看自己的数据，管理员可以查看所有用户的数据
+  - 测试错误处理：未登录、权限不足、用户不存在等情况
+  - 包含数据库连接检查和测试数据清理
+  - 参考auth.spec.ts和wish.spec.ts的结构，使用supertest进行HTTP测试
+  - 修复CommentModel.create调用，添加author字段
+
+**当前状态：**
+Phase 7任务项中，T044已完成。个人中心功能的测试用例已完整实现，覆盖了所有API端点和权限控制逻辑。
+
+**下一步：**
+继续处理下一个未完成的Phase任务项。T045-T047已完成（数据模型、服务、API），T049-T050为前端UI组件任务。
+
 ### 2026-01-28 16:32:13
 
 **Session 9 ended** - 🔄 Context rotation (token limit reached)
@@ -1388,3 +1412,9 @@ Phase 7任务项中，T045、T046、T047已完成。个人中心功能的后端�
 ### 2026-01-28 16:33:25
 
 **Session 12 started** (model: composer-1)
+
+### 2026-01-28 16:33:53
+**Session 12 ended** - 🔄 Context rotation (token limit reached)
+
+### 2026-01-28 16:33:55
+**Session 13 started** (model: composer-1)
