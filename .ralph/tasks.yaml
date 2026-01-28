@@ -3,8 +3,8 @@
 # DO NOT EDIT - regenerated on task file change
 
 source_file: RALPH_TASK.md
-source_mtime: 1769587310
-generated_at: 2026-01-28T08:02:02Z
+source_mtime: 1769587406
+generated_at: 2026-01-28T08:03:37Z
 
 tasks:
   - id: "line_26"
@@ -44,9 +44,9 @@ tasks:
     raw_marker: -
   - id: "line_34"
     line_number: 34
-    status: pending
+    status: completed
     parallel_group: 999999
-    description: T006 [数据模型] 定义核心数据类型和接口 `shared/types/index.ts`
+    description: T006 [数据模型] 定义核心数据类型和接口 `shared/types/index.js`
     indent_level: 0
     raw_marker: -
   - id: "line_35"
@@ -79,9 +79,9 @@ tasks:
     raw_marker: -
   - id: "line_39"
     line_number: 39
-    status: pending
+    status: completed
     parallel_group: 999999
-    description: T011 [配置] API请求封装和错误处理 `frontend/src/utils/api.ts`
+    description: T011 [配置] API请求封装和错误处理 `src/utils/api.js`
     indent_level: 0
     raw_marker: -
   - id: "line_43"
