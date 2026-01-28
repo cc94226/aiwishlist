@@ -3,8 +3,8 @@
 # DO NOT EDIT - regenerated on task file change
 
 source_file: RALPH_TASK.md
-source_mtime: 1769589309
-generated_at: 2026-01-28T08:35:11Z
+source_mtime: 1769589343
+generated_at: 2026-01-28T08:36:04Z
 
 tasks:
   - id: "line_26"
@@ -394,9 +394,9 @@ tasks:
     raw_marker: -
   - id: "line_102"
     line_number: 102
-    status: pending
+    status: completed
     parallel_group: 999999
-    description: T052 [配置] 实现性能优化 (代码分割、懒加载) `frontend/src/utils/lazyLoad.ts`
+    description: T052 [配置] 实现性能优化 (代码分割、懒加载) `src/utils/lazyLoad.js` (已完成：添加loadView函数，优化Vite配置实现代码分割)
     indent_level: 0
     raw_marker: -
   - id: "line_103"

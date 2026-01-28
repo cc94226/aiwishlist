@@ -24,13 +24,11 @@ export default defineConfig({
         assetFileNames: 'assets/[ext]/[name]-[hash].[ext]'
       }
     },
-    // 启用代码压缩
-    minify: 'terser',
-    terserOptions: {
-      compress: {
-        drop_console: true, // 生产环境移除console
-        drop_debugger: true // 生产环境移除debugger
-      }
+    // 启用代码压缩（使用esbuild，Vite默认压缩工具）
+    minify: 'esbuild',
+    // esbuild压缩选项
+    esbuild: {
+      drop: ['console', 'debugger'] // 生产环境移除console和debugger
     },
     // 设置chunk大小警告限制
     chunkSizeWarningLimit: 1000,
