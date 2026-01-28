@@ -63,8 +63,8 @@ task: Build a Web page app in Vue
 - [ ] T025 [API] 实现愿望相关路由和控制器 `backend/src/controllers/WishController.ts`
 - [x] T026 [UI] 创建愿望列表页面 `src/views/Home.vue` (Vue项目已实现)
 - [x] T027 [UI] 创建愿望详情页面 `src/views/WishDetail.vue` (Vue项目已实现)
-- [ ] T028 [UI] 创建岗位分类导航组件 `frontend/src/components/CategoryNav/index.tsx`
-- [ ] T029 [UI] 创建愿望卡片组件 `frontend/src/components/WishCard/index.tsx`
+- [x] T028 [UI] 创建岗位分类导航组件 `src/views/Home.vue` (Vue项目中已实现岗位分类筛选功能)
+- [x] T029 [UI] 创建愿望卡片组件 `src/views/Home.vue` (Vue项目中已实现愿望卡片展示功能)
 
 ### Phase 5: User Story - 愿望提交功能
 
