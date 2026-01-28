@@ -104,7 +104,7 @@ task: Build a Web page app in Vue
 - [x] T054 [配置] 实现数据缓存策略 `backend/src/services/CacheService.ts` (已完成：创建CacheService类，支持内存缓存和Redis缓存，实现TTL过期策略、缓存失效策略、缓存键管理、缓存装饰器)
 - [x] T055 [配置] 实现日志记录和监控 `backend/src/utils/logger.ts` (已完成：创建LoggerService类，支持多级别日志、文件输出、日志轮转、性能监控、错误监控、结构化日志输出、环境变量配置)
 - [x] T056 [配置] 实现前端路由权限控制 `src/components/ProtectedRoute/index.vue` (已完成：创建ProtectedRoute组件，支持登录权限、管理员权限、角色权限、岗位权限控制)
-- [ ] T057 [配置] 实现数据库备份和恢复脚本 `database/scripts/backup.sh`
+- [x] T057 [配置] 实现数据库备份和恢复脚本 `database/scripts/backup.sh` (已完成：创建backup.sh脚本，支持数据库备份、恢复、压缩、清理旧备份、列出备份文件等功能)
 - [ ] T058 [配置] 创建 Docker 配置和部署脚本 `docker-compose.yml`
 
 ## Requirements
