@@ -830,3 +830,10 @@ Ralph Session Started: 2026年 1月28日 星期三 16时32分53秒 CST
 [16:33:19] 🔴 READ backend/tests/auth.spec.ts (564 lines, ~55.0KB)
 [16:33:19] 🔴 WARN: Approaching token limit (73674 >= 70000)
 [16:33:19] 🔴 READ backend/src/index.ts (75 lines, ~7.3KB)
+[16:33:23] 🔴 TOKENS: 75552 / 80000 (94%) - rotation imminent [read:292KB write:0KB assist:0KB shell:0KB]
+[16:33:23] 🔴 READ backend/tests/wish.spec.ts (635 lines, ~62.0KB)
+[16:33:23] 🔴 ROTATE: Token threshold reached (91427 >= 80000)
+
+═══════════════════════════════════════════════════════════════
+Ralph Session Started: 2026年 1月28日 星期三 16时33分25秒 CST
+═══════════════════════════════════════════════════════════════

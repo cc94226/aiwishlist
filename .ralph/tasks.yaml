@@ -3,8 +3,8 @@
 # DO NOT EDIT - regenerated on task file change
 
 source_file: RALPH_TASK.md
-source_mtime: 1769589099
-generated_at: 2026-01-28T08:31:43Z
+source_mtime: 1769589196
+generated_at: 2026-01-28T08:33:23Z
 
 tasks:
   - id: "line_26"
@@ -345,21 +345,21 @@ tasks:
     raw_marker: -
   - id: "line_92"
     line_number: 92
-    status: pending
+    status: completed
     parallel_group: 999999
     description: T045 [数据模型] 扩展用户模型 (个人资料、愿望统计) `backend/src/models/UserProfile.ts`
     indent_level: 0
     raw_marker: -
   - id: "line_93"
     line_number: 93
-    status: pending
+    status: completed
     parallel_group: 999999
     description: T046 [业务逻辑] 实现个人资料服务 `backend/src/services/ProfileService.ts`
     indent_level: 0
     raw_marker: -
   - id: "line_94"
     line_number: 94
-    status: pending
+    status: completed
     parallel_group: 999999
     description: T047 [API] 实现个人中心路由 `backend/src/controllers/ProfileController.ts`
     indent_level: 0
