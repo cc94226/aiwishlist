@@ -42,7 +42,7 @@ task: Build a Web page app in Vue
 
 - [ ] T012 [测试] [P] 为用户注册/登录接口编写测试用例 `backend/tests/auth.spec.ts`
 - [ ] T013 [数据模型] 定义用户相关数据模型 `backend/src/models/User.ts`
-- [ ] T014 [数据模型] 定义认证相关 DTO 类型 `shared/types/auth.ts`
+- [x] T014 [数据模型] 定义认证相关 DTO 类型 `shared/types/auth.js`
 - [ ] T015 [业务逻辑] 实现用户服务 (注册、登录、信息管理) `backend/src/services/AuthService.ts`
 - [ ] T016 [API] 实现认证相关路由和控制器 `backend/src/controllers/AuthController.ts`
 - [ ] T017 [UI] 创建登录页面组件 `frontend/src/pages/Login/index.tsx`
@@ -82,9 +82,9 @@ task: Build a Web page app in Vue
 - [ ] T038 [数据模型] 定义互动相关 DTO 类型 `shared/types/interaction.ts`
 - [ ] T039 [业务逻辑] 实现互动服务 (点赞、收藏、评论) `backend/src/services/InteractionService.ts`
 - [ ] T040 [API] 实现互动相关路由和控制器 `backend/src/controllers/InteractionController.ts`
-- [ ] T041 [UI] 创建点赞组件 `frontend/src/components/LikeButton/index.tsx`
-- [ ] T042 [UI] 创建收藏组件 `frontend/src/components/FavoriteButton/index.tsx`
-- [ ] T043 [UI] 创建评论组件 `frontend/src/components/CommentSection/index.tsx`
+- [x] T041 [UI] 创建点赞组件 `src/views/WishDetail.vue` (Vue项目中已实现点赞功能)
+- [x] T042 [UI] 创建收藏组件 `src/views/WishDetail.vue` (Vue项目中已实现收藏功能)
+- [x] T043 [UI] 创建评论组件 `src/views/WishDetail.vue` (Vue项目中已实现评论功能)
 
 ### Phase 7: User Story - 个人中心
 
