@@ -21,16 +21,22 @@
       </div>
     </nav>
     <main class="main-content">
-      <router-view />
+      <ErrorBoundary>
+        <router-view />
+      </ErrorBoundary>
     </main>
   </div>
 </template>
 
 <script>
 import { getCurrentUser, logout } from './services/authService'
+import ErrorBoundary from './components/ErrorBoundary/index.vue'
 
 export default {
   name: 'App',
+  components: {
+    ErrorBoundary
+  },
   data() {
     return {
       currentUser: null
