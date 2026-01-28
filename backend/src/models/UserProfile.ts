@@ -1,6 +1,4 @@
 import { query } from '../config/database'
-import { AppError } from '../middleware/errorHandler'
-import { WishStatus } from './Wish'
 
 /**
  * 用户愿望统计信息接口

@@ -1232,6 +1232,30 @@ Phase 5任务项中，T030、T031、T032、T033、T034、T035均已完成。愿�
 
 **已完成的工作：**
 
+- ✅ T047: 实现个人中心路由和控制器（backend/src/controllers/ProfileController.ts）
+  - 创建ProfileController控制器类，处理所有个人中心相关的HTTP请求
+  - 实现获取用户个人资料API端点（GET /api/profile/:userId、GET /api/profile/me）
+  - 实现获取用户愿望列表API端点（GET /api/profile/:userId/wishes、GET /api/profile/me/wishes）
+  - 实现获取用户收藏列表API端点（GET /api/profile/:userId/favorites、GET /api/profile/me/favorites）
+  - 实现获取用户统计信息API端点（GET /api/profile/:userId/stats/wishes、GET /api/profile/:userId/stats/interactions）
+  - 创建profile.ts路由文件，配置所有个人中心路由
+  - 在index.ts中注册个人中心路由（/api/profile）
+  - 使用authenticate中间件保护所有路由
+  - 实现完整的权限控制（用户只能查看自己的信息，管理员可以查看所有用户）
+  - 包含完整的错误处理和统一的响应格式
+  - 修复UserProfile.ts中未使用的导入
+  - 验证TypeScript编译通过，无错误
+
+**当前状态：**
+Phase 7任务项中，T045（数据模型）、T046（业务逻辑）、T047（API路由和控制器）、T048（UI页面）已完成。个人中心功能的后端实现已完成，包括数据模型、服务层和API层。
+
+**下一步：**
+继续处理下一个未完成的任务项。T044（测试）和T049、T050（UI组件）可以开始实现。
+
+### 2026-01-28 (当前会话 - Session 7 - Iteration 7)
+
+**已完成的工作：**
+
 - ✅ T036: 为互动功能编写测试用例（backend/tests/interaction.spec.ts）
   - 创建完整的互动功能测试文件，包含所有API端点的测试用例
   - 测试点赞功能（成功点赞、拒绝未登录、拒绝不存在的愿望、拒绝空ID、取消点赞、检查点赞状态）
