@@ -25,7 +25,7 @@ declare global {
  */
 export const authenticate = (
   req: Request,
-  res: Response,
+  _res: Response,
   next: NextFunction
 ): void => {
   // 从请求头获取token

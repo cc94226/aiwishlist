@@ -391,7 +391,7 @@ export class AuthService {
       job: user.job
     }
 
-    return jwt.sign(payload, secret, { expiresIn })
+    return jwt.sign(payload, secret, { expiresIn } as jwt.SignOptions)
   }
 
   /**
