@@ -112,161 +112,77 @@ export class CacheService {
   /**
    * 获取缓存值
    */
-  async get<T>(key: string): Promise<T | null> {
+  get<T>(key: string): T | undefined {
     if (!this.config.enabled) {
-      return null
+      return undefined
     }
 
     try {
-      // 先尝试从内存缓存获取
-      const memoryItem = this.memoryCache.get(key)
-      if (memoryItem) {
-        if (Date.now() < memoryItem.expiresAt) {
-          return memoryItem.data as T
-        } else {
-          // 已过期，删除
-          this.memoryCache.delete(key)
-        }
-      }
-
-      // 如果配置了Redis，尝试从Redis获取
-      if (this.redisClient) {
-        try {
-          const redisValue = await this.redisClient.get(key)
-          if (redisValue) {
-            const data = JSON.parse(redisValue)
-            // 同时更新内存缓存
-            this.setMemoryCache(key, data, this.config.defaultTTL)
-            return data as T
-          }
-        } catch (error) {
-          console.error('Redis获取失败:', error)
-        }
-      }
-
-      return null
+      return this.cache.get(key) as T | undefined
     } catch (error) {
       console.error('缓存获取失败:', error)
-      return null
+      return undefined
     }
   }
 
   /**
    * 设置缓存值
    */
-  async set<T>(key: string, value: T, ttl: number = this.config.defaultTTL): Promise<void> {
+  set<T>(key: string, value: T, ttl?: number): void {
     if (!this.config.enabled) {
       return
     }
 
     try {
-      // 设置内存缓存
-      this.setMemoryCache(key, value, ttl)
-
-      // 如果配置了Redis，同时设置Redis缓存
-      if (this.redisClient) {
-        try {
-          const serialized = JSON.stringify(value)
-          await this.redisClient.setEx(key, ttl, serialized)
-        } catch (error) {
-          console.error('Redis设置失败:', error)
-        }
-      }
+      const cacheTtl = ttl ? ttl * 1000 : this.config.defaultTTL * 1000
+      this.cache.set(key, value, { ttl: cacheTtl })
     } catch (error) {
       console.error('缓存设置失败:', error)
     }
   }
 
   /**
-   * 设置内存缓存
-   */
-  private setMemoryCache<T>(key: string, value: T, ttl: number): void {
-    const now = Date.now()
-    const item: CacheItem<T> = {
-      data: value,
-      expiresAt: now + ttl * 1000,
-      createdAt: now
-    }
-    this.memoryCache.set(key, item)
-  }
-
-  /**
    * 删除缓存
    */
-  async delete(key: string): Promise<void> {
+  delete(key: string): boolean {
     try {
-      // 删除内存缓存
-      this.memoryCache.delete(key)
-
-      // 如果配置了Redis，同时删除Redis缓存
-      if (this.redisClient) {
-        try {
-          await this.redisClient.del(key)
-        } catch (error) {
-          console.error('Redis删除失败:', error)
-        }
-      }
+      return this.cache.delete(key)
     } catch (error) {
       console.error('缓存删除失败:', error)
+      return false
     }
   }
 
   /**
-   * 批量删除缓存（支持通配符）
+   * 批量删除缓存（支持前缀匹配）
    */
-  async deletePattern(pattern: string): Promise<void> {
-    try {
-      // 删除匹配的内存缓存
-      const keysToDelete: string[] = []
-      for (const key of this.memoryCache.keys()) {
-        if (this.matchPattern(key, pattern)) {
-          keysToDelete.push(key)
-        }
-      }
-      keysToDelete.forEach(key => this.memoryCache.delete(key))
+  deleteByPrefix(prefix: string): number {
+    let count = 0
+    const keysToDelete: string[] = []
 
-      // 如果配置了Redis，使用SCAN命令删除匹配的键
-      if (this.redisClient) {
-        try {
-          const keys = await this.redisClient.keys(pattern)
-          if (keys.length > 0) {
-            await this.redisClient.del(keys)
-          }
-        } catch (error) {
-          console.error('Redis批量删除失败:', error)
-        }
+    // 收集所有匹配前缀的键
+    for (const key of this.cache.keys()) {
+      if (key.startsWith(prefix)) {
+        keysToDelete.push(key)
       }
-    } catch (error) {
-      console.error('批量删除缓存失败:', error)
     }
-  }
 
-  /**
-   * 匹配模式（简单的通配符匹配）
-   */
-  private matchPattern(key: string, pattern: string): boolean {
-    // 将通配符模式转换为正则表达式
-    const regexPattern = pattern.replace(/\*/g, '.*').replace(/\?/g, '.')
-    const regex = new RegExp(`^${regexPattern}$`)
-    return regex.test(key)
+    // 删除匹配的键
+    for (const key of keysToDelete) {
+      if (this.cache.delete(key)) {
+        count++
+      }
+    }
+
+    return count
   }
 
   /**
    * 清空所有缓存
    */
-  async clear(): Promise<void> {
+  clear(): void {
     try {
-      // 清空内存缓存
-      this.memoryCache.clear()
-
-      // 如果配置了Redis，清空Redis缓存
-      if (this.redisClient) {
-        try {
-          await this.redisClient.flushDb()
-        } catch (error) {
-          console.error('Redis清空失败:', error)
-        }
-      }
+      this.cache.clear()
     } catch (error) {
       console.error('清空缓存失败:', error)
     }
@@ -275,29 +191,13 @@ export class CacheService {
   /**
    * 检查缓存是否存在
    */
-  async exists(key: string): Promise<boolean> {
+  has(key: string): boolean {
     if (!this.config.enabled) {
       return false
     }
 
     try {
-      // 检查内存缓存
-      const memoryItem = this.memoryCache.get(key)
-      if (memoryItem && Date.now() < memoryItem.expiresAt) {
-        return true
-      }
-
-      // 如果配置了Redis，检查Redis缓存
-      if (this.redisClient) {
-        try {
-          const exists = await this.redisClient.exists(key)
-          return exists === 1
-        } catch (error) {
-          console.error('Redis检查失败:', error)
-        }
-      }
-
-      return false
+      return this.cache.has(key)
     } catch (error) {
       console.error('缓存检查失败:', error)
       return false
@@ -308,76 +208,12 @@ export class CacheService {
    * 获取缓存统计信息
    */
   getStats(): {
-    memorySize: number
-    memoryKeys: string[]
-    redisEnabled: boolean
+    size: number
+    maxSize: number
   } {
     return {
-      memorySize: this.memoryCache.size,
-      memoryKeys: Array.from(this.memoryCache.keys()),
-      redisEnabled: this.redisClient !== null
-    }
-  }
-
-  /**
-   * 启动过期清理任务
-   */
-  private startCleanupTask(): void {
-    // 每5分钟清理一次过期缓存
-    setInterval(
-      () => {
-        this.cleanupExpired()
-      },
-      5 * 60 * 1000
-    )
-  }
-
-  /**
-   * 清理过期缓存
-   */
-  private cleanupExpired(): void {
-    const now = Date.now()
-    const keysToDelete: string[] = []
-
-    for (const [key, item] of this.memoryCache.entries()) {
-      if (now >= item.expiresAt) {
-        keysToDelete.push(key)
-      }
-    }
-
-    keysToDelete.forEach(key => this.memoryCache.delete(key))
-
-    if (keysToDelete.length > 0) {
-      console.log(`清理了 ${keysToDelete.length} 个过期缓存项`)
-    }
-  }
-
-  /**
-   * 缓存装饰器：自动缓存方法结果
-   */
-  static cache<T>(cacheService: CacheService, keyGenerator: CacheKeyGenerator, ttl: number = 300) {
-    return function (_target: any, _propertyName: string, descriptor: PropertyDescriptor) {
-      const method = descriptor.value
-
-      descriptor.value = async function (...args: any[]) {
-        const cacheKey = keyGenerator(...args)
-
-        // 尝试从缓存获取
-        const cached = await cacheService.get<T>(cacheKey)
-        if (cached !== null) {
-          return cached
-        }
-
-        // 执行原方法
-        const result = await method.apply(this, args)
-
-        // 缓存结果
-        await cacheService.set(cacheKey, result, ttl)
-
-        return result
-      }
-
-      return descriptor
+      size: this.cache.size,
+      maxSize: this.config.max
     }
   }
 }
@@ -432,14 +268,7 @@ export function getCacheService(): CacheService {
     const config: CacheConfig = {
       defaultTTL: parseInt(process.env.CACHE_TTL || '300', 10),
       enabled: process.env.CACHE_ENABLED !== 'false',
-      redis: process.env.REDIS_HOST
-        ? {
-            host: process.env.REDIS_HOST,
-            port: parseInt(process.env.REDIS_PORT || '6379', 10),
-            password: process.env.REDIS_PASSWORD,
-            db: parseInt(process.env.REDIS_DB || '0', 10)
-          }
-        : undefined
+      max: parseInt(process.env.CACHE_MAX || '100', 10)
     }
     defaultCacheService = new CacheService(config)
   }

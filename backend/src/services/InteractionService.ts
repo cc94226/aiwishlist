@@ -10,6 +10,7 @@ import {
 } from '../models/Interaction'
 import { WishModel } from '../models/Wish'
 import { AppError } from '../middleware/errorHandler'
+import { getCacheService, CacheKeys } from './CacheService'
 
 /**
  * 点赞请求参数
@@ -132,6 +133,12 @@ export class InteractionService {
       throw new AppError('获取愿望信息失败', 500, 'GET_WISH_FAILED')
     }
 
+    // 清除相关缓存（点赞会影响愿望的点赞数）
+    const cacheService = getCacheService()
+    await cacheService.delete(CacheKeys.wishDetail(wishId)) // 清除愿望详情缓存
+    await cacheService.deletePattern('wish:list:*') // 清除愿望列表缓存（可能按点赞数排序）
+    await cacheService.deletePattern('wish:popular:*') // 清除热门愿望缓存（按点赞数排序）
+
     return {
       liked: true,
       totalLikes: updatedWish.likes
@@ -166,6 +173,12 @@ export class InteractionService {
     if (!updatedWish) {
       throw new AppError('获取愿望信息失败', 500, 'GET_WISH_FAILED')
     }
+
+    // 清除相关缓存（取消点赞会影响愿望的点赞数）
+    const cacheService = getCacheService()
+    await cacheService.delete(CacheKeys.wishDetail(wishId)) // 清除愿望详情缓存
+    await cacheService.deletePattern('wish:list:*') // 清除愿望列表缓存（可能按点赞数排序）
+    await cacheService.deletePattern('wish:popular:*') // 清除热门愿望缓存（按点赞数排序）
 
     return {
       liked: false,

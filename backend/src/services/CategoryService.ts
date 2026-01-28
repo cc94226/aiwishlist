@@ -1,6 +1,7 @@
 import { query } from '../config/database'
 import { JobType } from '../models/User'
 import { AppError } from '../middleware/errorHandler'
+import { getCacheService, CacheKeys } from './CacheService'
 
 /**
  * 岗位分类信息
@@ -78,6 +79,16 @@ export class CategoryService {
    * @returns Promise<CategoryStats> 岗位统计信息
    */
   static async getCategoryStats(isAdmin: boolean = false): Promise<CategoryStats> {
+    // 尝试从缓存获取（仅对普通用户的查询进行缓存）
+    const cacheService = getCacheService()
+    if (!isAdmin) {
+      const cacheKey = CacheKeys.categoryStats()
+      const cached = await cacheService.get<CategoryStats>(cacheKey)
+      if (cached !== null) {
+        return cached
+      }
+    }
+
     try {
       const categories: CategoryInfo[] = []
       let totalWishes = 0
@@ -137,13 +148,21 @@ export class CategoryService {
         totalArchivedWishes += archivedWishesForJob
       }
 
-      return {
+      const result = {
         categories,
         totalWishes,
         totalPublishedWishes,
         totalDraftWishes,
         totalArchivedWishes
       }
+
+      // 缓存结果（仅对普通用户的查询进行缓存）
+      if (!isAdmin) {
+        const cacheKey = CacheKeys.categoryStats()
+        await cacheService.set(cacheKey, result, 600) // 缓存10分钟
+      }
+
+      return result
     } catch (error) {
       if (error instanceof AppError) {
         throw error

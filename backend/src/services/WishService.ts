@@ -1,6 +1,7 @@
 import { WishModel, Wish, WishQueryOptions, WishQueryResult, WishStatus } from '../models/Wish'
 import { JobType } from '../models/User'
 import { AppError } from '../middleware/errorHandler'
+import { getCacheService, CacheKeys } from './CacheService'
 
 /**
  * 获取愿望列表请求参数
@@ -84,8 +85,39 @@ export class WishService {
       queryOptions.submitter_id = userId
     }
 
+    // 尝试从缓存获取（仅对已发布状态的查询进行缓存，且不包含用户特定查询）
+    const cacheService = getCacheService()
+    if (!userId && !search && queryStatus === 'published') {
+      const cacheKey = CacheKeys.wishList({
+        job,
+        status: queryStatus,
+        page,
+        pageSize,
+        sortBy,
+        sortOrder
+      })
+      const cached = await cacheService.get<WishQueryResult>(cacheKey)
+      if (cached !== null) {
+        return cached
+      }
+    }
+
     try {
       const result = await WishModel.findAll(queryOptions)
+      
+      // 缓存结果（仅对已发布状态的查询进行缓存，且不包含用户特定查询）
+      if (!userId && !search && queryStatus === 'published') {
+        const cacheKey = CacheKeys.wishList({
+          job,
+          status: queryStatus,
+          page,
+          pageSize,
+          sortBy,
+          sortOrder
+        })
+        await cacheService.set(cacheKey, result, 300) // 缓存5分钟
+      }
+      
       return result
     } catch (error) {
       if (error instanceof AppError) {
@@ -108,6 +140,16 @@ export class WishService {
       throw new AppError('愿望ID不能为空', 400, 'INVALID_INPUT')
     }
 
+    // 尝试从缓存获取（仅对已发布状态的愿望进行缓存，且不包含用户特定权限）
+    const cacheService = getCacheService()
+    if (!userId && !isAdmin) {
+      const cacheKey = CacheKeys.wishDetail(id)
+      const cached = await cacheService.get<Wish>(cacheKey)
+      if (cached !== null && cached.status === 'published') {
+        return cached
+      }
+    }
+
     try {
       const wish = await WishModel.findById(id)
 
@@ -128,6 +170,12 @@ export class WishService {
         if (!userId || wish.submitter_id !== userId) {
           throw new AppError('愿望已下架', 404, 'WISH_NOT_FOUND')
         }
+      }
+
+      // 缓存结果（仅对已发布状态的愿望进行缓存，且不包含用户特定权限）
+      if (!userId && !isAdmin && wish.status === 'published') {
+        const cacheKey = CacheKeys.wishDetail(id)
+        await cacheService.set(cacheKey, wish, 600) // 缓存10分钟
       }
 
       return wish
@@ -279,6 +327,16 @@ export class WishService {
     pageSize: number = 10,
     isAdmin: boolean = false
   ): Promise<WishQueryResult> {
+    // 尝试从缓存获取（仅对普通用户的查询进行缓存）
+    const cacheService = getCacheService()
+    if (!isAdmin) {
+      const cacheKey = CacheKeys.popularWishes(pageSize)
+      const cached = await cacheService.get<WishQueryResult>(cacheKey)
+      if (cached !== null) {
+        return cached
+      }
+    }
+
     const queryOptions: WishQueryOptions = {
       status: isAdmin ? undefined : 'published', // 普通用户只能查看已发布的
       page: Math.max(1, page),
@@ -289,6 +347,13 @@ export class WishService {
 
     try {
       const result = await WishModel.findAll(queryOptions)
+      
+      // 缓存结果（仅对普通用户的查询进行缓存）
+      if (!isAdmin) {
+        const cacheKey = CacheKeys.popularWishes(pageSize)
+        await cacheService.set(cacheKey, result, 300) // 缓存5分钟
+      }
+      
       return result
     } catch (error) {
       if (error instanceof AppError) {
@@ -310,6 +375,16 @@ export class WishService {
     pageSize: number = 10,
     isAdmin: boolean = false
   ): Promise<WishQueryResult> {
+    // 尝试从缓存获取（仅对普通用户的查询进行缓存）
+    const cacheService = getCacheService()
+    if (!isAdmin) {
+      const cacheKey = CacheKeys.latestWishes(pageSize)
+      const cached = await cacheService.get<WishQueryResult>(cacheKey)
+      if (cached !== null) {
+        return cached
+      }
+    }
+
     const queryOptions: WishQueryOptions = {
       status: isAdmin ? undefined : 'published', // 普通用户只能查看已发布的
       page: Math.max(1, page),
@@ -320,6 +395,13 @@ export class WishService {
 
     try {
       const result = await WishModel.findAll(queryOptions)
+      
+      // 缓存结果（仅对普通用户的查询进行缓存）
+      if (!isAdmin) {
+        const cacheKey = CacheKeys.latestWishes(pageSize)
+        await cacheService.set(cacheKey, result, 180) // 缓存3分钟（最新列表更新频繁）
+      }
+      
       return result
     } catch (error) {
       if (error instanceof AppError) {
