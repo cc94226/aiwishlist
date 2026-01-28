@@ -97,14 +97,6 @@ export class CacheService {
   }
 
   /**
-   * 生成缓存键
-   */
-  private generateKey(prefix: string, ...args: any[]): string {
-    const keyParts = [prefix, ...args.map(arg => String(arg))]
-    return keyParts.join(':')
-  }
-
-  /**
    * 获取缓存值
    */
   async get<T>(key: string): Promise<T | null> {
