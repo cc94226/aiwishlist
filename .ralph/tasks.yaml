@@ -3,8 +3,8 @@
 # DO NOT EDIT - regenerated on task file change
 
 source_file: RALPH_TASK.md
-source_mtime: 1769588931
-generated_at: 2026-01-28T08:29:02Z
+source_mtime: 1769588961
+generated_at: 2026-01-28T08:29:37Z
 
 tasks:
   - id: "line_26"
@@ -240,7 +240,7 @@ tasks:
     raw_marker: -
   - id: "line_71"
     line_number: 71
-    status: pending
+    status: completed
     parallel_group: 999999
     description: T030 [测试] [P] 为愿望提交接口编写测试 `backend/tests/wish-create.spec.ts`
     indent_level: 0
