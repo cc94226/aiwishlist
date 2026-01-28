@@ -20,106 +20,109 @@ task: Build a Web page app in Vue
 ---
 
 # Task: CLI Todo App (TypeScript)
+
 ### Phase 1: Setup (项目初始化)
 
-* [x] T001 [配置] 初始化 pnpm workspace 和项目结构 `package.json`
-* [x] T002 [配置] 配置前端项目 (Vite + Vue 3) `package.json`
-* [ ] T003 [配置] 配置后端项目 (Node.js + Express + TypeScript) `backend/package.json`
-* [x] T004 [配置] 设置 ESLint 和 Prettier 统一代码规范 `eslint.config.js`
-* [ ] T005 [配置] 配置 Git hooks (pre-commit, pre-push) `root/.husky/`
+- [x] T001 [配置] 初始化 pnpm workspace 和项目结构 `package.json`
+- [x] T002 [配置] 配置前端项目 (Vite + Vue 3) `package.json`
+- [ ] T003 [配置] 配置后端项目 (Node.js + Express + TypeScript) `backend/package.json`
+- [x] T004 [配置] 设置 ESLint 和 Prettier 统一代码规范 `eslint.config.js`
+- [x] T005 [配置] 配置 Git hooks (pre-commit, pre-push) `.husky/`
 
 ### Phase 2: Foundational (基础设施)
 
-* [ ] T006 [数据模型] 定义核心数据类型和接口 `shared/types/index.ts`
-* [ ] T007 [数据模型] 设计数据库表结构 (MySQL) `database/migrations/001_create_tables.sql`
-* [ ] T008 [配置] 配置数据库连接和基础配置 `backend/src/config/database.ts`
-* [ ] T009 [配置] 实现基础中间件 (认证、错误处理、日志) `backend/src/middleware/`
-* [ ] T010 [配置] 前端路由配置和状态管理基础设置 `frontend/src/store/index.ts`
-* [ ] T011 [配置] API请求封装和错误处理 `frontend/src/utils/api.ts`
+- [ ] T006 [数据模型] 定义核心数据类型和接口 `shared/types/index.ts`
+- [ ] T007 [数据模型] 设计数据库表结构 (MySQL) `database/migrations/001_create_tables.sql`
+- [ ] T008 [配置] 配置数据库连接和基础配置 `backend/src/config/database.ts`
+- [ ] T009 [配置] 实现基础中间件 (认证、错误处理、日志) `backend/src/middleware/`
+- [ ] T010 [配置] 前端路由配置和状态管理基础设置 `frontend/src/store/index.ts`
+- [ ] T011 [配置] API请求封装和错误处理 `frontend/src/utils/api.ts`
 
 ### Phase 3: User Story - 用户认证系统
 
-* [ ] T012 [测试] [P] 为用户注册/登录接口编写测试用例 `backend/tests/auth.spec.ts`
-* [ ] T013 [数据模型] 定义用户相关数据模型 `backend/src/models/User.ts`
-* [ ] T014 [数据模型] 定义认证相关 DTO 类型 `shared/types/auth.ts`
-* [ ] T015 [业务逻辑] 实现用户服务 (注册、登录、信息管理) `backend/src/services/AuthService.ts`
-* [ ] T016 [API] 实现认证相关路由和控制器 `backend/src/controllers/AuthController.ts`
-* [ ] T017 [UI] 创建登录页面组件 `frontend/src/pages/Login/index.tsx`
-* [ ] T018 [UI] 创建注册页面组件 `frontend/src/pages/Register/index.tsx`
-* [ ] T019 [UI] 创建用户状态管理 hooks `frontend/src/hooks/useAuth.ts`
-* [ ] T017.1 [UI] 创建ProtectedRoute路由保护组件 `frontend/src/components/ProtectedRoute/index.tsx`
-* [ ] T017.2 [UI] 创建Dashboard用户仪表板页面 `frontend/src/pages/Dashboard/index.tsx`
-* [ ] T017.3 [集成] 升级App.tsx集成完整认证系统 `frontend/src/App.tsx`
-* [ ] T017.4 [测试] 创建前端认证系统完整测试套件 `frontend/src/**/__tests__/*.test.tsx`
+- [ ] T012 [测试] [P] 为用户注册/登录接口编写测试用例 `backend/tests/auth.spec.ts`
+- [ ] T013 [数据模型] 定义用户相关数据模型 `backend/src/models/User.ts`
+- [ ] T014 [数据模型] 定义认证相关 DTO 类型 `shared/types/auth.ts`
+- [ ] T015 [业务逻辑] 实现用户服务 (注册、登录、信息管理) `backend/src/services/AuthService.ts`
+- [ ] T016 [API] 实现认证相关路由和控制器 `backend/src/controllers/AuthController.ts`
+- [ ] T017 [UI] 创建登录页面组件 `frontend/src/pages/Login/index.tsx`
+- [ ] T018 [UI] 创建注册页面组件 `frontend/src/pages/Register/index.tsx`
+- [ ] T019 [UI] 创建用户状态管理 hooks `frontend/src/hooks/useAuth.ts`
+- [ ] T017.1 [UI] 创建ProtectedRoute路由保护组件 `frontend/src/components/ProtectedRoute/index.tsx`
+- [ ] T017.2 [UI] 创建Dashboard用户仪表板页面 `frontend/src/pages/Dashboard/index.tsx`
+- [ ] T017.3 [集成] 升级App.tsx集成完整认证系统 `frontend/src/App.tsx`
+- [ ] T017.4 [测试] 创建前端认证系统完整测试套件 `frontend/src/**/__tests__/*.test.tsx`
 
 ### Phase 4: User Story - 愿望展示与浏览
 
-* [ ] T020 [测试] [P] 为愿望查询接口编写测试 `backend/tests/wish.spec.ts`
-* [ ] T021 [数据模型] 定义愿望数据模型 `backend/src/models/Wish.ts`
-* [ ] T022 [数据模型] 定义愿望相关 DTO 类型 `shared/types/wish.ts`
-* [ ] T023 [业务逻辑] 实现愿望查询服务 (列表、详情、搜索) `backend/src/services/WishService.ts`
-* [ ] T024 [业务逻辑] 实现岗位分类服务 `backend/src/services/CategoryService.ts`
-* [ ] T025 [API] 实现愿望相关路由和控制器 `backend/src/controllers/WishController.ts`
-* [ ] T026 [UI] 创建愿望列表页面 `frontend/src/pages/WishList/index.tsx`
-* [ ] T027 [UI] 创建愿望详情页面 `frontend/src/pages/WishDetail/index.tsx`
-* [ ] T028 [UI] 创建岗位分类导航组件 `frontend/src/components/CategoryNav/index.tsx`
-* [ ] T029 [UI] 创建愿望卡片组件 `frontend/src/components/WishCard/index.tsx`
+- [ ] T020 [测试] [P] 为愿望查询接口编写测试 `backend/tests/wish.spec.ts`
+- [ ] T021 [数据模型] 定义愿望数据模型 `backend/src/models/Wish.ts`
+- [ ] T022 [数据模型] 定义愿望相关 DTO 类型 `shared/types/wish.ts`
+- [ ] T023 [业务逻辑] 实现愿望查询服务 (列表、详情、搜索) `backend/src/services/WishService.ts`
+- [ ] T024 [业务逻辑] 实现岗位分类服务 `backend/src/services/CategoryService.ts`
+- [ ] T025 [API] 实现愿望相关路由和控制器 `backend/src/controllers/WishController.ts`
+- [ ] T026 [UI] 创建愿望列表页面 `frontend/src/pages/WishList/index.tsx`
+- [ ] T027 [UI] 创建愿望详情页面 `frontend/src/pages/WishDetail/index.tsx`
+- [ ] T028 [UI] 创建岗位分类导航组件 `frontend/src/components/CategoryNav/index.tsx`
+- [ ] T029 [UI] 创建愿望卡片组件 `frontend/src/components/WishCard/index.tsx`
 
 ### Phase 5: User Story - 愿望提交功能
 
-* [ ] T030 [测试] [P] 为愿望提交接口编写测试 `backend/tests/wish-create.spec.ts`
-* [ ] T031 [数据模型] 定义愿望表单验证规则 `frontend/src/utils/validation.ts`
-* [ ] T032 [业务逻辑] 实现愿望创建服务 `backend/src/services/WishCreateService.ts`
-* [ ] T033 [API] 实现愿望提交相关路由 `backend/src/controllers/WishCreateController.ts`
-* [ ] T034 [UI] 创建愿望提交页面 `frontend/src/pages/WishSubmit/index.tsx`
-* [ ] T035 [UI] 创建愿望表单组件 `frontend/src/components/WishForm/index.tsx`
+- [ ] T030 [测试] [P] 为愿望提交接口编写测试 `backend/tests/wish-create.spec.ts`
+- [ ] T031 [数据模型] 定义愿望表单验证规则 `frontend/src/utils/validation.ts`
+- [ ] T032 [业务逻辑] 实现愿望创建服务 `backend/src/services/WishCreateService.ts`
+- [ ] T033 [API] 实现愿望提交相关路由 `backend/src/controllers/WishCreateController.ts`
+- [ ] T034 [UI] 创建愿望提交页面 `frontend/src/pages/WishSubmit/index.tsx`
+- [ ] T035 [UI] 创建愿望表单组件 `frontend/src/components/WishForm/index.tsx`
 
 ### Phase 6: User Story - 互动功能 (点赞、收藏、评论)
 
-* [ ] T036 [测试] [P] 为互动功能编写测试 `backend/tests/interaction.spec.ts`
-* [ ] T037 [数据模型] 定义互动数据模型 `backend/src/models/Interaction.ts`
-* [ ] T038 [数据模型] 定义互动相关 DTO 类型 `shared/types/interaction.ts`
-* [ ] T039 [业务逻辑] 实现互动服务 (点赞、收藏、评论) `backend/src/services/InteractionService.ts`
-* [ ] T040 [API] 实现互动相关路由和控制器 `backend/src/controllers/InteractionController.ts`
-* [ ] T041 [UI] 创建点赞组件 `frontend/src/components/LikeButton/index.tsx`
-* [ ] T042 [UI] 创建收藏组件 `frontend/src/components/FavoriteButton/index.tsx`
-* [ ] T043 [UI] 创建评论组件 `frontend/src/components/CommentSection/index.tsx`
+- [ ] T036 [测试] [P] 为互动功能编写测试 `backend/tests/interaction.spec.ts`
+- [ ] T037 [数据模型] 定义互动数据模型 `backend/src/models/Interaction.ts`
+- [ ] T038 [数据模型] 定义互动相关 DTO 类型 `shared/types/interaction.ts`
+- [ ] T039 [业务逻辑] 实现互动服务 (点赞、收藏、评论) `backend/src/services/InteractionService.ts`
+- [ ] T040 [API] 实现互动相关路由和控制器 `backend/src/controllers/InteractionController.ts`
+- [ ] T041 [UI] 创建点赞组件 `frontend/src/components/LikeButton/index.tsx`
+- [ ] T042 [UI] 创建收藏组件 `frontend/src/components/FavoriteButton/index.tsx`
+- [ ] T043 [UI] 创建评论组件 `frontend/src/components/CommentSection/index.tsx`
 
 ### Phase 7: User Story - 个人中心
 
-* [ ] T044 [测试] [P] 为个人中心功能编写测试 `backend/tests/profile.spec.ts`
-* [ ] T045 [数据模型] 扩展用户模型 (个人资料、愿望统计) `backend/src/models/UserProfile.ts`
-* [ ] T046 [业务逻辑] 实现个人资料服务 `backend/src/services/ProfileService.ts`
-* [ ] T047 [API] 实现个人中心路由 `backend/src/controllers/ProfileController.ts`
-* [ ] T048 [UI] 创建个人中心页面 `frontend/src/pages/Profile/index.tsx`
-* [ ] T049 [UI] 创建我的愿望组件 `frontend/src/components/MyWishes/index.tsx`
-* [ ] T050 [UI] 创建收藏夹组件 `frontend/src/components/Favorites/index.tsx`
+- [ ] T044 [测试] [P] 为个人中心功能编写测试 `backend/tests/profile.spec.ts`
+- [ ] T045 [数据模型] 扩展用户模型 (个人资料、愿望统计) `backend/src/models/UserProfile.ts`
+- [ ] T046 [业务逻辑] 实现个人资料服务 `backend/src/services/ProfileService.ts`
+- [ ] T047 [API] 实现个人中心路由 `backend/src/controllers/ProfileController.ts`
+- [ ] T048 [UI] 创建个人中心页面 `frontend/src/pages/Profile/index.tsx`
+- [ ] T049 [UI] 创建我的愿望组件 `frontend/src/components/MyWishes/index.tsx`
+- [ ] T050 [UI] 创建收藏夹组件 `frontend/src/components/Favorites/index.tsx`
 
 ### Phase 8: Polish (收尾优化)
 
-* [ ] T051 [配置] 实现响应式设计和移动端适配 `frontend/src/styles/responsive.css`
-* [ ] T052 [配置] 实现性能优化 (代码分割、懒加载) `frontend/src/utils/lazyLoad.ts`
-* [ ] T053 [配置] 实现错误边界和异常处理 `frontend/src/components/ErrorBoundary/index.tsx`
-* [ ] T054 [配置] 实现数据缓存策略 `backend/src/services/CacheService.ts`
-* [ ] T055 [配置] 实现日志记录和监控 `backend/src/utils/logger.ts`
-* [ ] T056 [配置] 实现前端路由权限控制 `frontend/src/components/ProtectedRoute/index.tsx`
-* [ ] T057 [配置] 实现数据库备份和恢复脚本 `database/scripts/backup.sh`
-* [ ] T058 [配置] 创建 Docker 配置和部署脚本 `docker-compose.yml`
-
+- [ ] T051 [配置] 实现响应式设计和移动端适配 `frontend/src/styles/responsive.css`
+- [ ] T052 [配置] 实现性能优化 (代码分割、懒加载) `frontend/src/utils/lazyLoad.ts`
+- [ ] T053 [配置] 实现错误边界和异常处理 `frontend/src/components/ErrorBoundary/index.tsx`
+- [ ] T054 [配置] 实现数据缓存策略 `backend/src/services/CacheService.ts`
+- [ ] T055 [配置] 实现日志记录和监控 `backend/src/utils/logger.ts`
+- [ ] T056 [配置] 实现前端路由权限控制 `frontend/src/components/ProtectedRoute/index.tsx`
+- [ ] T057 [配置] 实现数据库备份和恢复脚本 `database/scripts/backup.sh`
+- [ ] T058 [配置] 创建 Docker 配置和部署脚本 `docker-compose.yml`
 
 ## Requirements
+
 针对公司内部不同岗位员工对 AI 工具的差异化需求，我们搭建了一个全岗位 AI 需求愿望收集平台。该平台会将用户提交的需求愿望按照职业需求进行分类，用户在不同分类界面可以查看各职业用户提交的需求愿望，点击可查看愿望的详细信息（包括愿望名称、描述、提交者岗位），用户可以为现有愿望点赞、评论，平台根据点赞数进行排行，还支持大家提交自己的新需求愿望。用户借此能够直观查找、快速探索适配自身岗位的优质 AI 工具需求，最终打造一个需求共享、高效匹配岗位需求的内部 AI 工具交流阵地。
 
-
 ## Success Criteria
+
 1. [x]**愿望收集**：获取各职业对 AI 工具的需求愿望相关信息，建立网站初始愿望库
 2. [x]**愿望单展示页面**：按职业/岗位（如开发、设计、行政）分类展示用户提交的愿望
+
 - 展示方式为按岗位类别分类展示，以及按提交新旧顺序进行展示
+
 3. [x]**建立愿望提交页面**：由用户发起"提交愿望"并填写愿望相关信息：
-信息包括以下字段：愿望名称、需求描述、提交者岗位
+   信息包括以下字段：愿望名称、需求描述、提交者岗位
 4. [x]**互动与收藏**：用户可以对已展示的愿望进行"点赞"或"收藏"
 5. [x]**系统管理**：管理员有权限编辑、下架所有愿望信息。普通用户仅有权限编辑或删除自己"未提交暂存"状态的愿望信息
-6. [x]**岗位匹配分析**：若用户提供岗位信息，系统可基于岗位标签对愿望进行匹配度分析，并在愿望详情页展示匹配结果 
+6. [x]**岗位匹配分析**：若用户提供岗位信息，系统可基于岗位标签对愿望进行匹配度分析，并在愿望详情页展示匹配结果
 
 ## Example Output
 
@@ -130,6 +133,7 @@ you can add output by your understanding of my Requirements
 ---
 
 ## Ralph Instructions
+
 Read .ralph/progress.md to see what's been done
 Check .ralph/guardrails.md for signs to follow
 Work on the next incomplete criterion
