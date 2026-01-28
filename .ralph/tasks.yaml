@@ -3,7 +3,441 @@
 # DO NOT EDIT - regenerated on task file change
 
 source_file: RALPH_TASK.md
-source_mtime: 1769585541
-generated_at: 2026-01-28T07:32:24Z
+source_mtime: 1769586898
+generated_at: 2026-01-28T07:56:36Z
 
 tasks:
+  - id: "line_25"
+    line_number: 25
+    status: pending
+    parallel_group: 999999
+    description: T001 [配置] 初始化 pnpm workspace 和项目结构 `package.json`
+    indent_level: 0
+    raw_marker: *
+  - id: "line_26"
+    line_number: 26
+    status: pending
+    parallel_group: 999999
+    description: T002 [配置] 配置前端项目 (Vite + React + TypeScript) `frontend/package.json`
+    indent_level: 0
+    raw_marker: *
+  - id: "line_27"
+    line_number: 27
+    status: pending
+    parallel_group: 999999
+    description: T003 [配置] 配置后端项目 (Node.js + Express + TypeScript) `backend/package.json`
+    indent_level: 0
+    raw_marker: *
+  - id: "line_28"
+    line_number: 28
+    status: pending
+    parallel_group: 999999
+    description: T004 [配置] 设置 ESLint 和 Prettier 统一代码规范 `root/.eslintrc.js`
+    indent_level: 0
+    raw_marker: *
+  - id: "line_29"
+    line_number: 29
+    status: pending
+    parallel_group: 999999
+    description: T005 [配置] 配置 Git hooks (pre-commit, pre-push) `root/.husky/`
+    indent_level: 0
+    raw_marker: *
+  - id: "line_33"
+    line_number: 33
+    status: pending
+    parallel_group: 999999
+    description: T006 [数据模型] 定义核心数据类型和接口 `shared/types/index.ts`
+    indent_level: 0
+    raw_marker: *
+  - id: "line_34"
+    line_number: 34
+    status: pending
+    parallel_group: 999999
+    description: T007 [数据模型] 设计数据库表结构 (MySQL) `database/migrations/001_create_tables.sql`
+    indent_level: 0
+    raw_marker: *
+  - id: "line_35"
+    line_number: 35
+    status: pending
+    parallel_group: 999999
+    description: T008 [配置] 配置数据库连接和基础配置 `backend/src/config/database.ts`
+    indent_level: 0
+    raw_marker: *
+  - id: "line_36"
+    line_number: 36
+    status: pending
+    parallel_group: 999999
+    description: T009 [配置] 实现基础中间件 (认证、错误处理、日志) `backend/src/middleware/`
+    indent_level: 0
+    raw_marker: *
+  - id: "line_37"
+    line_number: 37
+    status: pending
+    parallel_group: 999999
+    description: T010 [配置] 前端路由配置和状态管理基础设置 `frontend/src/store/index.ts`
+    indent_level: 0
+    raw_marker: *
+  - id: "line_38"
+    line_number: 38
+    status: pending
+    parallel_group: 999999
+    description: T011 [配置] API请求封装和错误处理 `frontend/src/utils/api.ts`
+    indent_level: 0
+    raw_marker: *
+  - id: "line_42"
+    line_number: 42
+    status: pending
+    parallel_group: 999999
+    description: T012 [测试] [P] 为用户注册/登录接口编写测试用例 `backend/tests/auth.spec.ts`
+    indent_level: 0
+    raw_marker: *
+  - id: "line_43"
+    line_number: 43
+    status: pending
+    parallel_group: 999999
+    description: T013 [数据模型] 定义用户相关数据模型 `backend/src/models/User.ts`
+    indent_level: 0
+    raw_marker: *
+  - id: "line_44"
+    line_number: 44
+    status: pending
+    parallel_group: 999999
+    description: T014 [数据模型] 定义认证相关 DTO 类型 `shared/types/auth.ts`
+    indent_level: 0
+    raw_marker: *
+  - id: "line_45"
+    line_number: 45
+    status: pending
+    parallel_group: 999999
+    description: T015 [业务逻辑] 实现用户服务 (注册、登录、信息管理) `backend/src/services/AuthService.ts`
+    indent_level: 0
+    raw_marker: *
+  - id: "line_46"
+    line_number: 46
+    status: pending
+    parallel_group: 999999
+    description: T016 [API] 实现认证相关路由和控制器 `backend/src/controllers/AuthController.ts`
+    indent_level: 0
+    raw_marker: *
+  - id: "line_47"
+    line_number: 47
+    status: pending
+    parallel_group: 999999
+    description: T017 [UI] 创建登录页面组件 `frontend/src/pages/Login/index.tsx`
+    indent_level: 0
+    raw_marker: *
+  - id: "line_48"
+    line_number: 48
+    status: pending
+    parallel_group: 999999
+    description: T018 [UI] 创建注册页面组件 `frontend/src/pages/Register/index.tsx`
+    indent_level: 0
+    raw_marker: *
+  - id: "line_49"
+    line_number: 49
+    status: pending
+    parallel_group: 999999
+    description: T019 [UI] 创建用户状态管理 hooks `frontend/src/hooks/useAuth.ts`
+    indent_level: 0
+    raw_marker: *
+  - id: "line_50"
+    line_number: 50
+    status: pending
+    parallel_group: 999999
+    description: T017.1 [UI] 创建ProtectedRoute路由保护组件 `frontend/src/components/ProtectedRoute/index.tsx`
+    indent_level: 0
+    raw_marker: *
+  - id: "line_51"
+    line_number: 51
+    status: pending
+    parallel_group: 999999
+    description: T017.2 [UI] 创建Dashboard用户仪表板页面 `frontend/src/pages/Dashboard/index.tsx`
+    indent_level: 0
+    raw_marker: *
+  - id: "line_52"
+    line_number: 52
+    status: pending
+    parallel_group: 999999
+    description: T017.3 [集成] 升级App.tsx集成完整认证系统 `frontend/src/App.tsx`
+    indent_level: 0
+    raw_marker: *
+  - id: "line_53"
+    line_number: 53
+    status: pending
+    parallel_group: 999999
+    description: T017.4 [测试] 创建前端认证系统完整测试套件 `frontend/src/**/__tests__/*.test.tsx`
+    indent_level: 0
+    raw_marker: *
+  - id: "line_57"
+    line_number: 57
+    status: pending
+    parallel_group: 999999
+    description: T020 [测试] [P] 为愿望查询接口编写测试 `backend/tests/wish.spec.ts`
+    indent_level: 0
+    raw_marker: *
+  - id: "line_58"
+    line_number: 58
+    status: pending
+    parallel_group: 999999
+    description: T021 [数据模型] 定义愿望数据模型 `backend/src/models/Wish.ts`
+    indent_level: 0
+    raw_marker: *
+  - id: "line_59"
+    line_number: 59
+    status: pending
+    parallel_group: 999999
+    description: T022 [数据模型] 定义愿望相关 DTO 类型 `shared/types/wish.ts`
+    indent_level: 0
+    raw_marker: *
+  - id: "line_60"
+    line_number: 60
+    status: pending
+    parallel_group: 999999
+    description: T023 [业务逻辑] 实现愿望查询服务 (列表、详情、搜索) `backend/src/services/WishService.ts`
+    indent_level: 0
+    raw_marker: *
+  - id: "line_61"
+    line_number: 61
+    status: pending
+    parallel_group: 999999
+    description: T024 [业务逻辑] 实现岗位分类服务 `backend/src/services/CategoryService.ts`
+    indent_level: 0
+    raw_marker: *
+  - id: "line_62"
+    line_number: 62
+    status: pending
+    parallel_group: 999999
+    description: T025 [API] 实现愿望相关路由和控制器 `backend/src/controllers/WishController.ts`
+    indent_level: 0
+    raw_marker: *
+  - id: "line_63"
+    line_number: 63
+    status: pending
+    parallel_group: 999999
+    description: T026 [UI] 创建愿望列表页面 `frontend/src/pages/WishList/index.tsx`
+    indent_level: 0
+    raw_marker: *
+  - id: "line_64"
+    line_number: 64
+    status: pending
+    parallel_group: 999999
+    description: T027 [UI] 创建愿望详情页面 `frontend/src/pages/WishDetail/index.tsx`
+    indent_level: 0
+    raw_marker: *
+  - id: "line_65"
+    line_number: 65
+    status: pending
+    parallel_group: 999999
+    description: T028 [UI] 创建岗位分类导航组件 `frontend/src/components/CategoryNav/index.tsx`
+    indent_level: 0
+    raw_marker: *
+  - id: "line_66"
+    line_number: 66
+    status: pending
+    parallel_group: 999999
+    description: T029 [UI] 创建愿望卡片组件 `frontend/src/components/WishCard/index.tsx`
+    indent_level: 0
+    raw_marker: *
+  - id: "line_70"
+    line_number: 70
+    status: pending
+    parallel_group: 999999
+    description: T030 [测试] [P] 为愿望提交接口编写测试 `backend/tests/wish-create.spec.ts`
+    indent_level: 0
+    raw_marker: *
+  - id: "line_71"
+    line_number: 71
+    status: pending
+    parallel_group: 999999
+    description: T031 [数据模型] 定义愿望表单验证规则 `frontend/src/utils/validation.ts`
+    indent_level: 0
+    raw_marker: *
+  - id: "line_72"
+    line_number: 72
+    status: pending
+    parallel_group: 999999
+    description: T032 [业务逻辑] 实现愿望创建服务 `backend/src/services/WishCreateService.ts`
+    indent_level: 0
+    raw_marker: *
+  - id: "line_73"
+    line_number: 73
+    status: pending
+    parallel_group: 999999
+    description: T033 [API] 实现愿望提交相关路由 `backend/src/controllers/WishCreateController.ts`
+    indent_level: 0
+    raw_marker: *
+  - id: "line_74"
+    line_number: 74
+    status: pending
+    parallel_group: 999999
+    description: T034 [UI] 创建愿望提交页面 `frontend/src/pages/WishSubmit/index.tsx`
+    indent_level: 0
+    raw_marker: *
+  - id: "line_75"
+    line_number: 75
+    status: pending
+    parallel_group: 999999
+    description: T035 [UI] 创建愿望表单组件 `frontend/src/components/WishForm/index.tsx`
+    indent_level: 0
+    raw_marker: *
+  - id: "line_79"
+    line_number: 79
+    status: pending
+    parallel_group: 999999
+    description: T036 [测试] [P] 为互动功能编写测试 `backend/tests/interaction.spec.ts`
+    indent_level: 0
+    raw_marker: *
+  - id: "line_80"
+    line_number: 80
+    status: pending
+    parallel_group: 999999
+    description: T037 [数据模型] 定义互动数据模型 `backend/src/models/Interaction.ts`
+    indent_level: 0
+    raw_marker: *
+  - id: "line_81"
+    line_number: 81
+    status: pending
+    parallel_group: 999999
+    description: T038 [数据模型] 定义互动相关 DTO 类型 `shared/types/interaction.ts`
+    indent_level: 0
+    raw_marker: *
+  - id: "line_82"
+    line_number: 82
+    status: pending
+    parallel_group: 999999
+    description: T039 [业务逻辑] 实现互动服务 (点赞、收藏、评论) `backend/src/services/InteractionService.ts`
+    indent_level: 0
+    raw_marker: *
+  - id: "line_83"
+    line_number: 83
+    status: pending
+    parallel_group: 999999
+    description: T040 [API] 实现互动相关路由和控制器 `backend/src/controllers/InteractionController.ts`
+    indent_level: 0
+    raw_marker: *
+  - id: "line_84"
+    line_number: 84
+    status: pending
+    parallel_group: 999999
+    description: T041 [UI] 创建点赞组件 `frontend/src/components/LikeButton/index.tsx`
+    indent_level: 0
+    raw_marker: *
+  - id: "line_85"
+    line_number: 85
+    status: pending
+    parallel_group: 999999
+    description: T042 [UI] 创建收藏组件 `frontend/src/components/FavoriteButton/index.tsx`
+    indent_level: 0
+    raw_marker: *
+  - id: "line_86"
+    line_number: 86
+    status: pending
+    parallel_group: 999999
+    description: T043 [UI] 创建评论组件 `frontend/src/components/CommentSection/index.tsx`
+    indent_level: 0
+    raw_marker: *
+  - id: "line_90"
+    line_number: 90
+    status: pending
+    parallel_group: 999999
+    description: T044 [测试] [P] 为个人中心功能编写测试 `backend/tests/profile.spec.ts`
+    indent_level: 0
+    raw_marker: *
+  - id: "line_91"
+    line_number: 91
+    status: pending
+    parallel_group: 999999
+    description: T045 [数据模型] 扩展用户模型 (个人资料、愿望统计) `backend/src/models/UserProfile.ts`
+    indent_level: 0
+    raw_marker: *
+  - id: "line_92"
+    line_number: 92
+    status: pending
+    parallel_group: 999999
+    description: T046 [业务逻辑] 实现个人资料服务 `backend/src/services/ProfileService.ts`
+    indent_level: 0
+    raw_marker: *
+  - id: "line_93"
+    line_number: 93
+    status: pending
+    parallel_group: 999999
+    description: T047 [API] 实现个人中心路由 `backend/src/controllers/ProfileController.ts`
+    indent_level: 0
+    raw_marker: *
+  - id: "line_94"
+    line_number: 94
+    status: pending
+    parallel_group: 999999
+    description: T048 [UI] 创建个人中心页面 `frontend/src/pages/Profile/index.tsx`
+    indent_level: 0
+    raw_marker: *
+  - id: "line_95"
+    line_number: 95
+    status: pending
+    parallel_group: 999999
+    description: T049 [UI] 创建我的愿望组件 `frontend/src/components/MyWishes/index.tsx`
+    indent_level: 0
+    raw_marker: *
+  - id: "line_96"
+    line_number: 96
+    status: pending
+    parallel_group: 999999
+    description: T050 [UI] 创建收藏夹组件 `frontend/src/components/Favorites/index.tsx`
+    indent_level: 0
+    raw_marker: *
+  - id: "line_100"
+    line_number: 100
+    status: pending
+    parallel_group: 999999
+    description: T051 [配置] 实现响应式设计和移动端适配 `frontend/src/styles/responsive.css`
+    indent_level: 0
+    raw_marker: *
+  - id: "line_101"
+    line_number: 101
+    status: pending
+    parallel_group: 999999
+    description: T052 [配置] 实现性能优化 (代码分割、懒加载) `frontend/src/utils/lazyLoad.ts`
+    indent_level: 0
+    raw_marker: *
+  - id: "line_102"
+    line_number: 102
+    status: pending
+    parallel_group: 999999
+    description: T053 [配置] 实现错误边界和异常处理 `frontend/src/components/ErrorBoundary/index.tsx`
+    indent_level: 0
+    raw_marker: *
+  - id: "line_103"
+    line_number: 103
+    status: pending
+    parallel_group: 999999
+    description: T054 [配置] 实现数据缓存策略 `backend/src/services/CacheService.ts`
+    indent_level: 0
+    raw_marker: *
+  - id: "line_104"
+    line_number: 104
+    status: pending
+    parallel_group: 999999
+    description: T055 [配置] 实现日志记录和监控 `backend/src/utils/logger.ts`
+    indent_level: 0
+    raw_marker: *
+  - id: "line_105"
+    line_number: 105
+    status: pending
+    parallel_group: 999999
+    description: T056 [配置] 实现前端路由权限控制 `frontend/src/components/ProtectedRoute/index.tsx`
+    indent_level: 0
+    raw_marker: *
+  - id: "line_106"
+    line_number: 106
+    status: pending
+    parallel_group: 999999
+    description: T057 [配置] 实现数据库备份和恢复脚本 `database/scripts/backup.sh`
+    indent_level: 0
+    raw_marker: *
+  - id: "line_107"
+    line_number: 107
+    status: pending
+    parallel_group: 999999
+    description: T058 [配置] 创建 Docker 配置和部署脚本 `docker-compose.yml`
+    indent_level: 0
+    raw_marker: *
