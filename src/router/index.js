@@ -6,6 +6,7 @@ import AdminPanel from '../views/AdminPanel.vue'
 import UserProfile from '../views/UserProfile.vue'
 import Login from '../views/Login.vue'
 import Register from '../views/Register.vue'
+import { requireAuth, requireAdmin, redirectIfAuthenticated } from './guards'
 
 const routes = [
   {
@@ -26,22 +27,26 @@ const routes = [
   {
     path: '/admin',
     name: 'AdminPanel',
-    component: AdminPanel
+    component: AdminPanel,
+    beforeEnter: requireAdmin // 需要管理员权限
   },
   {
     path: '/profile',
     name: 'UserProfile',
-    component: UserProfile
+    component: UserProfile,
+    beforeEnter: requireAuth // 需要登录
   },
   {
     path: '/login',
     name: 'Login',
-    component: Login
+    component: Login,
+    beforeEnter: redirectIfAuthenticated // 如果已登录则重定向
   },
   {
     path: '/register',
     name: 'Register',
-    component: Register
+    component: Register,
+    beforeEnter: redirectIfAuthenticated // 如果已登录则重定向
   }
 ]
 

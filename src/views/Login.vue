@@ -87,8 +87,9 @@ export default {
         const result = login(this.formData.email, this.formData.password)
 
         if (result.success) {
-          // 登录成功，跳转到首页
-          this.$router.push('/')
+          // 登录成功，跳转到redirect参数指定的页面，如果没有则跳转到首页
+          const redirect = this.$route.query.redirect || '/'
+          this.$router.push(redirect)
         } else {
           this.errorMessage = result.message || '登录失败，请检查邮箱和密码'
         }
