@@ -55,7 +55,7 @@ task: Build a Web page app in Vue
 
 ### Phase 4: User Story - 愿望展示与浏览
 
-- [ ] T020 [测试] [P] 为愿望查询接口编写测试 `backend/tests/wish.spec.ts`
+- [x] T020 [测试] [P] 为愿望查询接口编写测试 `backend/tests/wish.spec.ts`
 - [x] T021 [数据模型] 定义愿望数据模型 `backend/src/models/Wish.ts`
 - [x] T022 [数据模型] 定义愿望相关 DTO 类型 `shared/types/wish.js`
 - [x] T023 [业务逻辑] 实现愿望查询服务 (列表、详情、搜索) `backend/src/services/WishService.ts`

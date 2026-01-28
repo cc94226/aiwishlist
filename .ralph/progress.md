@@ -817,13 +817,13 @@ Phase 3任务项中，T012已完成。认证接口的测试用例已完整编写
 **已完成的工作：**
 
 - ✅ T017.4: 创建前端认证系统完整测试套件
-  - 创建Login.vue组件测试文件（src/views/__tests__/Login.test.js）
+  - 创建Login.vue组件测试文件（src/views/**tests**/Login.test.js）
     - 测试组件渲染、表单验证、登录功能、已登录用户重定向、记住我功能
     - 共9个测试用例，全部通过
-  - 创建Register.vue组件测试文件（src/views/__tests__/Register.test.js）
+  - 创建Register.vue组件测试文件（src/views/**tests**/Register.test.js）
     - 测试组件渲染、表单验证（姓名、邮箱、密码、确认密码）、注册功能、已登录用户重定向
     - 共11个测试用例，全部通过
-  - 创建路由守卫guards.js测试文件（src/router/__tests__/guards.test.js）
+  - 创建路由守卫guards.js测试文件（src/router/**tests**/guards.test.js）
     - 测试requireAuth、requireAdmin、redirectIfAuthenticated三个路由守卫
     - 共8个测试用例，全部通过
   - 安装测试依赖（@vue/test-utils, vitest, @vitest/ui, jsdom）
@@ -871,11 +871,43 @@ Phase 3任务项中，T017.4已完成。前端认证系统的完整测试套件�
 **当前状态：**
 Phase 4任务项中，T023和T025已完成。愿望查询服务和API接口已完整实现，包括列表、详情、搜索等所有查询功能，并包含完整的权限控制逻辑。
 
+**已完成的工作（续）：**
+
+- ✅ T020: 为愿望查询接口编写测试用例（backend/tests/wish.spec.ts）
+  - 创建完整的愿望查询接口测试文件
+  - 测试GET /api/wishes - 获取愿望列表（支持分页、筛选、排序、搜索）
+  - 测试GET /api/wishes/:id - 获取愿望详情（包含权限控制测试）
+  - 测试GET /api/wishes/search - 搜索愿望
+  - 测试GET /api/wishes/job/:job - 根据岗位获取愿望列表
+  - 测试GET /api/wishes/user/:userId - 获取用户提交的愿望列表
+  - 测试GET /api/wishes/popular - 获取热门愿望列表
+  - 测试GET /api/wishes/latest - 获取最新愿望列表
+  - 测试权限控制：普通用户只能查看已发布的愿望，管理员可以查看所有状态
+  - 测试权限控制：草稿状态的愿望只有管理员或提交者可以查看
+  - 测试权限控制：普通用户不能查看他人的愿望列表
+  - 测试各种查询参数（分页、排序、筛选、搜索）
+  - 测试错误处理（无效ID、空参数等）
+  - 参考auth.spec.ts的结构，包含数据库连接检查和测试数据清理
+  - 修复所有TypeScript类型错误
+
+**当前状态：**
+Phase 4任务项中，T020、T021、T023、T025已完成。愿望查询系统的数据模型、服务层、API层和测试用例已完整实现。
+
 **下一步：**
-继续处理下一个未完成的任务项。T024（岗位分类服务）或T020（愿望查询接口测试）可以开始实现。
+继续处理下一个未完成的任务项。T024（岗位分类服务）可以开始实现。
 
 ### 2026-01-28 16:21:46
+
 **Session 19 ended** - 🔄 Context rotation (token limit reached)
 
 ### 2026-01-28 16:21:48
+
 **Session 20 started** (model: composer-1)
+
+### 2026-01-28 16:22:16
+
+**Session 20 ended** - 🔄 Context rotation (token limit reached)
+
+### 2026-01-28 16:22:18
+
+**Loop ended** - ⚠️ Max iterations (20) reached
