@@ -6,6 +6,7 @@ import { testConnection } from './config/database'
 import authRouter from './routes/auth'
 import wishRouter from './routes/wish'
 import interactionRouter from './routes/interaction'
+import profileRouter from './routes/profile'
 
 // 加载环境变量
 dotenv.config()
@@ -49,6 +50,9 @@ app.use('/api/wishes', wishRouter)
 
 // 互动路由
 app.use('/api/interactions', interactionRouter)
+
+// 个人中心路由
+app.use('/api/profile', profileRouter)
 
 // 404错误处理（必须在所有路由之后）
 app.use(notFoundHandler)
