@@ -3,8 +3,8 @@
 # DO NOT EDIT - regenerated on task file change
 
 source_file: RALPH_TASK.md
-source_mtime: 1769590312
-generated_at: 2026-01-28T08:52:58Z
+source_mtime: 1769591737
+generated_at: 2026-01-28T09:15:39Z
 
 tasks:
   - id: "line_26"
@@ -443,8 +443,15 @@ tasks:
     raw_marker: -
   - id: "line_109"
     line_number: 109
-    status: pending
+    status: completed
     parallel_group: 999999
     description: T059 [文档] 创建一个“howtorun.md”文件，指导人类如何运行程序并使用功能
+    indent_level: 0
+    raw_marker: -
+  - id: "line_110"
+    line_number: 110
+    status: completed
+    parallel_group: 999999
+    description: T060 [文档] 创建一个“databaseinfo.md”文件，输出数据库信息，让我可以在命令行里使用脚本或命令查看后台数据
     indent_level: 0
     raw_marker: -
