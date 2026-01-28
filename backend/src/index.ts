@@ -1,6 +1,8 @@
 import express, { Request, Response } from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
+import { requestLogger, errorHandler, notFoundHandler } from './middleware'
+import { testConnection } from './config/database'
 
 // 加载环境变量
 dotenv.config()
@@ -13,9 +15,22 @@ app.use(cors())
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
+// 请求日志中间件（应该在其他中间件之前）
+app.use(requestLogger)
+
 // 健康检查路由
 app.get('/health', (req: Request, res: Response) => {
   res.json({ status: 'ok', message: '后端服务运行正常' })
+})
+
+// 数据库连接测试路由
+app.get('/health/db', async (req: Request, res: Response) => {
+  const isConnected = await testConnection()
+  res.json({
+    status: isConnected ? 'ok' : 'error',
+    message: isConnected ? '数据库连接正常' : '数据库连接失败',
+    database: isConnected
+  })
 })
 
 // API路由占位符
@@ -23,10 +38,19 @@ app.get('/api', (req: Request, res: Response) => {
   res.json({ message: 'AI工具需求愿望收集平台 API' })
 })
 
+// 404错误处理（必须在所有路由之后）
+app.use(notFoundHandler)
+
+// 错误处理中间件（必须在最后）
+app.use(errorHandler)
+
 // 启动服务器
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`🚀 后端服务运行在 http://localhost:${PORT}`)
   console.log(`📝 API文档: http://localhost:${PORT}/api`)
+  
+  // 测试数据库连接
+  await testConnection()
 })
 
 export default app
