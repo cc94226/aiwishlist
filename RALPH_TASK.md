@@ -33,7 +33,7 @@ task: Build a Web page app in Vue
 
 - [x] T006 [数据模型] 定义核心数据类型和接口 `shared/types/index.js`
 - [x] T007 [数据模型] 设计数据库表结构 (MySQL) `database/migrations/001_create_tables.sql`
-- [ ] T008 [配置] 配置数据库连接和基础配置 `backend/src/config/database.ts`
+- [x] T008 [配置] 配置数据库连接和基础配置 `backend/src/config/database.ts`
 - [ ] T009 [配置] 实现基础中间件 (认证、错误处理、日志) `backend/src/middleware/`
 - [x] T010 [配置] 前端路由配置 `src/router/index.js` (Vue Router已配置)
 - [x] T011 [配置] API请求封装和错误处理 `src/utils/api.js`
