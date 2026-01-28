@@ -3,8 +3,8 @@
 # DO NOT EDIT - regenerated on task file change
 
 source_file: RALPH_TASK.md
-source_mtime: 1769589534
-generated_at: 2026-01-28T08:39:17Z
+source_mtime: 1769590312
+generated_at: 2026-01-28T08:52:58Z
 
 tasks:
   - id: "line_26"
@@ -417,27 +417,34 @@ tasks:
     line_number: 105
     status: completed
     parallel_group: 999999
-    description: T055 [配置] 实现日志记录和监控 `backend/src/utils/logger.ts` (已完成：创建Logger类，支持多级别日志、文件输出、日志轮转、监控指标、告警功能)
+    description: T055 [配置] 实现日志记录和监控 `backend/src/utils/logger.ts` (已完成：创建LoggerService类，支持多级别日志、文件输出、日志轮转、性能监控、错误监控、结构化日志输出、环境变量配置)
     indent_level: 0
     raw_marker: -
   - id: "line_106"
     line_number: 106
-    status: pending
+    status: completed
     parallel_group: 999999
-    description: T056 [配置] 实现前端路由权限控制 `frontend/src/components/ProtectedRoute/index.tsx`
+    description: T056 [配置] 实现前端路由权限控制 `src/components/ProtectedRoute/index.vue` (已完成：创建ProtectedRoute组件，支持登录权限、管理员权限、角色权限、岗位权限控制)
     indent_level: 0
     raw_marker: -
   - id: "line_107"
     line_number: 107
-    status: pending
+    status: completed
     parallel_group: 999999
-    description: T057 [配置] 实现数据库备份和恢复脚本 `database/scripts/backup.sh`
+    description: T057 [配置] 实现数据库备份和恢复脚本 `database/scripts/backup.sh` (已完成：创建backup.sh脚本，支持数据库备份、恢复、压缩、清理旧备份、列出备份文件等功能)
     indent_level: 0
     raw_marker: -
   - id: "line_108"
     line_number: 108
+    status: completed
+    parallel_group: 999999
+    description: T058 [配置] 创建 Docker 配置和部署脚本 `docker-compose.yml` (已完成：创建Dockerfile、docker-compose.yml、nginx.conf、deploy.sh，支持前端、后端、MySQL、Redis服务的容器化部署)
+    indent_level: 0
+    raw_marker: -
+  - id: "line_109"
+    line_number: 109
     status: pending
     parallel_group: 999999
-    description: T058 [配置] 创建 Docker 配置和部署脚本 `docker-compose.yml`
+    description: T059 [文档] 创建一个“howtorun.md”文件，指导人类如何运行程序并使用功能
     indent_level: 0
     raw_marker: -
