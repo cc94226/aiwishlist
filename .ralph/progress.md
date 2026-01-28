@@ -811,3 +811,52 @@ Phase 3任务项中，T012已完成。认证接口的测试用例已完整编写
 ### 2026-01-28 16:17:03
 
 **Session 17 started** (model: composer-1)
+
+### 2026-01-28 (当前会话 - Session 17)
+
+**已完成的工作：**
+
+- ✅ T023: 实现愿望查询服务（backend/src/services/WishService.ts）
+  - 创建WishService类，提供完整的愿望查询业务逻辑
+  - 实现getWishList方法 - 获取愿望列表（支持分页、筛选、排序、搜索）
+  - 实现getWishDetail方法 - 获取愿望详情（包含权限控制）
+  - 实现searchWish方法 - 搜索愿望（根据关键词搜索标题和描述）
+  - 实现getWishesByJob方法 - 根据岗位获取愿望列表
+  - 实现getWishesByUser方法 - 获取用户提交的愿望列表
+  - 实现getPopularWishes方法 - 获取热门愿望列表（按点赞数排序）
+  - 实现getLatestWishes方法 - 获取最新愿望列表（按创建时间排序）
+  - 实现权限控制：普通用户只能查看已发布的愿望，管理员可以查看所有状态
+  - 实现权限控制：草稿状态的愿望只有管理员或提交者可以查看
+  - 实现权限控制：已下架的愿望只有管理员或提交者可以查看
+  - 包含完整的输入验证和错误处理
+  - 验证TypeScript编译通过，无错误
+
+- ✅ T025: 实现愿望相关路由和控制器（backend/src/controllers/WishController.ts）
+  - 创建WishController类，提供完整的愿望查询API端点
+  - 实现getWishList方法 - GET /api/wishes（获取愿望列表，支持分页、筛选、排序、搜索）
+  - 实现getWishDetail方法 - GET /api/wishes/:id（获取愿望详情）
+  - 实现searchWish方法 - GET /api/wishes/search（搜索愿望）
+  - 实现getWishesByJob方法 - GET /api/wishes/job/:job（根据岗位获取愿望列表）
+  - 实现getWishesByUser方法 - GET /api/wishes/user/:userId（获取用户提交的愿望列表）
+  - 实现getPopularWishes方法 - GET /api/wishes/popular（获取热门愿望列表）
+  - 实现getLatestWishes方法 - GET /api/wishes/latest（获取最新愿望列表）
+  - 创建wish路由文件（backend/src/routes/wish.ts）
+  - 在index.ts中注册愿望路由（/api/wishes）
+  - 使用optionalAuth中间件，支持已登录和未登录用户访问
+  - 实现权限控制：普通用户只能查看已发布的愿望，管理员可以查看所有状态
+  - 实现权限控制：用户只能查看自己的愿望列表（除非是管理员）
+  - 包含完整的输入验证和错误处理
+  - 统一响应格式（success, data, error）
+  - 验证TypeScript编译通过，无错误
+
+**当前状态：**
+Phase 4任务项中，T023和T025已完成。愿望查询服务和API接口已完整实现，包括列表、详情、搜索等所有查询功能，并包含完整的权限控制逻辑。
+
+**下一步：**
+继续处理下一个未完成的任务项。T024（岗位分类服务）或T020（愿望查询接口测试）可以开始实现。
+
+### 2026-01-28 16:21:46
+**Session 19 ended** - 🔄 Context rotation (token limit reached)
+
+### 2026-01-28 16:21:48
+**Session 20 started** (model: composer-1)

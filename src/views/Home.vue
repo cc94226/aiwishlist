@@ -18,9 +18,9 @@
     </div>
 
     <div class="wishes-grid">
-      <div 
-        v-for="wish in filteredWishes" 
-        :key="wish.id" 
+      <div
+        v-for="wish in filteredWishes"
+        :key="wish.id"
         class="wish-card"
         @click="goToDetail(wish.id)"
       >
@@ -63,10 +63,11 @@ export default {
   },
   computed: {
     filteredWishes() {
-      let filtered = this.selectedJob === '全部' 
-        ? this.wishes.filter(w => w.status === 'published')
-        : getWishesByJob(this.selectedJob)
-      
+      let filtered =
+        this.selectedJob === '全部'
+          ? this.wishes.filter(w => w.status === 'published')
+          : getWishesByJob(this.selectedJob)
+
       // 排序
       filtered = [...filtered].sort((a, b) => {
         if (this.sortBy === 'newest') {
@@ -78,7 +79,7 @@ export default {
         }
         return 0
       })
-      
+
       return filtered
     }
   },
@@ -106,9 +107,9 @@ export default {
     },
     getJobClass(job) {
       const classes = {
-        '开发': 'job-dev',
-        '设计': 'job-design',
-        '行政': 'job-admin'
+        开发: 'job-dev',
+        设计: 'job-design',
+        行政: 'job-admin'
       }
       return classes[job] || ''
     }
@@ -170,14 +171,16 @@ export default {
   background: white;
   border-radius: 8px;
   padding: 1.5rem;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
 }
 
 .wish-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 .wish-header {

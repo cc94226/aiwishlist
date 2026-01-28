@@ -3,7 +3,11 @@
     <div class="admin-header">
       <h2>系统管理面板</h2>
       <div class="user-info">
-        <span>当前用户：{{ currentUser?.name }} ({{ currentUser?.role === 'admin' ? '管理员' : '普通用户' }})</span>
+        <span
+          >当前用户：{{ currentUser?.name }} ({{
+            currentUser?.role === 'admin' ? '管理员' : '普通用户'
+          }})</span
+        >
         <button class="logout-btn" @click="logout">退出登录</button>
       </div>
     </div>
@@ -59,16 +63,16 @@
               <td>{{ formatDate(wish.createdAt) }}</td>
               <td class="actions-cell">
                 <button class="btn btn-edit" @click="editWish(wish.id)">编辑</button>
-                <button 
-                  v-if="wish.status === 'published'" 
-                  class="btn btn-unpublish" 
+                <button
+                  v-if="wish.status === 'published'"
+                  class="btn btn-unpublish"
                   @click="unpublishWish(wish.id)"
                 >
                   下架
                 </button>
-                <button 
-                  v-if="wish.status === 'unpublished'" 
-                  class="btn btn-publish" 
+                <button
+                  v-if="wish.status === 'unpublished'"
+                  class="btn btn-publish"
                   @click="publishWish(wish.id)"
                 >
                   发布
@@ -96,7 +100,12 @@
           </div>
           <div class="form-group">
             <label>需求描述：</label>
-            <textarea v-model="editingWish.description" required rows="4" class="form-textarea"></textarea>
+            <textarea
+              v-model="editingWish.description"
+              required
+              rows="4"
+              class="form-textarea"
+            ></textarea>
           </div>
           <div class="form-group">
             <label>职业：</label>
@@ -128,7 +137,13 @@
 </template>
 
 <script>
-import { getAllWishesForAdmin, updateWish, deleteWish as deleteWishService, unpublishWish as unpublishWishService, publishWish as publishWishService } from '../services/wishService'
+import {
+  getAllWishesForAdmin,
+  updateWish,
+  deleteWish as deleteWishService,
+  unpublishWish as unpublishWishService,
+  publishWish as publishWishService
+} from '../services/wishService'
 import { getCurrentUser, isAdmin, logout as logoutService } from '../services/authService'
 
 export default {
@@ -149,12 +164,12 @@ export default {
     },
     filteredWishes() {
       let filtered = [...this.wishes]
-      
+
       // 状态筛选
       if (this.statusFilter !== 'all') {
         filtered = filtered.filter(w => w.status === this.statusFilter)
       }
-      
+
       // 排序
       filtered.sort((a, b) => {
         if (this.sortBy === 'newest') {
@@ -166,7 +181,7 @@ export default {
         }
         return 0
       })
-      
+
       return filtered
     }
   },
@@ -242,17 +257,17 @@ export default {
     },
     getStatusText(status) {
       const statusMap = {
-        'published': '已发布',
-        'unpublished': '已下架',
-        'draft': '草稿'
+        published: '已发布',
+        unpublished: '已下架',
+        draft: '草稿'
       }
       return statusMap[status] || status
     },
     getStatusClass(status) {
       const classMap = {
-        'published': 'status-published',
-        'unpublished': 'status-unpublished',
-        'draft': 'status-draft'
+        published: 'status-published',
+        unpublished: 'status-unpublished',
+        draft: 'status-draft'
       }
       return classMap[status] || ''
     },
@@ -307,7 +322,7 @@ export default {
   padding: 4rem 2rem;
   background: white;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .no-permission p {
@@ -325,7 +340,7 @@ export default {
   background: white;
   border-radius: 8px;
   padding: 2rem;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .filter-section {
@@ -365,7 +380,8 @@ thead {
   background-color: #f8f9fa;
 }
 
-th, td {
+th,
+td {
   padding: 1rem;
   text-align: left;
   border-bottom: 1px solid #eee;

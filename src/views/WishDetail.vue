@@ -22,8 +22,12 @@
               <span class="match-percentage">匹配度：{{ matchInfo.score }}%</span>
             </div>
             <div class="match-details">
-              <p>您的岗位：<strong>{{ matchInfo.userJob }}</strong></p>
-              <p>愿望岗位：<strong>{{ matchInfo.wishJob }}</strong></p>
+              <p>
+                您的岗位：<strong>{{ matchInfo.userJob }}</strong>
+              </p>
+              <p>
+                愿望岗位：<strong>{{ matchInfo.wishJob }}</strong>
+              </p>
             </div>
           </div>
         </div>
@@ -45,24 +49,16 @@
         </div>
 
         <div class="wish-actions">
-          <button class="action-btn like-btn" @click="likeWish">
-            👍 点赞 ({{ wish.likes }})
-          </button>
-          <button class="action-btn favorite-btn" :class="{ active: isFavorited }" @click="toggleFavorite">
+          <button class="action-btn like-btn" @click="likeWish">👍 点赞 ({{ wish.likes }})</button>
+          <button
+            class="action-btn favorite-btn"
+            :class="{ active: isFavorited }"
+            @click="toggleFavorite"
+          >
             ⭐ {{ isFavorited ? '已收藏' : '收藏' }}
           </button>
-          <button 
-            v-if="canEdit" 
-            class="action-btn edit-btn" 
-            @click="editWish"
-          >
-            ✏️ 编辑
-          </button>
-          <button 
-            v-if="canDelete" 
-            class="action-btn delete-btn" 
-            @click="deleteWish"
-          >
+          <button v-if="canEdit" class="action-btn edit-btn" @click="editWish">✏️ 编辑</button>
+          <button v-if="canDelete" class="action-btn delete-btn" @click="deleteWish">
             🗑️ 删除
           </button>
         </div>
@@ -70,8 +66,8 @@
         <div class="comments-section">
           <h3>评论 ({{ wish.comments.length }})</h3>
           <div class="comment-form">
-            <textarea 
-              v-model="newComment" 
+            <textarea
+              v-model="newComment"
               placeholder="写下你的评论..."
               rows="3"
               class="comment-input"
@@ -111,7 +107,12 @@
           </div>
           <div class="form-group">
             <label>需求描述：</label>
-            <textarea v-model="editingWish.description" required rows="4" class="form-textarea"></textarea>
+            <textarea
+              v-model="editingWish.description"
+              required
+              rows="4"
+              class="form-textarea"
+            ></textarea>
           </div>
           <div class="form-group">
             <label>职业：</label>
@@ -135,7 +136,13 @@
 </template>
 
 <script>
-import { getWishById, likeWish as likeWishService, addComment as addCommentService, updateWish, deleteWish as deleteWishService } from '../services/wishService'
+import {
+  getWishById,
+  likeWish as likeWishService,
+  addComment as addCommentService,
+  updateWish,
+  deleteWish as deleteWishService
+} from '../services/wishService'
 import { canEditWish, canDeleteWish } from '../services/authService'
 import { getWishMatchInfo } from '../services/matchService'
 
@@ -201,7 +208,7 @@ export default {
     toggleFavorite() {
       const favorites = JSON.parse(localStorage.getItem('favorites') || '[]')
       const wishId = parseInt(this.$route.params.id)
-      
+
       if (this.isFavorited) {
         const index = favorites.indexOf(wishId)
         if (index > -1) {
@@ -210,13 +217,13 @@ export default {
       } else {
         favorites.push(wishId)
       }
-      
+
       localStorage.setItem('favorites', JSON.stringify(favorites))
       this.isFavorited = !this.isFavorited
     },
     addComment() {
       if (!this.newComment.trim()) return
-      
+
       const updated = addCommentService(this.wish.id, this.newComment)
       if (updated) {
         this.wish = updated
@@ -235,9 +242,9 @@ export default {
     },
     getJobClass(job) {
       const classes = {
-        '开发': 'job-dev',
-        '设计': 'job-design',
-        '行政': 'job-admin'
+        开发: 'job-dev',
+        设计: 'job-design',
+        行政: 'job-admin'
       }
       return classes[job] || ''
     },
@@ -289,7 +296,7 @@ export default {
   background: white;
   border-radius: 8px;
   padding: 2rem;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .detail-header {

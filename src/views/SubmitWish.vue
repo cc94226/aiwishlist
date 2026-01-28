@@ -4,10 +4,10 @@
     <form class="wish-form" @submit.prevent="submitWish">
       <div class="form-group">
         <label for="title">愿望名称 *</label>
-        <input 
-          id="title" 
-          v-model="form.title" 
-          type="text" 
+        <input
+          id="title"
+          v-model="form.title"
+          type="text"
           required
           placeholder="请输入愿望名称"
           class="form-input"
@@ -16,9 +16,9 @@
 
       <div class="form-group">
         <label for="description">需求描述 *</label>
-        <textarea 
-          id="description" 
-          v-model="form.description" 
+        <textarea
+          id="description"
+          v-model="form.description"
           required
           placeholder="请详细描述您的需求"
           rows="6"
@@ -28,12 +28,7 @@
 
       <div class="form-group">
         <label for="job">提交者岗位 *</label>
-        <select 
-          id="job" 
-          v-model="form.job" 
-          required
-          class="form-select"
-        >
+        <select id="job" v-model="form.job" required class="form-select">
           <option value="">请选择岗位</option>
           <option value="开发">开发</option>
           <option value="设计">设计</option>
@@ -46,10 +41,10 @@
 
       <div class="form-group">
         <label for="submitter">提交者姓名</label>
-        <input 
-          id="submitter" 
-          v-model="form.submitter" 
-          type="text" 
+        <input
+          id="submitter"
+          v-model="form.submitter"
+          type="text"
           placeholder="可选，默认为匿名用户"
           class="form-input"
         />
@@ -109,7 +104,7 @@ export default {
         submitterId: user ? user.id : null,
         status: 'published'
       })
-      
+
       if (newWish) {
         this.submitSuccess = true
         this.resetForm()
@@ -123,7 +118,7 @@ export default {
         alert('请至少填写愿望名称、需求描述和岗位信息才能保存为草稿')
         return
       }
-      
+
       const user = getCurrentUser()
       const newWish = addWish({
         title: this.form.title,
@@ -133,7 +128,7 @@ export default {
         submitterId: user ? user.id : null,
         status: 'draft'
       })
-      
+
       if (newWish) {
         this.draftSuccess = true
         this.resetForm()
@@ -162,7 +157,7 @@ export default {
   padding: 2rem;
   background: white;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .submit-wish h2 {

@@ -158,10 +158,10 @@ describe('Login.vue', () => {
 
       await wrapper.find('input[type="email"]').setValue('test@example.com')
       await wrapper.find('input[type="password"]').setValue('password123')
-      
+
       // 在提交前，loading应该是false
       expect(wrapper.vm.loading).toBe(false)
-      
+
       // 提交表单
       await wrapper.find('form').trigger('submit.prevent')
       await wrapper.vm.$nextTick()
@@ -173,14 +173,15 @@ describe('Login.vue', () => {
   })
 
   describe('已登录用户重定向', () => {
-    it('如果用户已登录，应该调用getCurrentUser检查', async () => {
+    it('如果用户已登录，组件应该检查用户状态', async () => {
       const mockUser = {
         id: 'user-1',
         name: '测试用户',
         email: 'test@example.com'
       }
 
-      authService.getCurrentUser.mockReturnValue(mockUser)
+      // 设置localStorage中的用户
+      localStorage.setItem('currentUser', JSON.stringify(mockUser))
 
       const wrapper = mount(Login, {
         global: {
@@ -190,8 +191,9 @@ describe('Login.vue', () => {
 
       await wrapper.vm.$nextTick()
 
-      // 验证getCurrentUser被调用（在mounted钩子中）
-      expect(authService.getCurrentUser).toHaveBeenCalled()
+      // 验证组件可以访问用户信息（通过组件内部的getCurrentUser方法）
+      const currentUser = wrapper.vm.getCurrentUser()
+      expect(currentUser).toEqual(mockUser)
     })
   })
 

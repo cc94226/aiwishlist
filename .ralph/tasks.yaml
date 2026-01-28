@@ -3,8 +3,8 @@
 # DO NOT EDIT - regenerated on task file change
 
 source_file: RALPH_TASK.md
-source_mtime: 1769588122
-generated_at: 2026-01-28T08:17:00Z
+source_mtime: 1769588499
+generated_at: 2026-01-28T08:21:46Z
 
 tasks:
   - id: "line_26"
@@ -86,7 +86,7 @@ tasks:
     raw_marker: -
   - id: "line_43"
     line_number: 43
-    status: pending
+    status: completed
     parallel_group: 999999
     description: T012 [测试] [P] 为用户注册/登录接口编写测试用例 `backend/tests/auth.spec.ts`
     indent_level: 0
@@ -191,7 +191,7 @@ tasks:
     raw_marker: -
   - id: "line_61"
     line_number: 61
-    status: pending
+    status: completed
     parallel_group: 999999
     description: T023 [业务逻辑] 实现愿望查询服务 (列表、详情、搜索) `backend/src/services/WishService.ts`
     indent_level: 0
@@ -205,7 +205,7 @@ tasks:
     raw_marker: -
   - id: "line_63"
     line_number: 63
-    status: pending
+    status: completed
     parallel_group: 999999
     description: T025 [API] 实现愿望相关路由和控制器 `backend/src/controllers/WishController.ts`
     indent_level: 0

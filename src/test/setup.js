@@ -10,13 +10,13 @@ const localStorageMock = (() => {
   let store = {}
 
   return {
-    getItem: vi.fn((key) => {
+    getItem: vi.fn(key => {
       return store[key] || null
     }),
     setItem: vi.fn((key, value) => {
       store[key] = value.toString()
     }),
-    removeItem: vi.fn((key) => {
+    removeItem: vi.fn(key => {
       delete store[key]
     }),
     clear: vi.fn(() => {
@@ -25,7 +25,7 @@ const localStorageMock = (() => {
     get length() {
       return Object.keys(store).length
     },
-    key: vi.fn((index) => {
+    key: vi.fn(index => {
       const keys = Object.keys(store)
       return keys[index] || null
     })
