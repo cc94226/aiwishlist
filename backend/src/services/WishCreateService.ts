@@ -343,11 +343,10 @@ export class WishCreateService {
   /**
    * 下架愿望（将已发布状态改为已归档）
    * @param id 愿望ID
-   * @param userId 当前用户ID（用于权限控制）
    * @param isAdmin 是否为管理员（用于权限控制）
    * @returns Promise<Wish> 更新后的愿望信息
    */
-  static async archiveWish(id: string, userId?: string, isAdmin: boolean = false): Promise<Wish> {
+  static async archiveWish(id: string, isAdmin: boolean = false): Promise<Wish> {
     // 验证ID
     if (!id || id.trim().length === 0) {
       throw new AppError('愿望ID不能为空', 400, 'INVALID_INPUT')
