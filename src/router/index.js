@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import Home from '../views/Home.vue'
 import SubmitWish from '../views/SubmitWish.vue'
 import WishDetail from '../views/WishDetail.vue'
+import AdminPanel from '../views/AdminPanel.vue'
 
 const routes = [
   {
@@ -18,6 +19,11 @@ const routes = [
     path: '/wish/:id',
     name: 'WishDetail',
     component: WishDetail
+  },
+  {
+    path: '/admin',
+    name: 'AdminPanel',
+    component: AdminPanel
   }
 ]
 

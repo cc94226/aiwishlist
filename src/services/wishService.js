@@ -29,6 +29,7 @@ export function addWish(wishData) {
     description: wishData.description,
     job: wishData.job,
     submitter: wishData.submitter || '匿名用户',
+    submitterId: wishData.submitterId || null,
     likes: 0,
     comments: [],
     createdAt: new Date().toISOString(),
@@ -88,4 +89,19 @@ export function getAllJobs() {
   const wishes = loadWishes()
   const jobs = [...new Set(wishes.map(w => w.job))]
   return jobs.sort()
+}
+
+// 下架愿望（管理员功能）
+export function unpublishWish(id) {
+  return updateWish(id, { status: 'unpublished' })
+}
+
+// 发布愿望（管理员功能）
+export function publishWish(id) {
+  return updateWish(id, { status: 'published' })
+}
+
+// 获取所有愿望（包括未发布的，管理员使用）
+export function getAllWishesForAdmin() {
+  return loadWishes()
 }

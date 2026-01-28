@@ -57,6 +57,7 @@
 
       <div class="form-actions">
         <button type="submit" class="btn btn-primary">提交愿望</button>
+        <button type="button" @click="saveAsDraft" class="btn btn-draft">保存为草稿</button>
         <button type="button" @click="resetForm" class="btn btn-secondary">重置</button>
       </div>
     </form>
@@ -65,11 +66,16 @@
       <p>✅ 愿望提交成功！</p>
       <router-link to="/" class="link">返回首页查看</router-link>
     </div>
+    <div v-if="draftSuccess" class="success-message">
+      <p>✅ 愿望已保存为草稿！您可以在管理面板中编辑和发布。</p>
+      <router-link to="/admin" class="link">前往管理面板</router-link>
+    </div>
   </div>
 </template>
 
 <script>
 import { addWish } from '../services/wishService'
+import { getCurrentUser } from '../services/authService'
 
 export default {
   name: 'SubmitWish',
@@ -81,16 +87,26 @@ export default {
         job: '',
         submitter: ''
       },
-      submitSuccess: false
+      submitSuccess: false,
+      draftSuccess: false
+    }
+  },
+  mounted() {
+    // 设置提交者姓名（如果已登录）
+    const user = getCurrentUser()
+    if (user) {
+      this.form.submitter = user.name
     }
   },
   methods: {
     submitWish() {
+      const user = getCurrentUser()
       const newWish = addWish({
         title: this.form.title,
         description: this.form.description,
         job: this.form.job,
         submitter: this.form.submitter || undefined,
+        submitterId: user ? user.id : null,
         status: 'published'
       })
       
@@ -102,12 +118,37 @@ export default {
         }, 5000)
       }
     },
+    saveAsDraft() {
+      if (!this.form.title || !this.form.description || !this.form.job) {
+        alert('请至少填写愿望名称、需求描述和岗位信息才能保存为草稿')
+        return
+      }
+      
+      const user = getCurrentUser()
+      const newWish = addWish({
+        title: this.form.title,
+        description: this.form.description,
+        job: this.form.job,
+        submitter: this.form.submitter || undefined,
+        submitterId: user ? user.id : null,
+        status: 'draft'
+      })
+      
+      if (newWish) {
+        this.draftSuccess = true
+        this.resetForm()
+        setTimeout(() => {
+          this.draftSuccess = false
+        }, 5000)
+      }
+    },
     resetForm() {
+      const user = getCurrentUser()
       this.form = {
         title: '',
         description: '',
         job: '',
-        submitter: ''
+        submitter: user ? user.name : ''
       }
     }
   }
@@ -202,6 +243,15 @@ export default {
 
 .btn-secondary:hover {
   background-color: #bdc3c7;
+}
+
+.btn-draft {
+  background-color: #f39c12;
+  color: white;
+}
+
+.btn-draft:hover {
+  background-color: #e67e22;
 }
 
 .success-message {

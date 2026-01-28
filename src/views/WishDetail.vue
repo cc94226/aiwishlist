@@ -33,6 +33,20 @@
           <button @click="toggleFavorite" class="action-btn favorite-btn" :class="{ active: isFavorited }">
             ⭐ {{ isFavorited ? '已收藏' : '收藏' }}
           </button>
+          <button 
+            v-if="canEdit" 
+            @click="editWish" 
+            class="action-btn edit-btn"
+          >
+            ✏️ 编辑
+          </button>
+          <button 
+            v-if="canDelete" 
+            @click="deleteWish" 
+            class="action-btn delete-btn"
+          >
+            🗑️ 删除
+          </button>
         </div>
 
         <div class="comments-section">
@@ -67,11 +81,44 @@
     <div v-else class="loading">
       <p>加载中...</p>
     </div>
+
+    <!-- 编辑愿望对话框 -->
+    <div v-if="showEditDialog" class="modal-overlay" @click="closeEditDialog">
+      <div class="modal-content" @click.stop>
+        <h3>编辑愿望</h3>
+        <form @submit.prevent="saveEdit">
+          <div class="form-group">
+            <label>愿望名称：</label>
+            <input v-model="editingWish.title" required class="form-input" />
+          </div>
+          <div class="form-group">
+            <label>需求描述：</label>
+            <textarea v-model="editingWish.description" required rows="4" class="form-textarea"></textarea>
+          </div>
+          <div class="form-group">
+            <label>职业：</label>
+            <select v-model="editingWish.job" required class="form-select">
+              <option value="开发">开发</option>
+              <option value="设计">设计</option>
+              <option value="行政">行政</option>
+              <option value="产品">产品</option>
+              <option value="运营">运营</option>
+              <option value="其他">其他</option>
+            </select>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">保存</button>
+            <button type="button" @click="closeEditDialog" class="btn btn-secondary">取消</button>
+          </div>
+        </form>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
-import { getWishById, likeWish as likeWishService, addComment as addCommentService } from '../services/wishService'
+import { getWishById, likeWish as likeWishService, addComment as addCommentService, updateWish, deleteWish as deleteWishService } from '../services/wishService'
+import { canEditWish, canDeleteWish } from '../services/authService'
 
 export default {
   name: 'WishDetail',
@@ -79,7 +126,17 @@ export default {
     return {
       wish: null,
       newComment: '',
-      isFavorited: false
+      isFavorited: false,
+      showEditDialog: false,
+      editingWish: null
+    }
+  },
+  computed: {
+    canEdit() {
+      return this.wish && canEditWish(this.wish)
+    },
+    canDelete() {
+      return this.wish && canDeleteWish(this.wish)
     }
   },
   mounted() {
@@ -156,6 +213,39 @@ export default {
         '行政': 'job-admin'
       }
       return classes[job] || ''
+    },
+    editWish() {
+      if (this.wish) {
+        this.editingWish = { ...this.wish }
+        this.showEditDialog = true
+      }
+    },
+    closeEditDialog() {
+      this.showEditDialog = false
+      this.editingWish = null
+    },
+    saveEdit() {
+      if (this.editingWish) {
+        const updated = updateWish(this.editingWish.id, {
+          title: this.editingWish.title,
+          description: this.editingWish.description,
+          job: this.editingWish.job
+        })
+        if (updated) {
+          this.wish = updated
+          this.closeEditDialog()
+          alert('愿望更新成功！')
+        }
+      }
+    },
+    deleteWish() {
+      if (confirm('确定要删除这个愿望吗？此操作不可恢复！')) {
+        const success = deleteWishService(this.wish.id)
+        if (success) {
+          alert('愿望已删除')
+          this.$router.push('/')
+        }
+      }
     }
   }
 }
@@ -384,5 +474,113 @@ export default {
   text-align: center;
   padding: 4rem;
   color: #999;
+}
+
+.edit-btn {
+  background-color: #3498db;
+  color: white;
+  border-color: #3498db;
+}
+
+.edit-btn:hover {
+  background-color: #2980b9;
+  border-color: #2980b9;
+}
+
+.delete-btn {
+  background-color: #e74c3c;
+  color: white;
+  border-color: #e74c3c;
+}
+
+.delete-btn:hover {
+  background-color: #c0392b;
+  border-color: #c0392b;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  max-width: 600px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-content h3 {
+  margin-bottom: 1.5rem;
+  color: #2c3e50;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #555;
+}
+
+.form-input,
+.form-textarea,
+.form-select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-family: inherit;
+}
+
+.form-textarea {
+  resize: vertical;
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.btn-primary {
+  background-color: #2c3e50;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background-color: #34495e;
+}
+
+.btn-secondary {
+  background-color: #ecf0f1;
+  color: #2c3e50;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-secondary:hover {
+  background-color: #bdc3c7;
 }
 </style>
