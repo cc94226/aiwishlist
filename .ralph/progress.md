@@ -1062,8 +1062,49 @@ Phase 5任务项中，T030、T032、T033已完成。愿望创建服务的业务�
 **当前状态：**
 Phase 5任务项中，T030、T032、T033已完成。愿望提交功能的后端实现已完成，包括服务层、API层和测试用例。
 
+**已完成的工作（续）：**
+
+- ✅ T037: 定义互动数据模型（backend/src/models/Interaction.ts）
+  - 创建CommentModel类，提供评论的CRUD操作（创建、查询、更新、删除）
+  - 创建LikeModel类，提供点赞的创建、删除、查询操作
+  - 创建FavoriteModel类，提供收藏的创建、删除、查询操作
+  - 实现权限控制：用户只能编辑/删除自己的评论
+  - 实现防重复点赞/收藏机制（唯一约束）
+  - 包含完整的类型定义和错误处理
+
+- ✅ T039: 实现互动服务（backend/src/services/InteractionService.ts）
+  - 更新InteractionService类，使用新的数据模型（CommentModel、LikeModel、FavoriteModel）
+  - 实现点赞/取消点赞功能（likeWish、unlikeWish）
+  - 实现收藏/取消收藏功能（favoriteWish、unfavoriteWish）
+  - 实现评论的创建、更新、删除功能（createComment、updateComment、deleteComment）
+  - 实现获取评论列表功能（getComments）
+  - 实现获取用户收藏列表功能（getFavorites）
+  - 实现获取互动统计信息功能（getInteractionStats）
+  - 包含完整的权限控制和错误处理
+
+- ✅ T040: 实现互动相关路由和控制器（backend/src/controllers/InteractionController.ts）
+  - 创建InteractionController控制器类，处理所有互动相关的HTTP请求
+  - 实现点赞相关接口：POST /api/interactions/likes、DELETE /api/interactions/likes、GET /api/interactions/likes/status
+  - 实现收藏相关接口：POST /api/interactions/favorites、DELETE /api/interactions/favorites、GET /api/interactions/favorites/status、GET /api/interactions/favorites
+  - 实现评论相关接口：POST /api/interactions/comments、PUT /api/interactions/comments/:id、DELETE /api/interactions/comments/:id、GET /api/interactions/comments
+  - 实现统计信息接口：GET /api/interactions/stats/:wishId
+  - 创建interaction.ts路由文件，配置所有互动路由（使用authenticate和optionalAuth中间件）
+  - 所有接口都包含完整的错误处理和统一的响应格式
+
+- ✅ T036: 为互动功能编写测试用例（backend/tests/interaction.spec.ts）
+  - 创建完整的互动功能测试文件
+  - 测试点赞功能：成功点赞、拒绝未登录、拒绝重复点赞、取消点赞、检查点赞状态
+  - 测试收藏功能：成功收藏、拒绝未登录、拒绝重复收藏、取消收藏、获取收藏列表
+  - 测试评论功能：创建评论、更新评论、删除评论、获取评论列表、权限控制（只能编辑/删除自己的评论）
+  - 测试统计信息功能：获取互动统计信息（点赞数、收藏数、评论数、用户状态）
+  - 包含数据库连接检查和测试数据清理
+  - 修复所有TypeScript类型错误
+
+**当前状态：**
+Phase 6任务项中，T036、T037、T039、T040已完成。互动功能（点赞、收藏、评论）的后端实现已完成，包括数据模型、服务层、API层和测试用例。
+
 **下一步：**
-继续处理下一个未完成的任务项。Phase 6（互动功能）可以开始实现。
+继续处理下一个未完成的任务项。
 
 ### 2026-01-28 16:28:28
 
