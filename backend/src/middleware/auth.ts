@@ -46,7 +46,7 @@ export const authenticate = (
       email: decoded.email,
       role: decoded.role,
       name: decoded.name,
-      job: decoded.job
+      job: decoded.job || undefined
     }
 
     next()

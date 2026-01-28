@@ -19,12 +19,12 @@ app.use(express.urlencoded({ extended: true }))
 app.use(requestLogger)
 
 // 健康检查路由
-app.get('/health', (req: Request, res: Response) => {
+app.get('/health', (_req: Request, res: Response) => {
   res.json({ status: 'ok', message: '后端服务运行正常' })
 })
 
 // 数据库连接测试路由
-app.get('/health/db', async (req: Request, res: Response) => {
+app.get('/health/db', async (_req: Request, res: Response) => {
   const isConnected = await testConnection()
   res.json({
     status: isConnected ? 'ok' : 'error',
@@ -34,7 +34,7 @@ app.get('/health/db', async (req: Request, res: Response) => {
 })
 
 // API路由占位符
-app.get('/api', (req: Request, res: Response) => {
+app.get('/api', (_req: Request, res: Response) => {
   res.json({ message: 'AI工具需求愿望收集平台 API' })
 })
 

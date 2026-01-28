@@ -23,9 +23,9 @@ export class AppError extends Error {
  */
 export const errorHandler = (
   err: Error | AppError,
-  req: Request,
+  _req: Request,
   res: Response,
-  next: NextFunction
+  _next: NextFunction
 ): void => {
   // 如果是自定义错误（AppError），使用其状态码和消息
   if (err instanceof AppError) {
@@ -95,7 +95,7 @@ export const errorHandler = (
 export const notFoundHandler = (
   req: Request,
   res: Response,
-  next: NextFunction
+  _next: NextFunction
 ): void => {
   res.status(404).json({
     success: false,
