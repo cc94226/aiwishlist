@@ -19,7 +19,7 @@ export interface CacheConfig {
     port: number
     password?: string
     db?: number
-  }
+  } | null
 }
 
 /**
@@ -46,13 +46,17 @@ export type CacheKeyGenerator = (...args: any[]) => string
 export class CacheService {
   private memoryCache: Map<string, CacheItem<any>>
   private redisClient: any = null
-  private config: Required<CacheConfig>
+  private config: {
+    defaultTTL: number
+    enabled: boolean
+    redis: { host: string; port: number; password?: string; db?: number } | null
+  }
 
   constructor(config: CacheConfig = {}) {
     this.config = {
       defaultTTL: config.defaultTTL || 300, // 默认5分钟
       enabled: config.enabled !== false, // 默认启用
-      redis: config.redis || { host: 'localhost', port: 6379 }
+      redis: config.redis || null
     }
 
     // 初始化内存缓存
@@ -73,7 +77,16 @@ export class CacheService {
   private async initRedis() {
     try {
       // 动态导入redis模块（如果安装了）
-      const redis = await import('redis')
+      // 动态导入redis（如果安装了redis包）
+      // 使用try-catch处理redis模块不存在的情况
+      let redis: any = null
+      try {
+        // @ts-ignore - redis包是可选的
+        redis = await import('redis')
+      } catch {
+        // redis包未安装，使用内存缓存
+        redis = null
+      }
       this.redisClient = redis.createClient({
         socket: {
           host: this.config.redis!.host,
