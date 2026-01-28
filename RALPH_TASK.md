@@ -49,7 +49,7 @@ task: Build a Web page app in Vue
 - [x] T018 [UI] 创建注册页面组件 `src/views/Register.vue` (Vue项目已实现)
 - [x] T019 [UI] 创建用户状态管理 hooks `src/composables/useAuth.js` (Vue项目已实现)
 - [x] T017.1 [UI] 创建ProtectedRoute路由保护组件 `src/router/guards.js` (Vue项目已实现路由守卫)
-- [ ] T017.2 [UI] 创建Dashboard用户仪表板页面 `frontend/src/pages/Dashboard/index.tsx`
+- [x] T017.2 [UI] 创建Dashboard用户仪表板页面 `src/views/Dashboard.vue` (Vue项目已实现)
 - [x] T017.3 [集成] 升级App.vue集成完整认证系统 `src/App.vue` (Vue项目已实现)
 - [ ] T017.4 [测试] 创建前端认证系统完整测试套件 `frontend/src/**/__tests__/*.test.tsx`
 
