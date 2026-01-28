@@ -106,6 +106,7 @@ task: Build a Web page app in Vue
 - [x] T056 [配置] 实现前端路由权限控制 `src/components/ProtectedRoute/index.vue` (已完成：创建ProtectedRoute组件，支持登录权限、管理员权限、角色权限、岗位权限控制)
 - [x] T057 [配置] 实现数据库备份和恢复脚本 `database/scripts/backup.sh` (已完成：创建backup.sh脚本，支持数据库备份、恢复、压缩、清理旧备份、列出备份文件等功能)
 - [x] T058 [配置] 创建 Docker 配置和部署脚本 `docker-compose.yml` (已完成：创建Dockerfile、docker-compose.yml、nginx.conf、deploy.sh，支持前端、后端、MySQL、Redis服务的容器化部署)
+- [ ] T059 [文档] 创建一个“howtorun.md”文件，指导人类如何运行程序并使用功能
 
 ## Requirements
 
