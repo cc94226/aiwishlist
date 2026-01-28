@@ -674,11 +674,48 @@ Phase 2任务项中，T009已完成。Phase 3任务项中，T013已完成。
   - 添加密码长度验证（至少6位）
   - 安装bcrypt和@types/bcrypt依赖
 
+**已完成的工作（续）：**
+
+- ✅ T015: 完善用户认证服务JWT功能（backend/src/services/AuthService.ts）
+  - 实现JWT token生成功能（generateToken）- 使用jsonwebtoken库生成token
+  - 实现JWT token验证功能（verifyToken）- 验证token有效性并解析用户信息
+  - 更新login方法返回JWT token
+  - 更新认证中间件（auth.ts）使用JWT验证：
+    - authenticate中间件：验证JWT token并解析用户信息
+    - optionalAuth中间件：可选认证，支持已登录和未登录用户
+  - 安装jsonwebtoken和@types/jsonwebtoken依赖
+  - 修复所有TypeScript类型错误
+  - 支持从环境变量读取JWT_SECRET和JWT_EXPIRES_IN配置
+
 **当前状态：**
-Phase 3任务项中，T013、T015已完成。用户数据模型和认证服务已完整实现。
+Phase 3任务项中，T013、T015已完成。用户数据模型和认证服务已完整实现，包括JWT认证功能。
+
+**已完成的工作（续）：**
+
+- ✅ T016: 实现认证相关路由和控制器
+  - 创建AuthController类（backend/src/controllers/AuthController.ts）
+    - 实现login方法 - 处理用户登录请求
+    - 实现register方法 - 处理用户注册请求
+    - 实现getCurrentUser方法 - 获取当前用户信息（需要认证）
+    - 实现updateProfile方法 - 更新用户信息（需要认证）
+    - 实现changePassword方法 - 修改密码（需要认证）
+    - 实现logout方法 - 用户登出（需要认证）
+  - 创建auth路由（backend/src/routes/auth.ts）
+    - POST /api/auth/login - 用户登录
+    - POST /api/auth/register - 用户注册
+    - GET /api/auth/me - 获取当前用户信息（需要认证）
+    - PUT /api/auth/profile - 更新用户信息（需要认证）
+    - PUT /api/auth/password - 修改密码（需要认证）
+    - POST /api/auth/logout - 用户登出（需要认证）
+  - 在index.ts中注册认证路由（/api/auth）
+  - 使用authenticate中间件保护需要认证的路由
+  - 统一错误处理，使用next(error)传递错误
+
+**当前状态：**
+Phase 3任务项中，T013、T015、T016已完成。用户认证系统的数据模型、服务层和API层已完整实现。
 
 **下一步：**
-继续处理下一个未完成的任务T016：实现认证相关路由和控制器。
+继续处理下一个未完成的任务。T012（测试）需要先有完整的API实现，现在可以开始编写测试用例。
 
 ### 2026-01-28 16:14:16
 

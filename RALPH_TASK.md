@@ -44,7 +44,7 @@ task: Build a Web page app in Vue
 - [x] T013 [数据模型] 定义用户相关数据模型 `backend/src/models/User.ts`
 - [x] T014 [数据模型] 定义认证相关 DTO 类型 `shared/types/auth.js`
 - [x] T015 [业务逻辑] 实现用户服务 (注册、登录、信息管理) `backend/src/services/AuthService.ts`
-- [ ] T016 [API] 实现认证相关路由和控制器 `backend/src/controllers/AuthController.ts`
+- [x] T016 [API] 实现认证相关路由和控制器 `backend/src/controllers/AuthController.ts`
 - [x] T017 [UI] 创建登录页面组件 `src/views/Login.vue` (Vue项目已实现)
 - [x] T018 [UI] 创建注册页面组件 `src/views/Register.vue` (Vue项目已实现)
 - [x] T019 [UI] 创建用户状态管理 hooks `src/composables/useAuth.js` (Vue项目已实现)
