@@ -77,11 +77,11 @@ task: Build a Web page app in Vue
 
 ### Phase 6: User Story - 互动功能 (点赞、收藏、评论)
 
-- [ ] T036 [测试] [P] 为互动功能编写测试 `backend/tests/interaction.spec.ts`
-- [ ] T037 [数据模型] 定义互动数据模型 `backend/src/models/Interaction.ts`
+- [x] T036 [测试] [P] 为互动功能编写测试 `backend/tests/interaction.spec.ts`
+- [x] T037 [数据模型] 定义互动数据模型 `backend/src/models/Interaction.ts`
 - [x] T038 [数据模型] 定义互动相关 DTO 类型 `shared/types/interaction.js`
-- [ ] T039 [业务逻辑] 实现互动服务 (点赞、收藏、评论) `backend/src/services/InteractionService.ts`
-- [ ] T040 [API] 实现互动相关路由和控制器 `backend/src/controllers/InteractionController.ts`
+- [x] T039 [业务逻辑] 实现互动服务 (点赞、收藏、评论) `backend/src/services/InteractionService.ts`
+- [x] T040 [API] 实现互动相关路由和控制器 `backend/src/controllers/InteractionController.ts`
 - [x] T041 [UI] 创建点赞组件 `src/views/WishDetail.vue` (Vue项目中已实现点赞功能)
 - [x] T042 [UI] 创建收藏组件 `src/views/WishDetail.vue` (Vue项目中已实现收藏功能)
 - [x] T043 [UI] 创建评论组件 `src/views/WishDetail.vue` (Vue项目中已实现评论功能)
