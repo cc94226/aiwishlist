@@ -3,8 +3,8 @@
 # DO NOT EDIT - regenerated on task file change
 
 source_file: RALPH_TASK.md
-source_mtime: 1769588576
-generated_at: 2026-01-28T08:27:52Z
+source_mtime: 1769588906
+generated_at: 2026-01-28T08:28:28Z
 
 tasks:
   - id: "line_26"
@@ -198,7 +198,7 @@ tasks:
     raw_marker: -
   - id: "line_62"
     line_number: 62
-    status: pending
+    status: completed
     parallel_group: 999999
     description: T024 [业务逻辑] 实现岗位分类服务 `backend/src/services/CategoryService.ts`
     indent_level: 0
@@ -254,7 +254,7 @@ tasks:
     raw_marker: -
   - id: "line_73"
     line_number: 73
-    status: pending
+    status: completed
     parallel_group: 999999
     description: T032 [业务逻辑] 实现愿望创建服务 `backend/src/services/WishCreateService.ts`
     indent_level: 0
