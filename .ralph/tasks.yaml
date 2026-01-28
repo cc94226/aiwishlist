@@ -3,8 +3,8 @@
 # DO NOT EDIT - regenerated on task file change
 
 source_file: RALPH_TASK.md
-source_mtime: 1769588961
-generated_at: 2026-01-28T08:29:37Z
+source_mtime: 1769589099
+generated_at: 2026-01-28T08:31:43Z
 
 tasks:
   - id: "line_26"
@@ -282,14 +282,14 @@ tasks:
     raw_marker: -
   - id: "line_80"
     line_number: 80
-    status: pending
+    status: completed
     parallel_group: 999999
     description: T036 [测试] [P] 为互动功能编写测试 `backend/tests/interaction.spec.ts`
     indent_level: 0
     raw_marker: -
   - id: "line_81"
     line_number: 81
-    status: pending
+    status: completed
     parallel_group: 999999
     description: T037 [数据模型] 定义互动数据模型 `backend/src/models/Interaction.ts`
     indent_level: 0
@@ -303,14 +303,14 @@ tasks:
     raw_marker: -
   - id: "line_83"
     line_number: 83
-    status: pending
+    status: completed
     parallel_group: 999999
     description: T039 [业务逻辑] 实现互动服务 (点赞、收藏、评论) `backend/src/services/InteractionService.ts`
     indent_level: 0
     raw_marker: -
   - id: "line_84"
     line_number: 84
-    status: pending
+    status: completed
     parallel_group: 999999
     description: T040 [API] 实现互动相关路由和控制器 `backend/src/controllers/InteractionController.ts`
     indent_level: 0
