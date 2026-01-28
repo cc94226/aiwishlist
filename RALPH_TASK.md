@@ -31,7 +31,7 @@ task: Build a Web page app in Vue
 
 ### Phase 2: Foundational (基础设施)
 
-- [ ] T006 [数据模型] 定义核心数据类型和接口 `shared/types/index.ts`
+- [x] T006 [数据模型] 定义核心数据类型和接口 `shared/types/index.js`
 - [ ] T007 [数据模型] 设计数据库表结构 (MySQL) `database/migrations/001_create_tables.sql`
 - [ ] T008 [配置] 配置数据库连接和基础配置 `backend/src/config/database.ts`
 - [ ] T009 [配置] 实现基础中间件 (认证、错误处理、日志) `backend/src/middleware/`
