@@ -89,8 +89,8 @@ task: Build a Web page app in Vue
 ### Phase 7: User Story - 个人中心
 
 - [ ] T044 [测试] [P] 为个人中心功能编写测试 `backend/tests/profile.spec.ts`
-- [ ] T045 [数据模型] 扩展用户模型 (个人资料、愿望统计) `backend/src/models/UserProfile.ts`
-- [ ] T046 [业务逻辑] 实现个人资料服务 `backend/src/services/ProfileService.ts`
+- [x] T045 [数据模型] 扩展用户模型 (个人资料、愿望统计) `backend/src/models/UserProfile.ts`
+- [x] T046 [业务逻辑] 实现个人资料服务 `backend/src/services/ProfileService.ts`
 - [x] T047 [API] 实现个人中心路由 `backend/src/controllers/ProfileController.ts`
 - [x] T048 [UI] 创建个人中心页面 `src/views/UserProfile.vue` (Vue项目中已实现个人中心页面)
 - [ ] T049 [UI] 创建我的愿望组件 `frontend/src/components/MyWishes/index.tsx`
