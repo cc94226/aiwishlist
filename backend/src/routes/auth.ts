@@ -2,45 +2,25 @@ import { Router } from 'express'
 import { AuthController } from '../controllers/AuthController'
 import { authenticate } from '../middleware/auth'
 
-/**
- * 认证路由
- */
-const authRouter = Router()
+const router = Router()
 
 /**
- * POST /api/auth/login
- * 用户登录
+ * 认证相关路由
  */
-authRouter.post('/login', AuthController.login)
 
-/**
- * POST /api/auth/register
- * 用户注册
- */
-authRouter.post('/register', AuthController.register)
+// 用户注册（不需要认证）
+router.post('/register', AuthController.register)
 
-/**
- * GET /api/auth/me
- * 获取当前用户信息（需要认证）
- */
-authRouter.get('/me', authenticate, AuthController.getCurrentUser)
+// 用户登录（不需要认证）
+router.post('/login', AuthController.login)
 
-/**
- * PUT /api/auth/profile
- * 更新用户信息（需要认证）
- */
-authRouter.put('/profile', authenticate, AuthController.updateProfile)
+// 获取当前用户信息（需要认证）
+router.get('/me', authenticate, AuthController.getCurrentUser)
 
-/**
- * PUT /api/auth/password
- * 修改密码（需要认证）
- */
-authRouter.put('/password', authenticate, AuthController.changePassword)
+// 更新用户信息（需要认证）
+router.put('/profile', authenticate, AuthController.updateProfile)
 
-/**
- * POST /api/auth/logout
- * 用户登出（需要认证）
- */
-authRouter.post('/logout', authenticate, AuthController.logout)
+// 修改密码（需要认证）
+router.put('/password', authenticate, AuthController.changePassword)
 
-export default authRouter
+export default router
