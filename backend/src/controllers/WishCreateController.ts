@@ -11,7 +11,7 @@ import { WishStatus } from '../models/Wish'
 export class WishCreateController {
   /**
    * 创建新愿望
-   * POST /api/wishes/create
+   * POST /api/wishes
    * 需要认证
    */
   static async createWish(req: Request, res: Response): Promise<void> {
@@ -74,7 +74,7 @@ export class WishCreateController {
 
   /**
    * 更新愿望信息
-   * PUT /api/wishes/create/:id
+   * PUT /api/wishes/:id
    * 需要认证
    */
   static async updateWish(req: Request, res: Response): Promise<void> {
@@ -138,7 +138,7 @@ export class WishCreateController {
 
   /**
    * 删除愿望
-   * DELETE /api/wishes/create/:id
+   * DELETE /api/wishes/:id
    * 需要认证
    */
   static async deleteWish(req: Request, res: Response): Promise<void> {
@@ -184,6 +184,135 @@ export class WishCreateController {
           success: false,
           error: {
             message: '删除愿望失败',
+            code: 'INTERNAL_ERROR'
+          }
+        })
+      }
+    }
+  }
+
+  /**
+   * 发布愿望（将草稿状态改为已发布）
+   * POST /api/wishes/:id/publish
+   * 需要认证
+   */
+  static async publishWish(req: Request, res: Response): Promise<void> {
+    try {
+      const { id } = req.params
+
+      // 从认证中间件获取用户信息
+      const userId = req.user?.id
+      const isAdmin = req.user?.role === 'admin'
+
+      if (!userId) {
+        res.status(401).json({
+          success: false,
+          error: {
+            message: '请先登录',
+            code: 'UNAUTHORIZED'
+          }
+        })
+        return
+      }
+
+      const wish = await WishCreateService.updateWish({
+        id,
+        status: 'published',
+        userId,
+        isAdmin
+      })
+
+      res.status(200).json({
+        success: true,
+        data: {
+          wish
+        },
+        message: '愿望发布成功'
+      })
+    } catch (error) {
+      if (error instanceof AppError) {
+        res.status(error.statusCode).json({
+          success: false,
+          error: {
+            message: error.message,
+            code: error.code || 'PUBLISH_WISH_FAILED'
+          }
+        })
+      } else {
+        res.status(500).json({
+          success: false,
+          error: {
+            message: '发布愿望失败',
+            code: 'INTERNAL_ERROR'
+          }
+        })
+      }
+    }
+  }
+
+  /**
+   * 下架愿望（将已发布状态改为已归档）
+   * POST /api/wishes/:id/archive
+   * 需要认证（仅管理员）
+   */
+  static async archiveWish(req: Request, res: Response): Promise<void> {
+    try {
+      const { id } = req.params
+
+      // 从认证中间件获取用户信息
+      const userId = req.user?.id
+      const isAdmin = req.user?.role === 'admin'
+
+      if (!userId) {
+        res.status(401).json({
+          success: false,
+          error: {
+            message: '请先登录',
+            code: 'UNAUTHORIZED'
+          }
+        })
+        return
+      }
+
+      if (!isAdmin) {
+        res.status(403).json({
+          success: false,
+          error: {
+            message: '只有管理员可以下架愿望',
+            code: 'FORBIDDEN'
+          }
+        })
+        return
+      }
+
+      const wish = await WishCreateService.updateWish({
+        id,
+        status: 'archived',
+        userId,
+        isAdmin
+      })
+
+      res.status(200).json({
+        success: true,
+        data: {
+          wish
+        },
+        message: '愿望下架成功'
+      })
+    } catch (error) {
+      if (error instanceof AppError) {
+        res.status(error.statusCode).json({
+          success: false,
+          error: {
+            message: error.message,
+            code: error.code || 'ARCHIVE_WISH_FAILED'
+          }
+        })
+      } else {
+        res.status(500).json({
+          success: false,
+          error: {
+            message: '下架愿望失败',
             code: 'INTERNAL_ERROR'
           }
         })
