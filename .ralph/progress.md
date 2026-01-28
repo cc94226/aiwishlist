@@ -934,6 +934,22 @@ Phase 4任务项中，T020、T021、T023、T025已完成。愿望查询系统的
 **当前状态：**
 Phase 4任务项中，T024已完成。岗位分类服务已完整实现，提供了岗位列表和统计信息查询功能。
 
+**已完成的工作（续）：**
+
+- ✅ T033: 实现愿望提交相关路由和控制器（backend/src/controllers/WishCreateController.ts）
+  - 创建WishCreateController控制器类，处理愿望创建、更新、删除相关的HTTP请求
+  - 实现createWish方法 - POST /api/wishes（创建新愿望）
+  - 实现updateWish方法 - PUT /api/wishes/:id（更新愿望信息）
+  - 实现deleteWish方法 - DELETE /api/wishes/:id（删除愿望）
+  - 实现publishWish方法 - POST /api/wishes/:id/publish（发布愿望）
+  - 实现archiveWish方法 - POST /api/wishes/:id/archive（下架愿望）
+  - 更新wish.ts路由文件，添加创建、更新、删除路由（使用authenticate中间件）
+  - 所有路由都包含完整的错误处理和统一的响应格式
+  - 验证TypeScript类型正确，无语法错误
+
+**当前状态：**
+Phase 5任务项中，T032、T033已完成。愿望创建服务的业务逻辑层和API层已完整实现，包括创建、更新、删除、发布、下架等所有功能。
+
 **下一步：**
 继续处理下一个未完成的任务项。
 
