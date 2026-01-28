@@ -3,7 +3,7 @@
  * 提供统一的数据缓存策略，支持内存缓存和Redis缓存
  */
 
-import { AppError } from '../middleware/errorHandler'
+// import { AppError } from '../middleware/errorHandler' // 暂时未使用
 
 /**
  * 缓存配置接口
@@ -52,7 +52,7 @@ export class CacheService {
     this.config = {
       defaultTTL: config.defaultTTL || 300, // 默认5分钟
       enabled: config.enabled !== false, // 默认启用
-      redis: config.redis || null
+      redis: config.redis || { host: 'localhost', port: 6379 }
     }
 
     // 初始化内存缓存
@@ -351,7 +351,7 @@ export class CacheService {
    * 缓存装饰器：自动缓存方法结果
    */
   static cache<T>(cacheService: CacheService, keyGenerator: CacheKeyGenerator, ttl: number = 300) {
-    return function (target: any, propertyName: string, descriptor: PropertyDescriptor) {
+    return function (_target: any, _propertyName: string, descriptor: PropertyDescriptor) {
       const method = descriptor.value
 
       descriptor.value = async function (...args: any[]) {
