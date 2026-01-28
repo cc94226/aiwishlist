@@ -3,18 +3,18 @@
     <div class="header">
       <h2>我的愿望</h2>
       <div class="filter-section">
-        <label>状态筛选：</label>
-        <select v-model="statusFilter" @change="filterWishes">
-          <option value="">全部</option>
-          <option value="published">已发布</option>
-          <option value="draft">草稿</option>
-          <option value="archived">已归档</option>
-        </select>
         <label>排序方式：</label>
         <select v-model="sortBy" @change="filterWishes">
-          <option value="newest">最新</option>
-          <option value="oldest">最早</option>
+          <option value="newest">最新提交</option>
+          <option value="oldest">最早提交</option>
           <option value="likes">点赞数最多</option>
+        </select>
+        <label>状态筛选：</label>
+        <select v-model="statusFilter" @change="filterWishes">
+          <option value="all">全部</option>
+          <option value="published">已发布</option>
+          <option value="draft">草稿</option>
+          <option value="unpublished">已下架</option>
         </select>
       </div>
     </div>
@@ -28,14 +28,16 @@
       >
         <div class="wish-header">
           <h3>{{ wish.title }}</h3>
-          <span class="status-badge" :class="getStatusClass(wish.status)">
-            {{ getStatusText(wish.status) }}
-          </span>
+          <div class="wish-badges">
+            <span class="job-badge" :class="getJobClass(wish.job)">{{ wish.job }}</span>
+            <span class="status-badge" :class="getStatusClass(wish.status)">
+              {{ getStatusText(wish.status) }}
+            </span>
+          </div>
         </div>
         <p class="wish-description">{{ wish.description }}</p>
         <div class="wish-footer">
           <div class="wish-meta">
-            <span class="job-badge" :class="getJobClass(wish.job)">{{ wish.job }}</span>
             <span class="date">{{ formatDate(wish.createdAt) }}</span>
           </div>
           <div class="wish-stats">
@@ -45,14 +47,14 @@
         </div>
         <div class="wish-actions">
           <button v-if="canEdit(wish)" class="action-btn edit-btn" @click.stop="editWish(wish.id)">
-            编辑
+            ✏️ 编辑
           </button>
           <button
             v-if="canDelete(wish)"
             class="action-btn delete-btn"
             @click.stop="deleteWish(wish.id)"
           >
-            删除
+            🗑️ 删除
           </button>
         </div>
       </div>
@@ -66,26 +68,16 @@
 </template>
 
 <script>
-import { getUserWishes, deleteWish } from '../services/wishService'
+import { getUserWishes, deleteWish as deleteWishService } from '../services/wishService'
 import { getCurrentUser } from '../services/authService'
 
 export default {
   name: 'MyWishes',
-  props: {
-    userId: {
-      type: String,
-      default: null
-    },
-    limit: {
-      type: Number,
-      default: null
-    }
-  },
   data() {
     return {
       wishes: [],
-      statusFilter: '',
       sortBy: 'newest',
+      statusFilter: 'all',
       currentUser: null
     }
   },
@@ -94,7 +86,7 @@ export default {
       let filtered = [...this.wishes]
 
       // 状态筛选
-      if (this.statusFilter) {
+      if (this.statusFilter !== 'all') {
         filtered = filtered.filter(w => w.status === this.statusFilter)
       }
 
@@ -110,11 +102,6 @@ export default {
         return 0
       })
 
-      // 限制数量
-      if (this.limit) {
-        filtered = filtered.slice(0, this.limit)
-      }
-
       return filtered
     }
   },
@@ -127,13 +114,13 @@ export default {
       this.currentUser = getCurrentUser()
     },
     loadWishes() {
-      const userId = this.userId || this.currentUser?.id || this.currentUser?.name
-      if (!userId) {
+      if (!this.currentUser) {
         return
       }
 
-      const userWishes = getUserWishes(userId)
-      this.wishes = userWishes
+      // 获取用户提交的愿望
+      const userId = this.currentUser.id || this.currentUser.name
+      this.wishes = getUserWishes(userId)
     },
     filterWishes() {
       // 计算属性会自动更新
@@ -142,29 +129,38 @@ export default {
       this.$router.push(`/wish/${id}`)
     },
     editWish(id) {
-      this.$router.push(`/wish/${id}?edit=true`)
+      // 跳转到编辑页面（可以传递编辑模式参数）
+      this.$router.push(`/submit?edit=${id}`)
     },
-    deleteWish(id) {
-      if (confirm('确定要删除这个愿望吗？')) {
-        deleteWish(id)
-        this.loadWishes()
-        this.$emit('wish-deleted', id)
+    deleteWish(wishId) {
+      if (confirm('确定要删除这个愿望吗？此操作不可恢复。')) {
+        const success = deleteWishService(wishId)
+        if (success) {
+          alert('愿望已删除')
+          this.loadWishes()
+        } else {
+          alert('删除失败')
+        }
       }
     },
     canEdit(wish) {
-      if (!this.currentUser) return false
-      // 管理员可以编辑所有愿望，普通用户只能编辑自己的草稿
+      // 普通用户只能编辑自己的草稿，管理员可以编辑所有愿望
+      if (this.currentUser?.role === 'admin') {
+        return true
+      }
       return (
-        this.currentUser.role === 'admin' ||
-        (wish.submitter_id === this.currentUser.id && wish.status === 'draft')
+        wish.status === 'draft' &&
+        (wish.submitterId === this.currentUser?.id || wish.submitter === this.currentUser?.name)
       )
     },
     canDelete(wish) {
-      if (!this.currentUser) return false
-      // 管理员可以删除所有愿望，普通用户只能删除自己的草稿
+      // 普通用户只能删除自己的草稿，管理员可以删除所有愿望
+      if (this.currentUser?.role === 'admin') {
+        return true
+      }
       return (
-        this.currentUser.role === 'admin' ||
-        (wish.submitter_id === this.currentUser.id && wish.status === 'draft')
+        wish.status === 'draft' &&
+        (wish.submitterId === this.currentUser?.id || wish.submitter === this.currentUser?.name)
       )
     },
     formatDate(dateString) {
@@ -175,22 +171,6 @@ export default {
         month: 'long',
         day: 'numeric'
       })
-    },
-    getStatusClass(status) {
-      const classes = {
-        published: 'status-published',
-        draft: 'status-draft',
-        archived: 'status-archived'
-      }
-      return classes[status] || ''
-    },
-    getStatusText(status) {
-      const texts = {
-        published: '已发布',
-        draft: '草稿',
-        archived: '已归档'
-      }
-      return texts[status] || status
     },
     getJobClass(job) {
       const jobClasses = {
@@ -203,6 +183,22 @@ export default {
         其他: 'job-other'
       }
       return jobClasses[job] || 'job-default'
+    },
+    getStatusClass(status) {
+      const statusClasses = {
+        published: 'status-published',
+        draft: 'status-draft',
+        unpublished: 'status-unpublished'
+      }
+      return statusClasses[status] || 'status-default'
+    },
+    getStatusText(status) {
+      const statusTexts = {
+        published: '已发布',
+        draft: '草稿',
+        unpublished: '已下架'
+      }
+      return statusTexts[status] || '未知'
     }
   }
 }
@@ -210,7 +206,9 @@ export default {
 
 <style scoped>
 .my-wishes {
-  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
 }
 
 .header {
@@ -285,50 +283,11 @@ export default {
   flex: 1;
 }
 
-.status-badge {
-  padding: 0.25rem 0.75rem;
-  border-radius: 12px;
-  font-size: 0.875rem;
-  font-weight: 500;
-}
-
-.status-published {
-  background-color: #e8f5e9;
-  color: #2e7d32;
-}
-
-.status-draft {
-  background-color: #fff3e0;
-  color: #e65100;
-}
-
-.status-archived {
-  background-color: #fce4ec;
-  color: #c2185b;
-}
-
-.wish-description {
-  color: #666;
-  margin-bottom: 1rem;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.wish-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-  padding-top: 1rem;
-  border-top: 1px solid #eee;
-}
-
-.wish-meta {
+.wish-badges {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.5rem;
+  align-items: flex-end;
 }
 
 .job-badge {
@@ -371,6 +330,52 @@ export default {
 .job-other {
   background-color: #f5f5f5;
   color: #616161;
+}
+
+.status-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.status-published {
+  background-color: #e8f5e9;
+  color: #388e3c;
+}
+
+.status-draft {
+  background-color: #fff3e0;
+  color: #f57c00;
+}
+
+.status-unpublished {
+  background-color: #ffebee;
+  color: #c62828;
+}
+
+.wish-description {
+  color: #666;
+  margin-bottom: 1rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.wish-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #eee;
+}
+
+.wish-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
 }
 
 .date {
