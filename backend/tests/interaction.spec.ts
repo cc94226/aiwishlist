@@ -49,7 +49,6 @@ describe('互动功能接口测试', () => {
 
   // 测试数据
   let testUserId: string
-  let testUser2Id: string
   let testAdminId: string
   let testUserToken: string
   let testUser2Token: string
@@ -101,8 +100,7 @@ describe('互动功能接口测试', () => {
       testUserId = userResult.user!.id
 
       // 创建测试用户2（普通用户）
-      const user2Result = await AuthService.register(testUser2)
-      testUser2Id = user2Result.user!.id
+      await AuthService.register(testUser2)
 
       // 创建测试管理员
       const adminResult = await AuthService.register(testAdmin)
