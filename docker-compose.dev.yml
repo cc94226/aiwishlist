@@ -1,0 +1,61 @@
+version: '3.8'
+
+# 开发环境Docker Compose配置
+# 使用: docker-compose -f docker-compose.dev.yml up
+
+services:
+  # MySQL数据库服务（开发环境）
+  mysql:
+    image: mysql:8.0
+    container_name: aiwishlist-mysql-dev
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: aiwishlist
+      MYSQL_USER: aiwishlist
+      MYSQL_PASSWORD: rootpassword
+      TZ: Asia/Shanghai
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_dev_data:/var/lib/mysql
+      - ./database/migrations:/docker-entrypoint-initdb.d
+    networks:
+      - aiwishlist-dev-network
+
+  # 后端API服务（开发环境，支持热重载）
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    container_name: aiwishlist-backend-dev
+    restart: unless-stopped
+    environment:
+      NODE_ENV: development
+      PORT: 3001
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: aiwishlist
+      DB_PASSWORD: rootpassword
+      DB_NAME: aiwishlist
+      DB_CONNECTION_LIMIT: 10
+      JWT_SECRET: dev_jwt_secret
+      JWT_EXPIRES_IN: 7d
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./backend/src:/app/src
+      - ./backend/logs:/app/logs
+    depends_on:
+      - mysql
+    networks:
+      - aiwishlist-dev-network
+    command: npm run dev
+
+volumes:
+  mysql_dev_data:
+    driver: local
+
+networks:
+  aiwishlist-dev-network:
+    driver: bridge
