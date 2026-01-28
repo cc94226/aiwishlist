@@ -8,6 +8,7 @@
           <router-link to="/submit">提交愿望</router-link>
           <router-link v-if="currentUser" to="/admin">管理面板</router-link>
           <template v-if="currentUser">
+            <router-link to="/dashboard">仪表板</router-link>
             <router-link to="/profile">用户信息</router-link>
             <span class="user-name">{{ currentUser.name }}</span>
             <button class="btn-logout-nav" @click="handleLogout">退出</button>
