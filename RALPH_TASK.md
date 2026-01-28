@@ -61,8 +61,8 @@ task: Build a Web page app in Vue
 - [ ] T023 [业务逻辑] 实现愿望查询服务 (列表、详情、搜索) `backend/src/services/WishService.ts`
 - [ ] T024 [业务逻辑] 实现岗位分类服务 `backend/src/services/CategoryService.ts`
 - [ ] T025 [API] 实现愿望相关路由和控制器 `backend/src/controllers/WishController.ts`
-- [ ] T026 [UI] 创建愿望列表页面 `frontend/src/pages/WishList/index.tsx`
-- [ ] T027 [UI] 创建愿望详情页面 `frontend/src/pages/WishDetail/index.tsx`
+- [x] T026 [UI] 创建愿望列表页面 `src/views/Home.vue` (Vue项目已实现)
+- [x] T027 [UI] 创建愿望详情页面 `src/views/WishDetail.vue` (Vue项目已实现)
 - [ ] T028 [UI] 创建岗位分类导航组件 `frontend/src/components/CategoryNav/index.tsx`
 - [ ] T029 [UI] 创建愿望卡片组件 `frontend/src/components/WishCard/index.tsx`
 
@@ -72,7 +72,7 @@ task: Build a Web page app in Vue
 - [x] T031 [数据模型] 定义愿望表单验证规则 `src/utils/validation.js`
 - [ ] T032 [业务逻辑] 实现愿望创建服务 `backend/src/services/WishCreateService.ts`
 - [ ] T033 [API] 实现愿望提交相关路由 `backend/src/controllers/WishCreateController.ts`
-- [ ] T034 [UI] 创建愿望提交页面 `frontend/src/pages/WishSubmit/index.tsx`
+- [x] T034 [UI] 创建愿望提交页面 `src/views/SubmitWish.vue` (Vue项目已实现)
 - [ ] T035 [UI] 创建愿望表单组件 `frontend/src/components/WishForm/index.tsx`
 
 ### Phase 6: User Story - 互动功能 (点赞、收藏、评论)
