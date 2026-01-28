@@ -64,7 +64,7 @@ export const authenticate = (
  */
 export const requireAdmin = (
   req: Request,
-  res: Response,
+  _res: Response,
   next: NextFunction
 ): void => {
   // 先检查是否已认证
@@ -86,7 +86,7 @@ export const requireAdmin = (
  */
 export const optionalAuth = (
   req: Request,
-  res: Response,
+  _res: Response,
   next: NextFunction
 ): void => {
   const authHeader = req.headers.authorization
@@ -108,7 +108,7 @@ export const optionalAuth = (
       email: decoded.email,
       role: decoded.role,
       name: decoded.name,
-      job: decoded.job
+      job: decoded.job || undefined
     }
   } catch (error) {
     // token无效，但不抛出错误，继续执行（不设置user）
