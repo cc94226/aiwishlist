@@ -1088,3 +1088,33 @@ Phase 5任务项中，T030、T032、T033已完成。愿望提交功能的后端�
 ### 2026-01-28 16:29:39
 
 **Session 5 started** (model: composer-1)
+
+### 2026-01-28 (当前会话 - Session 5 - Iteration 3)
+
+**已完成的工作：**
+
+- ✅ 完善WishCreateService添加publishWish和archiveWish方法
+  - 在WishCreateService中添加publishWish方法 - 发布愿望（将草稿状态改为已发布）
+  - 在WishCreateService中添加archiveWish方法 - 下架愿望（将已发布状态改为已归档）
+  - 实现完整的权限控制：普通用户只能发布自己的草稿，管理员可以发布任何愿望
+  - 实现完整的权限控制：只有管理员可以下架愿望
+  - 修复archiveWish方法签名，移除不必要的userId参数
+  - 验证TypeScript类型正确，无语法错误
+
+- ✅ 验证T030和T033任务完成状态
+  - T030（愿望提交接口测试）已在backend/tests/wish-create.spec.ts中完整实现
+  - T033（愿望提交相关路由）已在backend/src/controllers/WishCreateController.ts中完整实现
+  - 所有路由已在backend/src/routes/wish.ts中正确注册
+  - RALPH_TASK.md中T030和T033已标记为完成
+
+**当前状态：**
+Phase 5任务项中，T030、T031、T032、T033、T034、T035均已完成。愿望提交功能的完整实现已完成，包括：
+
+- 数据模型验证规则（T031）
+- 业务逻辑服务层（T032，包括publishWish和archiveWish方法）
+- API控制器和路由（T033）
+- 测试用例（T030）
+- UI组件（T034、T035）
+
+**下一步：**
+继续处理下一个未完成的任务项。Phase 6（互动功能）可以开始实现。
