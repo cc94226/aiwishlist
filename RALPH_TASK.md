@@ -93,8 +93,8 @@ task: Build a Web page app in Vue
 - [x] T046 [业务逻辑] 实现个人资料服务 `backend/src/services/ProfileService.ts`
 - [x] T047 [API] 实现个人中心路由 `backend/src/controllers/ProfileController.ts`
 - [x] T048 [UI] 创建个人中心页面 `src/views/UserProfile.vue` (Vue项目中已实现个人中心页面)
-- [ ] T049 [UI] 创建我的愿望组件 `frontend/src/components/MyWishes/index.tsx`
-- [ ] T050 [UI] 创建收藏夹组件 `frontend/src/components/Favorites/index.tsx`
+- [x] T049 [UI] 创建我的愿望组件 `src/components/MyWishes.vue`
+- [x] T050 [UI] 创建收藏夹组件 `src/components/Favorites.vue`
 
 ### Phase 8: Polish (收尾优化)
 
