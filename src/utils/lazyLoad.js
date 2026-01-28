@@ -4,7 +4,19 @@
  */
 
 /**
- * 创建懒加载组件
+ * 根据组件名称动态加载视图组件
+ * 用于Vue Router的懒加载，实现代码分割
+ * @param {string} viewName - 视图组件名称（不包含.vue扩展名）
+ * @returns {Function} 返回动态导入函数
+ */
+export function loadView(viewName) {
+  // 使用动态import实现代码分割
+  // Vite会自动将这些import转换为单独的chunk
+  return () => import(`../views/${viewName}.vue`)
+}
+
+/**
+ * 创建懒加载组件（使用defineAsyncComponent）
  * @param {Function} importFn - 动态导入函数，返回Promise
  * @returns {Object} Vue组件配置对象
  */
@@ -33,7 +45,7 @@ export function lazyLoad(importFn) {
 export function preloadComponent(importFn) {
   if ('requestIdleCallback' in window) {
     // 使用requestIdleCallback在浏览器空闲时预加载
-    requestIdleCallback(() => {
+    window.requestIdleCallback(() => {
       importFn().catch(() => {
         // 预加载失败不影响正常使用
       })
@@ -55,7 +67,7 @@ export function preloadComponent(importFn) {
 export function preloadComponents(importFns) {
   importFns.forEach((importFn, index) => {
     if ('requestIdleCallback' in window) {
-      requestIdleCallback(
+      window.requestIdleCallback(
         () => {
           importFn().catch(() => {
             // 预加载失败不影响正常使用
