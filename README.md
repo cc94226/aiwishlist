@@ -1,0 +1,1 @@
+AI wishlist init
