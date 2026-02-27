@@ -108,6 +108,7 @@ task: Build a Web page app in Vue
 - [x] T058 [配置] 创建 Docker 配置和部署脚本 `docker-compose.yml` (已完成：创建Dockerfile、docker-compose.yml、nginx.conf、deploy.sh，支持前端、后端、MySQL、Redis服务的容器化部署)
 - [x] T059 [文档] 创建一个“howtorun.md”文件，指导人类如何运行程序并使用功能
 - [x] T060 [文档] 创建一个“databaseinfo.md”文件，输出数据库信息，让我可以在命令行里使用脚本或命令查看后台数据 (已完成：创建databaseinfo.md文档，包含完整的数据库结构说明、常用查询命令，并创建了4个查询脚本：query_stats.sh、query_users.sh、query_wishes.sh、query_interactions.sh)
+- [ ] T)^! [debug] 清
 
 ## Requirements
 
