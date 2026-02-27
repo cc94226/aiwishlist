@@ -1,0 +1,2 @@
+2026-02-27 修复 pre-push ESLint 报错 - 清理后端中间件与模型的未使用变量、前端 Favorites 组件未使用导入，并通过 npm run lint - backend/src/middleware/errorHandler.ts, backend/src/middleware/auth.ts, backend/src/models/User.ts, backend/src/services/AuthService.ts, src/components/Favorites.vue
+2026-02-27 配置 Cloudflare 部署 - 添加 wrangler.jsonc、在 package.json 中新增 deploy 与 preview:cf 脚本并引入 wrangler 作为开发依赖，避免远程部署时重复交互与依赖冲突 - package.json, wrangler.jsonc, proj-context/PROJECT_CONTEXT.md

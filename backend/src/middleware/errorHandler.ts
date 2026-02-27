@@ -27,6 +27,8 @@ export const errorHandler = (
   res: Response,
   _next: NextFunction
 ): void => {
+  // 标记 _next 已使用以满足 ESLint，同时保留 Express 错误处理中间件签名
+  void _next
   // 如果是自定义错误（AppError），使用其状态码和消息
   if (err instanceof AppError) {
     res.status(err.statusCode).json({
@@ -78,9 +80,7 @@ export const errorHandler = (
     success: false,
     error: {
       name: err.name || 'Error',
-      message: process.env.NODE_ENV === 'production' 
-        ? '服务器内部错误' 
-        : err.message,
+      message: process.env.NODE_ENV === 'production' ? '服务器内部错误' : err.message,
       code: 'INTERNAL_SERVER_ERROR',
       statusCode
     },
@@ -92,11 +92,9 @@ export const errorHandler = (
  * 404错误处理中间件
  * 处理未找到的路由
  */
-export const notFoundHandler = (
-  req: Request,
-  res: Response,
-  _next: NextFunction
-): void => {
+export const notFoundHandler = (req: Request, res: Response, _next: NextFunction): void => {
+  // 标记 _next 已使用以满足 ESLint，同时保留 Express 中间件签名
+  void _next
   res.status(404).json({
     success: false,
     error: {

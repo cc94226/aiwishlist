@@ -9,15 +9,7 @@ export type UserRole = 'admin' | 'user'
 /**
  * 岗位类型枚举
  */
-export type JobType =
-  | '开发'
-  | '设计'
-  | '产品'
-  | '运营'
-  | '行政'
-  | '测试'
-  | '人事'
-  | '财务'
+export type JobType = '开发' | '设计' | '产品' | '运营' | '行政' | '测试' | '人事' | '财务'
 
 /**
  * 用户数据模型接口
@@ -102,9 +94,7 @@ export class UserModel {
    * @param email 用户邮箱
    * @returns Promise<UserWithoutPassword | null> 用户信息（不包含密码）
    */
-  static async findByEmailWithoutPassword(
-    email: string
-  ): Promise<UserWithoutPassword | null> {
+  static async findByEmailWithoutPassword(email: string): Promise<UserWithoutPassword | null> {
     const sql =
       'SELECT id, name, email, role, job, created_at, updated_at FROM users WHERE email = ?'
     const results = await query<User[]>(sql, [email])
@@ -160,10 +150,7 @@ export class UserModel {
    * @param userData 要更新的用户数据
    * @returns Promise<UserWithoutPassword> 更新后的用户信息（不包含密码）
    */
-  static async update(
-    id: string,
-    userData: UpdateUserData
-  ): Promise<UserWithoutPassword> {
+  static async update(id: string, userData: UpdateUserData): Promise<UserWithoutPassword> {
     // 检查用户是否存在
     const existingUser = await this.findById(id)
     if (!existingUser) {
@@ -313,10 +300,10 @@ export class UserModel {
    * @param user 用户对象
    * @returns UserWithoutPassword 不包含密码的用户对象
    */
-  private static mapToUserWithoutPassword(
-    user: User
-  ): UserWithoutPassword {
+  private static mapToUserWithoutPassword(user: User): UserWithoutPassword {
     const { password, ...userWithoutPassword } = user
+    // 使用 password 以避免 ESLint 无用变量告警，同时不改变返回结果
+    void password
     return userWithoutPassword as UserWithoutPassword
   }
 

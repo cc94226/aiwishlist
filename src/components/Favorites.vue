@@ -50,7 +50,7 @@
 </template>
 
 <script>
-import { getAllWishes, getWishById } from '../services/wishService'
+import { getAllWishes } from '../services/wishService'
 
 export default {
   name: 'Favorites',

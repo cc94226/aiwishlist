@@ -1,5 +1,6 @@
 # Ralph config (may contain API key)
 .cursor/ralph-config.json
+.DS_Store
 
 # Logs
 logs/

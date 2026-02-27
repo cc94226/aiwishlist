@@ -23,11 +23,7 @@ declare global {
  * 认证中间件
  * 验证用户是否已登录（使用JWT token验证）
  */
-export const authenticate = (
-  req: Request,
-  _res: Response,
-  next: NextFunction
-): void => {
+export const authenticate = (req: Request, _res: Response, next: NextFunction): void => {
   // 从请求头获取token
   const authHeader = req.headers.authorization
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -39,7 +35,7 @@ export const authenticate = (
   try {
     // 验证token并解析用户信息
     const decoded = AuthService.verifyToken(token)
-    
+
     // 将用户信息附加到请求对象
     req.user = {
       id: decoded.id,
@@ -62,11 +58,7 @@ export const authenticate = (
  * 授权中间件
  * 验证用户是否具有管理员权限
  */
-export const requireAdmin = (
-  req: Request,
-  _res: Response,
-  next: NextFunction
-): void => {
+export const requireAdmin = (req: Request, _res: Response, next: NextFunction): void => {
   // 先检查是否已认证
   if (!req.user) {
     throw new AppError('需要登录', 401, 'UNAUTHORIZED')
@@ -84,11 +76,7 @@ export const requireAdmin = (
  * 可选认证中间件
  * 如果提供了token则验证，否则继续（不要求必须登录）
  */
-export const optionalAuth = (
-  req: Request,
-  _res: Response,
-  next: NextFunction
-): void => {
+export const optionalAuth = (req: Request, _res: Response, next: NextFunction): void => {
   const authHeader = req.headers.authorization
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     // 没有token，继续执行（不设置user）
@@ -101,7 +89,7 @@ export const optionalAuth = (
   try {
     // 验证token并解析用户信息
     const decoded = AuthService.verifyToken(token)
-    
+
     // 将用户信息附加到请求对象
     req.user = {
       id: decoded.id,
@@ -111,6 +99,8 @@ export const optionalAuth = (
       job: decoded.job || undefined
     }
   } catch (error) {
+    // 标记 error 已使用以满足 ESLint，同时保持“静默失败”的业务语义
+    void error
     // token无效，但不抛出错误，继续执行（不设置user）
     // 这样可以让接口同时支持已登录和未登录的用户
   }

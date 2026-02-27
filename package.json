@@ -11,7 +11,9 @@
     "test:coverage": "vitest --coverage",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix",
     "format": "prettier --write \"src/**/*.{js,vue,json,css,scss,md}\"",
-    "prepare": "husky"
+    "prepare": "husky",
+    "deploy": "npm run build && wrangler deploy",
+    "preview:cf": "npm run build && wrangler dev"
   },
   "dependencies": {
     "vue": "^3.4.0",
@@ -55,6 +57,7 @@
     "lint-staged": "^16.2.7",
     "prettier": "^3.8.1",
     "vite": "^5.0.0",
-    "vitest": "^4.0.18"
+    "vitest": "^4.0.18",
+    "wrangler": "^4.69.0"
   }
 }

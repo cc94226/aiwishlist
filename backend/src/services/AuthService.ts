@@ -116,7 +116,9 @@ export class AuthService {
     }
 
     // 返回用户信息（不包含密码）
-    const { password: _, ...userWithoutPassword } = user
+    const { password: userPassword, ...userWithoutPassword } = user
+    // 使用 userPassword 以避免 ESLint 无用变量告警，同时不改变返回结果
+    void userPassword
 
     // 生成JWT token
     const token = this.generateToken(userWithoutPassword)
@@ -262,10 +264,7 @@ export class AuthService {
         throw new AppError('用户数据异常', 500, 'INTERNAL_ERROR')
       }
 
-      const isOldPasswordValid = await bcrypt.compare(
-        updateData.oldPassword,
-        user.password
-      )
+      const isOldPasswordValid = await bcrypt.compare(updateData.oldPassword, user.password)
       if (!isOldPasswordValid) {
         throw new AppError('旧密码错误', 401, 'INVALID_CREDENTIALS')
       }
@@ -276,10 +275,7 @@ export class AuthService {
       }
 
       // 加密新密码
-      updateUserData.password = await bcrypt.hash(
-        updateData.password,
-        this.SALT_ROUNDS
-      )
+      updateUserData.password = await bcrypt.hash(updateData.password, this.SALT_ROUNDS)
     }
 
     try {
@@ -331,10 +327,7 @@ export class AuthService {
     }
 
     // 验证旧密码
-    const isOldPasswordValid = await bcrypt.compare(
-      oldPassword,
-      userWithPassword.password
-    )
+    const isOldPasswordValid = await bcrypt.compare(oldPassword, userWithPassword.password)
     if (!isOldPasswordValid) {
       throw new AppError('旧密码错误', 401, 'INVALID_CREDENTIALS')
     }
